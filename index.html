@@ -1,669 +1,142 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Алматы — сейсмооповещение</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<style>
-:root{
-  --bg:#0f1418; --panel:#171e24; --panel2:#1f2830; --line:#2c3843; --text:#e6edf3; --muted:#8b9aa8;
-  --ok:#2ea043; --warn:#d29922; --emerg:#e5484d; --fault:#8957e5; --accent:#3b82f6;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-h1{font-size:18px;margin:0}
-h2{font-size:14px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-a{color:#7ab4ff}
-button,input,select{font:inherit}
-button{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
-button:hover{border-color:var(--accent)}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button.danger{background:var(--emerg);border-color:var(--emerg);color:#fff}
-button.small{padding:4px 8px;font-size:12px}
-input,select{width:100%;background:#0c1115;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
-label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
-
-header{display:flex;align-items:center;gap:16px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-header .sub{color:var(--muted);font-size:12px}
-.status{margin-left:auto;display:flex;align-items:center;gap:10px;padding:8px 16px;border-radius:10px;font-weight:700;font-size:16px;background:var(--ok);color:#fff;transition:background .3s}
-.status .dot{width:12px;height:12px;border-radius:50%;background:#fff}
-body[data-level=WARNING] .status{background:var(--warn)}
-body[data-level=EMERGENCY] .status{background:var(--emerg);animation:pulse 1s infinite}
-body[data-level=FAULT] .status{background:var(--fault)}
-@keyframes pulse{50%{filter:brightness(1.35)}}
-
-.levels{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.lvl{flex:1;min-width:150px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);opacity:.45;font-size:12px}
-.lvl b{display:block;font-size:13px}
-.lvl.on{opacity:1}
-.lvl.NORMAL.on{border-color:var(--ok);background:rgba(46,160,67,.15)}
-.lvl.WARNING.on{border-color:var(--warn);background:rgba(210,153,34,.15)}
-.lvl.EMERGENCY.on{border-color:var(--emerg);background:rgba(229,72,77,.18)}
-.lvl.FAULT.on{border-color:var(--fault);background:rgba(137,87,229,.18)}
-
-main{display:grid;grid-template-columns:360px 1fr;gap:12px;padding:12px 16px}
-@media (max-width:980px){main{grid-template-columns:1fr}}
-.col{display:flex;flex-direction:column;gap:12px;min-width:0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-
-#map{height:460px;border-radius:10px;border:1px solid var(--line)}
-canvas#scope{width:100%;height:150px;background:#05090c;border-radius:8px;border:1px solid var(--line);display:block}
-.meter{height:10px;background:#0c1115;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
-.meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .1s}
-
-.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.chip{padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:#0c1115;font-size:12px}
-.chip b{display:block;font-size:13px}
-.chip.act{border-color:var(--emerg);background:rgba(229,72,77,.15)}
-
-.evac{border-left:4px solid var(--ok)}
-body[data-level=WARNING] .evac{border-left-color:var(--warn)}
-body[data-level=EMERGENCY] .evac{border-left-color:var(--emerg)}
-.evac h3{margin:0 0 6px;font-size:16px}
-.evac ul{margin:6px 0 0;padding-left:18px}
-
-.ap{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
-.ap:first-child{border-top:0}
-.ap .n{width:24px;height:24px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-weight:700;flex:none;font-size:12px}
-.ap .body{flex:1;min-width:0}
-
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{text-align:left;padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--muted);font-weight:600}
-.mag{font-weight:700;padding:1px 6px;border-radius:5px;background:var(--panel2)}
-.mag.m4{background:rgba(210,153,34,.35)} .mag.m5{background:rgba(229,72,77,.45)}
-.tablewrap{max-height:300px;overflow:auto}
-
-.log{max-height:280px;overflow:auto;font-size:12px}
-.log .e{padding:7px 0;border-top:1px solid var(--line)}
-.log .e:first-child{border-top:0}
-.log pre{white-space:pre-wrap;margin:4px 0 0;background:#0c1115;padding:6px;border-radius:6px;font-size:11px}
-.badge{font-size:11px;padding:1px 6px;border-radius:5px;background:var(--panel2);border:1px solid var(--line)}
-.badge.ok{border-color:var(--ok);color:#6fdd8b} .badge.err{border-color:var(--emerg);color:#ff8a8d}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;place-items:center;z-index:2000;padding:16px}
-.modal.show{display:grid}
-.modal .box{background:var(--panel);border:2px solid var(--emerg);border-radius:14px;max-width:480px;width:100%;padding:20px}
-.modal .count{font-size:56px;font-weight:800;color:var(--emerg);text-align:center}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:10px 16px;border-radius:10px;z-index:3000;display:none;max-width:90vw}
-.leaflet-container{background:#1b242c}
-.ico{font-size:20px;line-height:1;text-shadow:0 0 3px #000}
-footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
-</style>
-<link rel="stylesheet" href="./ui.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f8ff">
+  <meta name="description" content="Seismo Almaty — учебный интерфейс мониторинга зарегистрированных землетрясений, карты Алматы и инструкций безопасности.">
+  <title>Seismo Almaty — сейсмический мониторинг</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="./site.css?v=2">
 </head>
-<body data-level="NORMAL">
+<body>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+  <svg aria-hidden="true" class="svg-defs" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 12h3l2.2-5.5 3.3 11L14 3l3.5 14 1.8-5H22" /></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10H3zM9 20v-7h6v7"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-events" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h5"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-4.5 4-7 8-7s7.5 2.5 8 7"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 2 9 4v6c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V6z"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-group" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20v-2a6 6 0 0 1 12 0v2m1-5a4.5 4.5 0 0 1 7 4v1"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5C9 3 5 3 2 5v14c3-2 7-2 10 0 3-2 7-2 10 0V5c-3-2-7-2-10 0zm0 0v14"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v6h-6M4 18v-6h6M5.5 9A8 8 0 0 1 19 6l1 6M4 12l1 6a8 8 0 0 0 13.5-3"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2L12 3zM12 9v5m0 3h.01"/></symbol>
+    <symbol id="i-location" viewBox="0 0 24 24"><path d="m20 4-7 16-3-7-7-3L20 4z"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  </svg>
 
-<header>
-<div class="brand"><div class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="brand-copy"><div class="brand-eyebrow">SEISMO / ALMATY · МОНИТОРИНГ</div><h1>Seismo <span>Almaty</span></h1><div class="sub">Сейсмические события · контроль здания · точки сбора</div></div></div>
-<div class="head-actions"><nav class="top-nav" aria-label="Разделы"><a href="#mapCard">Карта</a><a href="#signalCard">Датчики</a><a href="#systemCard">Система</a><a href="#profileCard">Адрес</a></nav><div class="status" id="statusBox" role="status" aria-live="polite"><span class="dot"></span><span id="statusText">NORMAL</span></div></div>
-<div class="disclaimer"><strong>DEMO MODE</strong> Учебная модель. Не предсказывает землетрясения, не отправляет SOS в экстренные службы и не подтверждает безопасность эвакуационных маршрутов.</div>
-</header>
+  <header class="site-header">
+    <a class="brand" href="#home" data-page="home" aria-label="Seismo Almaty — главная">
+      <span class="brand-icon"><svg class="icon"><use href="#i-wave"></use></svg></span>
+      <span><strong>Seismo Almaty</strong><small>Мониторинг · Алматы</small></span>
+    </a>
+    <nav class="desktop-nav" aria-label="Главная навигация">
+      <button class="nav-link is-active" data-page="home" type="button">Главная</button>
+      <button class="nav-link" data-page="map" type="button">Карта</button>
+      <button class="nav-link" data-page="events" type="button">События</button>
+      <button class="nav-link" data-page="instructions" type="button">Инструкции</button>
+      <button class="nav-link" data-page="profile" type="button">Профиль</button>
+    </nav>
+    <div class="header-actions"><span class="data-pill"><span class="data-dot"></span><span id="headerFeed">Источник загружается</span></span><button class="icon-button profile-shortcut" type="button" data-page="profile" aria-label="Открыть профиль"><svg class="icon"><use href="#i-user"></use></svg></button></div>
+  </header>
 
-<div class="levels" role="group" aria-label="Режимы системы">
-<div class="lvl NORMAL on" data-l="NORMAL"><b><span class="level-indicator"></span>NORMAL</b>Мониторинг</div>
-<div class="lvl WARNING" data-l="WARNING"><b><span class="level-indicator"></span>WARNING</b>Повышенная активность</div>
-<div class="lvl EMERGENCY" data-l="EMERGENCY"><b><span class="level-indicator"></span>EMERGENCY</b>Аварийный режим</div>
-<div class="lvl FAULT" data-l="FAULT"><b><span class="level-indicator"></span>FAULT</b>Ошибка датчика</div>
-</div>
-<nav class="mobile-nav" aria-label="Навигация"><a href="#mapCard">Карта</a><a href="#evacCard">Инструкции</a><a href="#signalCard">Сигнал</a><a href="#profileCard">Адрес</a></nav>
-<main>
-  <!-- LEFT COLUMN -->
-  <div class="col control-rail">
-    <div class="card" id="profileCard">
-      <h2>Местоположение / профиль</h2>
-      <form id="regForm">
-        <label>Имя и фамилия *</label><input id="fName" required placeholder="Айгерим Нурланова">
-        <label>Телефон</label><input id="fPhone" placeholder="+7 7__ ___ __ __">
-        <label>Адрес в Алматы *</label><input id="fAddr" required placeholder="пр. Абая 52">
-        <div class="grid2">
-          <div><label>Этаж *</label><input id="fFloor" type="number" min="0" max="60" required value="1"></div>
-          <div><label>Квартира</label><input id="fApt" placeholder="12"></div>
+  <main id="main">
+    <section id="page-home" class="page is-active" aria-labelledby="homeHeading">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">SEISMO / ALMATY <span>●</span> УЧЕБНЫЙ ПРОЕКТ</div>
+          <h1 id="homeHeading">Сейсмическая безопасность <em>Алматы</em></h1>
+          <p>Отслеживайте зарегистрированные землетрясения, находите ориентиры на карте и изучайте действия при толчках.</p>
+          <div class="hero-actions"><button class="button button-primary" type="button" data-page="map"><svg class="icon"><use href="#i-map"></use></svg> Открыть карту <svg class="icon arrow"><use href="#i-arrow"></use></svg></button><button class="button button-white" type="button" data-page="instructions">Как действовать</button></div>
         </div>
-        <div class="small muted" style="margin-top:8px">Учебный режим: события SOS сохраняются только в этом браузере и не отправляются в МЧС или больницы.</div>
-        <div class="row" style="margin-top:10px">
-          <button class="primary" type="submit">Сохранить</button>
-          <button type="button" id="pickBtn">Выбрать на карте</button>
-        </div>
-        <div id="geoStatus" class="small muted" style="margin-top:6px"></div>
-      </form>
-    </div>
-
-    <div class="card" id="signalCard">
-      <h2>Сигнал / осциллограф</h2>
-      <canvas id="scope" width="600" height="150"></canvas>
-      <div class="row" style="margin-top:8px;justify-content:space-between">
-        <span>Интенсивность: <b id="intVal">0</b>/100</span>
-        <span class="small muted">порог W=<span id="thW"></span> · E=<span id="thE"></span></span>
-      </div>
-      <div class="meter" style="margin-top:4px"><i id="meter"></i></div>
-      <label>Источник сигнала</label>
-      <select id="srcSel">
-        <option value="sim">Симуляция (Flex Sensor)</option>
-        <option value="motion">Акселерометр телефона</option>
-        <option value="serial">Arduino по USB (Web Serial)</option>
-      </select>
-      <div id="simBox">
-        <label>Амплитуда симуляции: <b id="ampVal">5</b></label>
-        <input type="range" id="amp" min="0" max="100" value="5" style="padding:0">
-        <div class="row" style="margin-top:8px">
-          <button class="small" data-amp="5">Низкий сигнал</button>
-          <button class="small" data-amp="42">Средний сигнал</button>
-          <button class="small" data-amp="88">Высокий сигнал</button>
+        <div class="mountain-visual" aria-hidden="true"><div class="sky-disc"></div><svg viewBox="0 0 680 335" preserveAspectRatio="xMidYMax slice"><path fill="#aacbf5" d="M0 268 103 182 145 210 267 57 349 199 442 71 534 204 590 113 680 236v99H0z"/><path fill="#f8fcff" d="m212 119 55-62 49 86-45-19-24 22-18-12ZM407 121l35-50 43 72-39-17-20 15ZM566 148l24-35 33 59-30-18-12 12Z"/><path fill="#83b3e7" d="M0 289 95 227 151 246 230 195 298 253 371 196 464 255 542 212 612 247 680 203v132H0z"/><path fill="#d8eaff" d="M0 299 92 265 170 277 267 248 355 288 434 253 517 287 602 265 680 289v46H0z"/><path fill="#9cbdd8" opacity=".65" d="M0 335v-19h30v-11h15v-12h30v10h17v-22h23v15h20v-27h21v29h20v-12h23v26h18v-34h16v31h25v-17h32v30h20v-27h24v28h40v-19h23v31h18v-34h23v25h26v-32h20v31h50v-21h21v24h32v-17h24v28z"/><path d="M565 95v210m-14 0h28M558 131h14M559 166h12" stroke="#6388aa" stroke-width="4"/><path d="M565 95 574 306h-18z" fill="#6388aa"/><path d="M565 94v-35" stroke="#6388aa" stroke-width="2"/></svg></div>
+        <div class="hero-status surface">
+          <div class="state-symbol"><svg class="icon"><use href="#i-wave"></use></svg></div>
+          <div><span class="small-label">СОСТОЯНИЕ ИСТОЧНИКА</span><strong id="homeFeedTitle">Подключаем данные USGS</strong><small id="homeFeedSubtitle">Информация о событиях, не прогноз опасности</small></div>
         </div>
       </div>
-      <div id="serialBox" class="small muted" style="display:none;margin-top:6px">
-        Arduino отправляет по Serial (9600 бод) одно число в строке: 0–100 или сырое значение 0–1023.
-        <div style="margin-top:6px"><button class="small" id="serialBtn">Подключить Arduino</button></div>
+
+      <div class="home-panels">
+        <article class="surface summary-card">
+          <div class="section-top"><div><span class="eyebrow">ОБЗОР ДАННЫХ</span><h2>Сейсмическая активность</h2></div><span class="source-chip">USGS · 30 дней</span></div>
+          <p class="muted">Зарегистрированные события M ≥ 2.5 в радиусе 500 км от Алматы</p>
+          <div class="stats-grid"><div class="stat"><span>Событий</span><strong id="statCount">—</strong></div><div class="stat"><span>Макс. магнитуда</span><strong id="statMax">—</strong></div><div class="stat"><span>Последнее</span><strong id="statRecent">—</strong></div></div>
+          <div class="caution-inline"><svg class="icon"><use href="#i-info"></use></svg><span>Каталог прошлых событий не определяет безопасность здания и не предсказывает будущие землетрясения.</span></div>
+        </article>
+        <article class="surface map-preview" role="button" tabindex="0" data-page="map" aria-label="Перейти к интерактивной карте Алматы">
+          <div class="section-top"><div><span class="eyebrow">НА КАРТЕ</span><h2>Алматы и окрестности</h2></div><span class="round-arrow"><svg class="icon"><use href="#i-arrow"></use></svg></span></div>
+          <div class="map-preview-art" aria-hidden="true"><div class="preview-grid"></div><span class="preview-city">АЛМАТЫ</span><span class="preview-pin p1"></span><span class="preview-pin p2"></span><span class="preview-pin p3"></span><span class="preview-pin user"></span></div>
+          <p class="muted">События USGS и возможные ориентиры для сбора. Доступна интерактивная карта.</p>
+        </article>
+        <article class="surface latest-card">
+          <div class="section-top"><div><span class="eyebrow">ЛЕНТА</span><h2>Последние события</h2></div><button type="button" class="text-link" data-page="events">Все <svg class="icon"><use href="#i-arrow"></use></svg></button></div>
+          <div id="homeEvents" class="feed-list"><div class="empty-state">Загружаем каталог USGS…</div></div>
+        </article>
       </div>
-    </div>
-
-    <div class="card" id="systemCard">
-      <h2>Управление зданием / симуляция</h2>
-      <div class="chips">
-        <div class="chip" id="cGas"><b>Газ</b><span>подача открыта</span></div>
-        <div class="chip" id="cPower"><b>Электропитание</b><span>включено</span></div>
-        <div class="chip" id="cLift"><b>Лифты</b><span>работают</span></div>
-        <div class="chip" id="cDoors"><b>Аварийные выходы</b><span>закрыты</span></div>
+      <div class="quick-actions" aria-label="Разделы приложения">
+        <button class="quick-action" type="button" data-page="map"><span><svg class="icon"><use href="#i-map"></use></svg></span><strong>Карта</strong><small>Сейсмические события</small></button>
+        <button class="quick-action" type="button" data-page="instructions"><span><svg class="icon"><use href="#i-book"></use></svg></span><strong>Инструкции</strong><small>До, во время и после</small></button>
+        <button class="quick-action" type="button" data-page="map" data-map-layer="assembly"><span><svg class="icon"><use href="#i-group"></use></svg></span><strong>Места сбора</strong><small>Учебные ориентиры</small></button>
+        <a class="quick-action" href="./engineering/"><span><svg class="icon"><use href="#i-wave"></use></svg></span><strong>Engineering</strong><small>Датчики и сценарии</small></a>
       </div>
-      <div class="row" style="margin-top:10px">
-        <button id="ackBtn">Подтвердить (ACK)</button>
-        <button id="resetBtn">Сброс (RESET)</button>
-        <button id="faultBtn">⚠ Симулировать сбой</button>
-        <button id="muteBtn">🔊 Звук вкл.</button>
+    </section>
+
+    <section id="page-map" class="page" aria-labelledby="mapHeading" hidden>
+      <div class="page-heading"><div><span class="eyebrow">СЕЙСМИЧЕСКАЯ КАРТА</span><h1 id="mapHeading">Карта Алматы</h1><p>Зарегистрированные землетрясения и демонстрационные ориентиры</p></div><button type="button" class="button button-secondary" id="locateMe"><svg class="icon"><use href="#i-location"></use></svg> Моё местоположение</button></div>
+      <div class="map-workspace">
+        <aside class="surface map-sidebar">
+          <div class="sidebar-heading"><h2>Слои карты</h2><span class="source-chip">USGS</span></div>
+          <label class="layer-control"><input type="checkbox" id="showQuakes" checked><span class="legend-dot quake"></span><span>Землетрясения<small>Каталог за 30 дней</small></span></label>
+          <label class="layer-control"><input type="checkbox" id="showAssembly" checked><span class="legend-dot assembly"></span><span>Возможные места сбора<small>Неофициальные ориентиры</small></span></label>
+          <div class="map-side-note"><svg class="icon"><use href="#i-info"></use></svg><p>Показанные парки и площади не проверены как безопасные места сбора. Маршруты и доступность нужно уточнять.</p></div>
+          <div class="map-sidebar-footer"><p id="mapDataInfo" class="muted">Получаем сейсмические данные…</p><button class="button button-secondary wide" type="button" id="mapRefresh"><svg class="icon"><use href="#i-refresh"></use></svg> Обновить события</button></div>
+        </aside>
+        <div class="map-canvas-wrap"><div id="map" aria-label="Карта сейсмических событий и ориентиров Алматы" role="region"></div><div class="map-legend-float"><span><i class="legend-dot quake"></i> Событие</span><span><i class="legend-dot assembly"></i> Ориентир</span><span><i class="legend-dot self"></i> Вы</span></div><div id="mapSheet" class="map-sheet" aria-live="polite"><div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на событие или ориентир, чтобы посмотреть сведения.</span></div></div></div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- MAIN WORKSPACE -->
-  <div class="col data-workspace">
-    <div class="card evac" id="evacCard">
-      <h3 id="evacTitle">Всё спокойно</h3>
-      <div id="evacBody" class="muted">Система мониторит датчик и сейсмические данные USGS для региона Алматы.</div>
-    </div>
+    <section id="page-events" class="page" aria-labelledby="eventsHeading" hidden>
+      <div class="page-heading"><div><span class="eyebrow">КАТАЛОГ СЕЙСМИЧЕСКИХ СОБЫТИЙ</span><h1 id="eventsHeading">История землетрясений</h1><p>Данные USGS в радиусе 500 км от Алматы, M ≥ 2.5</p></div><button class="button button-secondary" id="eventsRefresh" type="button"><svg class="icon"><use href="#i-refresh"></use></svg> Обновить</button></div>
+      <div class="surface event-panel"><div class="filters"><label>Период<select id="periodFilter"><option value="30">Последние 30 дней</option><option value="7">Последние 7 дней</option><option value="1">За сутки</option></select></label><label>Магнитуда<select id="magnitudeFilter"><option value="2.5">M ≥ 2.5</option><option value="3">M ≥ 3.0</option><option value="4">M ≥ 4.0</option><option value="5">M ≥ 5.0</option></select></label><span class="filter-meta" id="eventCount">Загружаем…</span></div><div id="eventsList" class="feed-list event-feed"><div class="empty-state">Загружаем данные…</div></div></div>
+    </section>
 
-    <div class="card" id="mapCard">
-<div class="map-head"><div><h2>Сейсмическая карта Алматы</h2><p>События USGS, инфраструктура и точки сбора</p></div><div class="map-tools"><a href="https://earthquake.usgs.gov/earthquakes/map/?extent=39.5,70&extent=47,84&listOnlyShown=true" target="_blank" rel="noopener">Источник USGS ↗</a><a href="https://www.emsc-csem.org/Earthquake_information/" target="_blank" rel="noopener">EMSC ↗</a></div></div>
-<div id="map" role="region" aria-label="Сейсмическая карта Алматы"></div>
-<div class="map-legend"><span><i></i>Место сбора*</span><span><i class="l-hosp"></i>Медпомощь</span><span><i class="l-quake"></i>Событие</span><span><i class="l-user"></i>Ваш адрес</span></div>
-<div class="map-disclosure">* Учебные ориентиры, не подтверждённые официальные безопасные зоны. Прямая линия до объекта не является проверенным маршрутом.</div>
-</div>
+    <section id="page-instructions" class="page" aria-labelledby="instructionsHeading" hidden>
+      <div class="page-heading"><div><span class="eyebrow">РЕКОМЕНДАЦИИ ПО БЕЗОПАСНОСТИ</span><h1 id="instructionsHeading">Что делать при землетрясении</h1><p>Общие рекомендации. Следуйте официальным указаниям экстренных служб.</p></div></div>
+      <div class="instructions-intro"><span class="instructions-icon"><svg class="icon"><use href="#i-shield"></use></svg></span><div><strong>Заранее изучите план безопасности</strong><p>Во время сильных толчков приоритет — укрыться и защитить голову, а не бежать наружу.</p></div></div>
+      <div class="instruction-tabs" role="tablist" aria-label="Этапы безопасности"><button class="is-active" data-guide="during" role="tab" aria-selected="true" type="button">Во время</button><button data-guide="before" role="tab" aria-selected="false" type="button">До</button><button data-guide="after" role="tab" aria-selected="false" type="button">После</button></div>
+      <div class="instruction-layout"><div class="guide-cards" id="guideCards"></div><aside class="surface training-card"><span class="eyebrow">УЧЕБНЫЙ РЕЖИМ</span><h2>Проверьте интерфейс тревоги</h2><p>Откройте демонстрационный экран с инструкциями. Он не связан с реальным датчиком и не отправляет сообщения.</p><button class="button button-danger wide" id="startDrill" type="button"><svg class="icon"><use href="#i-alert"></use></svg> Запустить тренировку</button><a href="./engineering/" class="text-link engineering-link">Открыть инженерный мониторинг <svg class="icon"><use href="#i-arrow"></use></svg></a></aside></div>
+    </section>
 
-    <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
-      <div class="card" id="assemblyCard">
-        <h2>Места сбора / ориентиры</h2>
-        <div id="apList" class="muted small">Зарегистрируйтесь, чтобы увидеть ближайшие к вам места сбора.</div>
-      </div>
-      <div class="card">
-        <div class="row" style="justify-content:space-between;margin-bottom:8px">
-          <h2 style="margin:0">Журнал SOS / симуляция</h2>
-          <button class="small" id="testSos">Запустить тест</button>
-        </div>
-        <div class="log" id="log"><div class="muted small">Пока ничего не отправлялось.</div></div>
-      </div>
-    </div>
+    <section id="page-profile" class="page" aria-labelledby="profileHeading" hidden>
+      <div class="page-heading"><div><span class="eyebrow">НАСТРОЙКИ</span><h1 id="profileHeading">Мой профиль</h1><p>Сохраняется только на этом устройстве. Для просмотра карты регистрация не нужна.</p></div></div>
+      <div class="profile-layout"><div class="surface profile-card"><div class="profile-avatar"><svg class="icon"><use href="#i-user"></use></svg></div><h2>Местоположение</h2><p class="muted">Можно указать район или координаты, чтобы видеть расстояние до объектов на карте.</p><form id="profileForm"><label>Адрес или ориентир (необязательно)<input id="profileAddress" maxlength="150" placeholder="Например, проспект Абая"></label><div class="profile-two"><label>Широта<input id="profileLat" type="number" min="-90" max="90" step="any" placeholder="43.238"></label><label>Долгота<input id="profileLng" type="number" min="-180" max="180" step="any" placeholder="76.945"></label></div><div class="form-actions"><button class="button button-primary" type="submit">Сохранить</button><button class="button button-secondary" type="button" id="profileGeolocate"><svg class="icon"><use href="#i-location"></use></svg> Определить</button></div><p class="form-feedback" id="profileStatus" aria-live="polite"></p></form></div>
+      <div class="profile-aside"><div class="surface setting-card"><h2>О приложении</h2><div class="setting-line"><span>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div><div class="setting-line"><span>Регион мониторинга</span><strong>Алматы · 500 км</strong></div><div class="setting-line"><span>Инженерный режим</span><a href="./engineering/">Открыть ↗</a></div><div class="setting-line"><span>Версия веб-интерфейса</span><strong>Resident UI 1.0</strong></div></div><div class="caution-inline standalone"><svg class="icon"><use href="#i-info"></use></svg><p>Приложение не прогнозирует землетрясения, не заменяет официальные оповещения и не отправляет SOS. Экстренная служба Казахстана: <strong>112</strong>.</p></div></div></div>
+    </section>
+  </main>
 
-    <div class="card">
-      <div class="row" style="justify-content:space-between;margin-bottom:8px">
-        <h2 style="margin:0">Сейсмические события / USGS · 500 км · 30 дней</h2>
-        <div class="row"><span class="small muted" id="usgsUpd"></span><button class="small" id="usgsRefresh">⟳</button></div>
-      </div>
-      <div id="riskBox" class="small" style="margin-bottom:8px"></div>
-      <div class="tablewrap"><table>
-        <thead><tr><th>Время (Алматы)</th><th>M</th><th>Место</th><th>Глубина</th><th>До вас</th></tr></thead>
-        <tbody id="qBody"><tr><td colspan="5" class="muted">Загрузка…</td></tr></tbody>
-      </table></div>
-    </div>
-  </div>
-</main>
+  <nav class="bottom-nav" aria-label="Мобильная навигация">
+    <button type="button" class="bottom-link is-active" data-page="home"><svg class="icon"><use href="#i-home"></use></svg><span>Главная</span></button>
+    <button type="button" class="bottom-link" data-page="map"><svg class="icon"><use href="#i-map"></use></svg><span>Карта</span></button>
+    <button type="button" class="bottom-link" data-page="events"><svg class="icon"><use href="#i-events"></use></svg><span>События</span></button>
+    <button type="button" class="bottom-link" data-page="profile"><svg class="icon"><use href="#i-user"></use></svg><span>Профиль</span></button>
+  </nav>
 
-<footer>
-  <div id="downloads" hidden style="margin-bottom:8px">📲 Скачать приложение (демо): <a href="SeismoAlmaty.apk" download>Android (.apk)</a> · <a href="SeismoAlmaty.exe" download>Windows (.exe)</a></div>
-  Экстренные номера РК: <b>112</b> (единая служба), <b>101</b> (пожарная/МЧС), <b>103</b> (скорая). Приложение не предсказывает землетрясения и не заменяет официальные системы оповещения.
-</footer>
+  <div class="dialog-backdrop" id="detailDialog" hidden><section class="detail-dialog surface" role="dialog" aria-modal="true" aria-labelledby="detailHeading"><button class="dialog-close icon-button" type="button" id="closeDetail" aria-label="Закрыть"><svg class="icon"><use href="#i-close"></use></svg></button><div id="detailContent"></div></section></div>
+  <div id="trainingOverlay" class="training-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="trainingTitle"><div class="training-content"><div class="training-top"><span><svg class="icon"><use href="#i-wave"></use></svg> Seismo Almaty · Тренировка</span><button id="endDrill" class="training-close" type="button" aria-label="Закрыть учебный сценарий"><svg class="icon"><use href="#i-close"></use></svg></button></div><div class="training-symbol"><svg class="icon"><use href="#i-alert"></use></svg></div><div class="eyebrow">ДЕМОНСТРАЦИЯ · НЕ РЕАЛЬНАЯ ТРЕВОГА</div><h1 id="trainingTitle">Сильные толчки</h1><p>Пригнитесь, укройтесь, держитесь. Не выбегайте из здания во время тряски.</p><div class="training-steps"><div><strong>01</strong><span>Укройтесь под прочной мебелью и защитите голову.</span></div><div><strong>02</strong><span>Не используйте лифты и не бегите по лестнице во время толчков.</span></div><div><strong>03</strong><span>После окончания толчков оцените обстановку и следуйте официальным указаниям.</span></div></div><button type="button" class="button training-button" id="trainingDone">Завершить тренировку</button><small>При реальной чрезвычайной ситуации звоните 112.</small></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <footer class="site-footer">Seismo Almaty · Учебный проект по автоматизации и управлению. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Экстренный номер: 112.</footer>
 
-<div class="modal" id="sosModal">
-  <div class="box">
-    <h2 style="color:var(--emerg)">Аварийный сигнал · DEMO</h2>
-    <div>Автоматическая запись в учебный журнал через:</div>
-    <div class="count" id="countNum">10</div>
-    <div class="small muted" id="sosPreview"></div>
-    <div class="row" style="margin-top:12px;justify-content:center">
-      <button class="danger" id="sendNow">Записать в журнал</button>
-      <button id="cancelSos">Отменить тест SOS</button>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script>
-/* ===================== ДАННЫЕ ===================== */
-const ALMATY = {lat:43.2380, lng:76.9450};
-const TH = {WARN:30, EMERG:65};           // пороги интенсивности 0..100
-const SAMPLE_MS = 20;                      // 50 Гц
-const CONFIRM_EMERG = 75;                  // 1.5 с выше порога = подтверждённая авария
-const CONFIRM_WARN = 25;                   // 0.5 с
-const CALM_SAMPLES = 150;                  // 3 с спокойствия
-const SOS_COUNTDOWN = 10;
-
-// Места сбора (открытые площадки). suit — пригодность 0..1 (площадь, отсутствие высоток рядом)
-const ASSEMBLY = [
-  {name:'Парк им. 28 гвардейцев-панфиловцев', lat:43.2587, lng:76.9534, suit:0.95, note:'большая открытая территория'},
-  {name:'Центральный парк культуры и отдыха', lat:43.2622, lng:76.9722, suit:0.95, note:'парк, широкие аллеи'},
-  {name:'Площадь Республики', lat:43.2383, lng:76.9456, suit:0.85, note:'площадь, держитесь дальше от зданий'},
-  {name:'Главный ботанический сад', lat:43.2215, lng:76.9130, suit:0.95, note:'открытая зелёная зона'},
-  {name:'Парк Первого Президента', lat:43.1890, lng:76.8860, suit:1.0, note:'очень большая открытая зона'},
-  {name:'Площадь у Центрального стадиона', lat:43.2376, lng:76.9205, suit:0.85, note:'площадь перед стадионом'},
-  {name:'Озеро Сайран (набережная)', lat:43.2390, lng:76.8690, suit:0.8, note:'открытая набережная'},
-  {name:'Парк у Атакента', lat:43.2250, lng:76.9070, suit:0.85, note:'открытые площадки'},
-  {name:'Площадь у «Алматы Арена»', lat:43.2970, lng:76.8390, suit:0.85, note:'Алатауский район'},
-];
-const HOSPITALS = [
-  {name:'Больница скорой неотложной помощи (БСНП)', lat:43.2570, lng:76.9160, phone:'103'},
-  {name:'Центральная городская клиническая больница', lat:43.2450, lng:76.9130, phone:'103'},
-  {name:'Городская клиническая больница №4', lat:43.2850, lng:76.9560, phone:'103'},
-  {name:'Городская клиническая больница №5', lat:43.2420, lng:76.8900, phone:'103'},
-  {name:'Городская клиническая больница №7', lat:43.2290, lng:76.7900, phone:'103'},
-  {name:'Городская клиническая больница №1', lat:43.2290, lng:76.8530, phone:'103'},
-];
-const MCHS = [
-  {name:'Департамент по ЧС г. Алматы (МЧС)', lat:43.2600, lng:76.9400, phone:'112'},
-];
-
-/* ===================== СОСТОЯНИЕ ===================== */
-const store = {
-  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d }catch(e){ return d } },
-  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch(e){} }
-};
-let profile = store.get('aq_profile', null);
-let sosLog = store.get('aq_log', []);
-
-const S = {
-  level:'NORMAL', src:'sim', amp:5, fault:false,
-  buf:new Array(300).fill(0), rmsWin:[], intensity:0,
-  eCnt:0, wCnt:0, calm:CALM_SAMPLES,
-  latched:false, acked:false, dispatched:false,
-  motionVal:0, serialAmp:0, external:null,
-  muted:false, pickMode:false, countdown:null, quakes:[]
-};
-
-/* ===================== УТИЛИТЫ ===================== */
-const $ = id => document.getElementById(id);
-function dist(a,b){ // метры, гаверсинус
-  const R=6371000, r=Math.PI/180;
-  const dLat=(b.lat-a.lat)*r, dLng=(b.lng-a.lng)*r;
-  const h=Math.sin(dLat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLng/2)**2;
-  return 2*R*Math.asin(Math.sqrt(h));
-}
-const fmtD = m => m<1000 ? Math.round(m)+' м' : (m/1000).toFixed(m<10000?1:0)+' км';
-const userLoc = () => profile && profile.lat ? {lat:profile.lat,lng:profile.lng} : null;
-const nearest = (list, loc, n) => list.map(p=>({...p, d:dist(loc,p)})).sort((a,b)=>a.d-b.d).slice(0,n);
-const fmtTime = t => new Date(t).toLocaleString('ru-RU',{timeZone:'Asia/Almaty',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-function esc(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
-function toast(msg,ms=3500){ const t=$('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',ms) }
-
-/* ===================== КАРТА ===================== */
-const map = L.map('map').setView([ALMATY.lat,ALMATY.lng], 12);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
-const icon = (e,cls='') => L.divIcon({className:'', html:`<div class="map-pin ${cls}">${e}</div>`, iconSize:[27,27], iconAnchor:[13,13]});
-const layers = {ap:L.layerGroup().addTo(map), hosp:L.layerGroup().addTo(map), quakes:L.layerGroup().addTo(map), route:L.layerGroup().addTo(map)};
-let userMarker=null;
-ASSEMBLY.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('A')}).bindPopup(`<b>Возможное место сбора</b><br>${esc(p.name)}<br><small>${esc(p.note)}</small>`).addTo(layers.ap));
-HOSPITALS.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('+','hospital')}).bindPopup(`<b>${esc(p.name)}</b><br>Скорая: ${p.phone}`).addTo(layers.hosp));
-MCHS.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('S','services')}).bindPopup(`<b>${esc(p.name)}</b><br>Тел.: ${p.phone}`).addTo(layers.hosp));
-L.control.layers(null,{'Места сбора':layers.ap,'Больницы и МЧС':layers.hosp,'Землетрясения USGS':layers.quakes,'Маршрут':layers.route},{collapsed:true}).addTo(map);
-
-map.on('click', e=>{
-  if(!S.pickMode) return;
-  S.pickMode=false; map.getContainer().style.cursor='';
-  setLocation(e.latlng.lat, e.latlng.lng, 'указано на карте');
-});
-
-function drawUser(){
-  if(userMarker) map.removeLayer(userMarker);
-  const u=userLoc(); if(!u) return;
-  userMarker=L.marker([u.lat,u.lng],{icon:icon('•','user'),zIndexOffset:1000}).bindPopup(`<b>${esc(profile.name)}</b><br>${esc(profile.address)}, этаж ${profile.floor}`).addTo(map);
-}
-
-/* ===================== РЕГИСТРАЦИЯ ===================== */
-function fillForm(){
-  if(!profile) return;
-  $('fName').value=profile.name||''; $('fPhone').value=profile.phone||'';
-  $('fAddr').value=profile.address||''; $('fFloor').value=profile.floor??1;
-  $('fApt').value=profile.apt||'';
-  $('geoStatus').textContent = profile.lat ? `📍 Координаты: ${profile.lat.toFixed(5)}, ${profile.lng.toFixed(5)} (${profile.geoSrc||''})` : '';
-}
-function readForm(){
-  return {...(profile||{}), name:$('fName').value.trim(), phone:$('fPhone').value.trim(), address:$('fAddr').value.trim(),
-    floor:parseInt($('fFloor').value||'0',10), apt:$('fApt').value.trim()};
-}
-async function geocode(addr){
-  const q = encodeURIComponent('Алматы, '+addr);
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kz&viewbox=76.65,43.42,77.20,43.05&bounded=1&accept-language=ru&q=${q}`;
-  const r = await fetch(url,{headers:{'Accept':'application/json'}});
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  const j = await r.json();
-  return j[0] ? {lat:+j[0].lat, lng:+j[0].lon, label:j[0].display_name} : null;
-}
-$('regForm').addEventListener('submit', async e=>{
-  e.preventDefault();
-  const p = readForm();
-  const addrChanged = !profile || profile.address!==p.address || !profile.lat;
-  profile = p; store.set('aq_profile',profile);
-  if(addrChanged){
-    $('geoStatus').textContent='Поиск адреса…';
-    try{
-      const g = await geocode(p.address);
-      if(g){ setLocation(g.lat,g.lng,'найден по адресу'); }
-      else { $('geoStatus').textContent='Адрес не найден. Нажмите «Указать на карте» и кликните по своему дому.'; }
-    }catch(err){ $('geoStatus').textContent='Ошибка геокодирования. Укажите дом на карте.'; }
-  } else { fillForm(); refreshAll(); toast('Профиль сохранён'); }
-});
-$('pickBtn').onclick=()=>{ S.pickMode=true; map.getContainer().style.cursor='crosshair'; toast('Кликните на карте по своему дому'); $('map').scrollIntoView({behavior:'smooth',block:'center'}) };
-function setLocation(lat,lng,src){
-  profile = {...readForm(), lat, lng, geoSrc:src};
-  store.set('aq_profile',profile);
-  fillForm(); drawUser(); refreshAll();
-  map.setView([lat,lng],14);
-  toast('Профиль сохранён, местоположение определено');
-}
-
-/* ===================== МЕСТА СБОРА ===================== */
-function rankAssembly(loc){
-  // учитываем не только расстояние, но и пригодность площадки
-  return ASSEMBLY.map(p=>{ const d=dist(loc,p); return {...p,d,score:d/p.suit} }).sort((a,b)=>a.score-b.score);
-}
-function renderAssembly(){
-  const u=userLoc();
-  if(!u){ $('apList').innerHTML='Зарегистрируйтесь, чтобы увидеть ближайшие к вам места сбора.'; return }
-  const top=rankAssembly(u).slice(0,3);
-  $('apList').classList.remove('muted');
-  $('apList').innerHTML = top.map((p,i)=>`
-    <div class="ap"><div class="n">${i+1}</div><div class="body">
-      <b>${esc(p.name)}</b><div class="small muted">${fmtD(p.d)} · ~${Math.max(1,Math.round(p.d/75))} мин пешком · ${esc(p.note)}</div>
-      <div class="row" style="margin-top:4px">
-        <button class="small" onclick="showRoute(${i})">Показать маршрут</button>
-        <a class="small" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${u.lat},${u.lng}&destination=${p.lat},${p.lng}&travelmode=walking">Навигатор ↗</a>
-      </div></div></div>`).join('');
-}
-window.showRoute = function(i){
-  const u=userLoc(); if(!u) return;
-  const p=rankAssembly(u)[i];
-  layers.route.clearLayers();
-  L.polyline([[u.lat,u.lng],[p.lat,p.lng]],{color:'#2ea043',weight:5,dashArray:'8 8'}).addTo(layers.route);
-  L.circle([p.lat,p.lng],{radius:150,color:'#2ea043'}).addTo(layers.route);
-  map.fitBounds([[u.lat,u.lng],[p.lat,p.lng]],{padding:[40,40]});
-};
-
-/* ===================== ДАТЧИК / СИГНАЛ ===================== */
-// ссылки на скачивание показываем только на опубликованном сайте (не в APK/EXE)
-if(location.protocol==='https:' && location.hostname!=='appassets.androidplatform.net') $('downloads').hidden=false;
-if(!('serial' in navigator)) $('srcSel').querySelector('option[value=serial]').remove();
-$('thW').textContent=TH.WARN; $('thE').textContent=TH.EMERG;
-function setAmp(v){ S.amp=+v; $('amp').value=v; $('ampVal').textContent=v }
-$('amp').oninput=e=>setAmp(e.target.value);
-document.querySelectorAll('[data-amp]').forEach(b=>b.onclick=()=>{ unlockAudio(); setAmp(b.dataset.amp) });
-
-$('srcSel').onchange = async e=>{
-  S.src=e.target.value;
-  $('simBox').style.display = S.src==='sim'?'':'none';
-  $('serialBox').style.display = S.src==='serial'?'':'none';
-  if(S.src==='motion'){
-    try{
-      if(typeof DeviceMotionEvent!=='undefined' && DeviceMotionEvent.requestPermission){
-        const r=await DeviceMotionEvent.requestPermission(); if(r!=='granted') throw 0;
-      }
-      window.addEventListener('devicemotion', onMotion);
-      toast('Акселерометр подключён. Потрясите телефон.');
-    }catch(err){ toast('Акселерометр недоступен на этом устройстве'); }
-  }
-};
-function onMotion(ev){
-  const a=ev.acceleration||{}; const x=a.x||0,y=a.y||0,z=a.z||0;
-  S.motionVal = Math.max(-1.3,Math.min(1.3, Math.sign(x+y+z)*Math.hypot(x,y,z)/5));
-}
-
-// Web Serial для Arduino (Chrome/Edge)
-$('serialBtn').onclick = async ()=>{
-  if(!('serial' in navigator)){ toast('Web Serial поддерживается только в Chrome / Edge'); return }
-  try{
-    const port = await navigator.serial.requestPort(); await port.open({baudRate:9600});
-    toast('Arduino подключена');
-    const reader = port.readable.pipeThrough(new TextDecoderStream()).getReader();
-    let buf='';
-    while(true){
-      const {value,done}=await reader.read(); if(done) break;
-      buf+=value; const lines=buf.split(/\r?\n/); buf=lines.pop();
-      for(const ln of lines){ const n=parseFloat(ln.replace(/[^\d.\-]/g,'')); if(!isNaN(n)) S.serialAmp = n>100 ? Math.min(100,n/10.23) : n; }
-    }
-  }catch(err){ toast('Не удалось подключить: '+err.message) }
-};
-
-let tPhase=0;
-function nextSample(){
-  tPhase += SAMPLE_MS/1000;
-  if(S.fault) return 0; // датчик «завис» — плоская линия
-  if(S.src==='motion') return S.motionVal + (Math.random()*2-1)*0.01;
-  const amp = (S.src==='serial' ? S.serialAmp : S.amp)/100;
-  const t=tPhase;
-  return amp*(0.6*Math.sin(2*Math.PI*3.1*t)+0.3*Math.sin(2*Math.PI*7.3*t+1)+0.25*(Math.random()*2-1)) + 0.015*(Math.random()*2-1);
-}
-
-let tick=0;
-function loop(){
-  const v=nextSample();
-  S.buf.push(v); S.buf.shift();
-  S.rmsWin.push(v*v); if(S.rmsWin.length>50) S.rmsWin.shift();
-  const rms=Math.sqrt(S.rmsWin.reduce((a,b)=>a+b,0)/S.rmsWin.length);
-  S.intensity = Math.min(100, Math.round(rms*200));
-  evaluate();
-  if(++tick%5===0) drawUI();
-}
-
-function evaluate(){
-  if(S.fault){ setLevel('FAULT'); return }
-  const I=S.intensity;
-  S.eCnt = I>=TH.EMERG ? S.eCnt+1 : 0;
-  if(I>=TH.WARN){ S.wCnt++; S.calm=0 } else { S.wCnt=0; S.calm++ }
-  if(S.eCnt>=CONFIRM_EMERG && !S.latched){ S.latched=true; onEmergency() }
-  if(S.latched) setLevel('EMERGENCY');
-  else if(S.wCnt>=CONFIRM_WARN || S.external) setLevel('WARNING');
-  else if(S.calm>=CALM_SAMPLES || S.level==='FAULT') setLevel('NORMAL');
-  if(S.latched && tick%10===0) renderEvac();
-}
-
-/* ===================== УРОВНИ ===================== */
-function setLevel(l){
-  if(S.level===l) return;
-  S.level=l;
-  document.body.dataset.level=l;
-  $('statusText').textContent = l + (l==='EMERGENCY'&&S.acked?' (подтверждено)':'');
-  document.querySelectorAll('.lvl').forEach(el=>el.classList.toggle('on',el.dataset.l===l));
-  if(l==='WARNING' && S.external==null) {}
-  renderEvac(); setShutdown(l==='EMERGENCY');
-  alarm();
-}
-function setShutdown(on){
-  const set=(id,act,txt)=>{ $(id).classList.toggle('act',act); $(id).querySelector('span').textContent=txt };
-  set('cGas',on, on?'ПЕРЕКРЫТ (клапан)':'подача открыта');
-  set('cPower',on, on?'ОТКЛЮЧЕНО (кроме аварийного)':'включено');
-  set('cLift',on, on?'ОСТАНОВЛЕНЫ на ближайшем этаже':'работают');
-  set('cDoors',on, on?'РАЗБЛОКИРОВАНЫ (сервопривод)':'закрыты');
-}
-
-function renderEvac(){
-  const u=userLoc(); const floor = profile?.floor ?? null;
-  let title, html;
-  if(S.level==='NORMAL'){
-    title='✅ Всё спокойно';
-    html='Система мониторит датчик и сейсмические данные USGS для региона Алматы.';
-  } else if(S.level==='FAULT'){
-    title='🟣 Неисправность датчика';
-    html='Сигнал датчика пропал или «завис». Оператору: проверьте подключение Flex Sensor и питание. Мониторинг по USGS продолжается.';
-  } else if(S.level==='WARNING'){
-    title='⚠ Предупреждение: повышенные колебания';
-    html = (S.external ? `<b>USGS:</b> M${S.external.mag.toFixed(1)} — ${esc(S.external.place)} (${fmtD(S.external.d)} от вас).<br>` : '') +
-      '<ul><li>Сохраняйте спокойствие, будьте готовы укрыться.</li><li>Отойдите от окон, шкафов, стеклянных предметов.</li><li>Подготовьте документы, воду, фонарик.</li></ul>';
-  } else { // EMERGENCY
-    const shaking = S.calm < CALM_SAMPLES;
-    if(shaking){
-      title='🔴 ЗЕМЛЕТРЯСЕНИЕ! Укройтесь — не выбегайте во время толчков';
-      html='<ul><li><b>Пригнитесь, укройтесь, держитесь</b> — под прочным столом или у несущей стены.</li><li>Не пользуйтесь лифтом и лестницей во время толчков.</li><li>Держитесь подальше от окон и наружных стен.</li><li>Газ и электричество отключены автоматически, двери эвакуации разблокированы.</li></ul>';
-    } else {
-      const best = u ? rankAssembly(u)[0] : null;
-      title='🏃 Толчки прекратились — начните эвакуацию';
-      html='<ul>' +
-        (floor!=null ? `<li>Вы на <b>${floor} этаже</b>: ${floor>0?'спускайтесь только по лестнице, лифт не используйте':'выходите через ближайший выход'}.</li>` : '') +
-        '<li>Возьмите документы, телефон, воду. Помогите соседям, детям и пожилым.</li>' +
-        (best ? `<li>Идите к месту сбора: <b>${esc(best.name)}</b> — ${fmtD(best.d)}, ~${Math.max(1,Math.round(best.d/75))} мин. <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${u.lat},${u.lng}&destination=${best.lat},${best.lng}&travelmode=walking">Маршрут ↗</a></li>` : '<li>Зарегистрируйте адрес, чтобы получить маршрут к месту сбора.</li>') +
-        '<li>Держитесь дальше от зданий, ЛЭП и деревьев. Возможны повторные толчки.</li></ul>';
-      if(best && !S._routeShown){ S._routeShown=true; showRoute(0) }
-    }
-    if(S.dispatched) html += '<div class="small" style="margin-top:6px">📨 SOS записан локально (демо).</div>';
-  }
-  if($('evacTitle').textContent!==title) $('evacTitle').textContent=title;
-  if($('evacBody').innerHTML!==html){ $('evacBody').innerHTML=html; $('evacBody').classList.toggle('muted',S.level==='NORMAL') }
-}
-
-/* ===================== SOS ===================== */
-function onEmergency(){
-  if(S.dispatched || S.countdown) return;
-  if(!profile || !profile.lat){ toast('⚠ Авария! SOS не отправлен: зарегистрируйте имя и адрес.',6000); return }
-  let n=SOS_COUNTDOWN; $('countNum').textContent=n;
-  $('sosPreview').textContent = buildMsg().split('\n').slice(0,3).join(' · ');
-  $('sosModal').classList.add('show');
-  S.countdown=setInterval(()=>{ n--; $('countNum').textContent=n; if(n<=0) dispatch('auto') },1000);
-}
-function closeModal(){ clearInterval(S.countdown); S.countdown=null; $('sosModal').classList.remove('show') }
-$('sendNow').onclick=()=>dispatch('manual');
-$('cancelSos').onclick=()=>{ closeModal(); S.dispatched=true; addLog({to:'—',type:'cancel',status:'Отменено пользователем (ложная тревога)',ok:false,msg:''}) };
-
-function buildMsg(){
-  const p=profile;
-  return `🚨 SOS: ЗЕМЛЕТРЯСЕНИЕ, Алматы\n`+
-    `Имя: ${p.name}\n`+
-    `Адрес: ${p.address}, этаж ${p.floor}${p.apt?', кв. '+p.apt:''}\n`+
-    (p.phone?`Телефон: ${p.phone}\n`:'')+
-    `Координаты: ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}\n`+
-    `Интенсивность датчика: ${S.intensity}/100\n`+
-    `Время: ${new Date().toLocaleString('ru-RU',{timeZone:'Asia/Almaty'})}`;
-}
-async function dispatch(mode){
-  closeModal(); if(S.dispatched) return; S.dispatched=true;
-  const u=userLoc(); const msg=buildMsg();
-  const recipients=[...nearest(HOSPITALS,u,3).map(h=>({...h,type:'Больница'})), ...nearest(MCHS,u,1).map(m=>({...m,type:'МЧС'}))];
-  const ok=true, status='Записано локально (демо)';
-  recipients.forEach(r=>addLog({to:r.name,type:r.type,d:r.d,phone:r.phone,status,ok,msg}));
-  toast("SOS записан в локальный журнал (демо)",5000);
-  renderEvac();
-}
-function addLog(e){
-  sosLog.unshift({...e,time:Date.now()}); sosLog=sosLog.slice(0,40); store.set('aq_log',sosLog); renderLog();
-}
-function renderLog(){
-  if(!sosLog.length){ $('log').innerHTML='<div class="muted small">Пока ничего не отправлялось.</div>'; return }
-  $('log').innerHTML = sosLog.map((e,i)=>`<div class="e">
-    <div class="row" style="justify-content:space-between"><b>${e.type==='МЧС'?'🚒':e.type==='Больница'?'🏥':'✖'} ${esc(e.to)}</b><span class="muted">${fmtTime(e.time)}</span></div>
-    <div class="row small">${e.d?`<span class="muted">${fmtD(e.d)}</span>`:''}<span class="badge ${e.ok?'ok':'err'}">${esc(e.status)}</span>
-    ${e.msg?`<a href="sms:${e.phone||112}?body=${encodeURIComponent(e.msg)}">SMS</a><a href="tel:${e.phone||112}">Позвонить ${e.phone||112}</a>`:''}</div>
-    ${e.msg && (i===0 || sosLog[i-1].msg!==e.msg) ? `<pre>${esc(e.msg)}</pre>`:''}</div>`).join('');
-}
-$('testSos').onclick=()=>{
-  if(!profile||!profile.lat){ toast('Сначала зарегистрируйтесь и укажите адрес'); return }
-  const keep=S.dispatched; S.dispatched=false; dispatch('test').then(()=>{ if(!S.latched) S.dispatched=keep });
-};
-
-/* ===================== УПРАВЛЕНИЕ ===================== */
-$('ackBtn').onclick=()=>{ S.acked=true; stopAlarm(); if(S.level==='EMERGENCY') $('statusText').textContent='EMERGENCY (подтверждено)'; toast('Тревога подтверждена оператором, звук отключён') };
-$('resetBtn').onclick=()=>{
-  if(S.intensity>=TH.WARN){ toast('Сброс невозможен: колебания ещё продолжаются'); return }
-  closeModal(); S.latched=false; S.acked=false; S.dispatched=false; S._routeShown=false; S.eCnt=0; S.wCnt=0; S.calm=CALM_SAMPLES;
-  layers.route.clearLayers(); S.level=''; setLevel(S.external?'WARNING':'NORMAL'); toast('Система сброшена');
-};
-$('faultBtn').onclick=()=>{ S.fault=!S.fault; $('faultBtn').textContent=S.fault?'✔ Устранить сбой':'⚠ Симулировать сбой'; if(!S.fault){ S.calm=CALM_SAMPLES; } };
-$('muteBtn').onclick=()=>{ S.muted=!S.muted; $('muteBtn').textContent=S.muted?'🔇 Звук выкл.':'🔊 Звук вкл.'; if(S.muted) stopAlarm(); else alarm() };
-
-/* ===================== ЗВУК ===================== */
-let actx=null, alarmTimer=null;
-function unlockAudio(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)() }catch(e){} } if(actx&&actx.state==='suspended') actx.resume() }
-document.addEventListener('pointerdown',unlockAudio,{once:true});
-function beep(f,d,vol=.15){ if(!actx) return; const o=actx.createOscillator(), g=actx.createGain(); o.type='square'; o.frequency.value=f; g.gain.value=vol; o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+d) }
-function stopAlarm(){ clearInterval(alarmTimer); alarmTimer=null }
-function vibrate(ms){ try{ if(window.AndroidBridge) AndroidBridge.vibrate(ms); else if(navigator.vibrate) navigator.vibrate(ms) }catch(e){} }
-function alarm(){
-  stopAlarm(); if(S.muted||S.acked) return;
-  if(S.level==='EMERGENCY') vibrate(1500); else if(S.level==='WARNING') vibrate(400);
-  if(S.level==='WARNING') alarmTimer=setInterval(()=>beep(880,.15,.08),1500);
-  else if(S.level==='EMERGENCY'){ let hi=false; alarmTimer=setInterval(()=>{ hi=!hi; beep(hi?1200:700,.35) },400) }
-  else if(S.level==='FAULT') alarmTimer=setInterval(()=>beep(400,.1,.06),3000);
-}
-
-/* ===================== ОТРИСОВКА ===================== */
-const cv=$('scope'), cx=cv.getContext('2d');
-function drawUI(){
-  const W=cv.width,H=cv.height,mid=H/2;
-  cx.fillStyle='#05090c'; cx.fillRect(0,0,W,H);
-  cx.strokeStyle='#123'; cx.lineWidth=1;
-  for(let x=0;x<W;x+=50){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke()}
-  for(let y=0;y<H;y+=25){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
-  const col = {NORMAL:'#3fdc6b',WARNING:'#f2b632',EMERGENCY:'#ff5a5f',FAULT:'#a47cf3'}[S.level]||'#3fdc6b';
-  cx.strokeStyle=col; cx.lineWidth=2; cx.beginPath();
-  S.buf.forEach((v,i)=>{ const x=i/(S.buf.length-1)*W, y=mid-v*mid*0.8; i?cx.lineTo(x,y):cx.moveTo(x,y) }); cx.stroke();
-  cx.fillStyle='#8b9aa8'; cx.font='11px monospace'; cx.fillText(`${S.src.toUpperCase()}  50 Гц  RMS→${S.intensity}`,6,13);
-  $('intVal').textContent=S.intensity;
-  const m=$('meter'); m.style.width=S.intensity+'%';
-  m.style.background = S.intensity>=TH.EMERG?'var(--emerg)':S.intensity>=TH.WARN?'var(--warn)':'var(--ok)';
-}
-
-/* ===================== USGS ===================== */
-async function fetchQuakes(){
-  const c = userLoc()||ALMATY;
-  const start = new Date(Date.now()-30*864e5).toISOString().slice(0,10);
-  const url=`https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=${ALMATY.lat}&longitude=${ALMATY.lng}&maxradiuskm=500&starttime=${start}&minmagnitude=2.5&orderby=time&limit=200`;
-  try{
-    const r=await fetch(url); const j=await r.json();
-    S.quakes = j.features.map(f=>({mag:f.properties.mag||0, place:f.properties.place||'—', time:f.properties.time, url:f.properties.url,
-      depth:f.geometry.coordinates[2], lat:f.geometry.coordinates[1], lng:f.geometry.coordinates[0]})).map(q=>({...q,d:dist(c,q)}));
-    $('usgsUpd').textContent='обновлено '+new Date().toLocaleTimeString('ru-RU',{timeZone:'Asia/Almaty',hour:'2-digit',minute:'2-digit'});
-    renderQuakes(); checkExternal();
-  }catch(err){ $('qBody').innerHTML=`<tr><td colspan="5" class="muted">Не удалось загрузить данные USGS: ${esc(err.message)}</td></tr>` }
-}
-function renderQuakes(){
-  layers.quakes.clearLayers();
-  S.quakes.forEach(q=>{
-    const col=q.mag>=5?'#ff5a5f':q.mag>=4?'#f2b632':'#3b82f6';
-    L.circleMarker([q.lat,q.lng],{radius:3+q.mag*2.2,color:col,fillColor:col,fillOpacity:.35,weight:1})
-      .bindPopup(`<b>M${q.mag.toFixed(1)}</b> — ${esc(q.place)}<br>${fmtTime(q.time)}<br>Глубина ${q.depth.toFixed(0)} км · ${fmtD(q.d)} от вас<br><a href="${q.url}" target="_blank" rel="noopener">USGS ↗</a>`).addTo(layers.quakes);
-  });
-  $('qBody').innerHTML = S.quakes.length ? S.quakes.slice(0,25).map(q=>`<tr>
-    <td>${fmtTime(q.time)}</td><td><span class="mag ${q.mag>=5?'m5':q.mag>=4?'m4':''}">${q.mag.toFixed(1)}</span></td>
-    <td><a href="${q.url}" target="_blank" rel="noopener">${esc(q.place)}</a></td><td>${q.depth.toFixed(0)} км</td><td>${fmtD(q.d)}</td></tr>`).join('')
-    : '<tr><td colspan="5" class="muted">За 30 дней событий M≥2.5 не зарегистрировано</td></tr>';
-  // предварительная оценка сейсмической активности
-  const n=S.quakes.length, max=n?Math.max(...S.quakes.map(q=>q.mag)):0, near=S.quakes.filter(q=>q.d<150000).length;
-  const lvl = max>=5.5||near>=10 ? ['высокая','var(--emerg)'] : max>=4.5||near>=4 ? ['повышенная','var(--warn)'] : ['фоновая','var(--ok)'];
-  $('riskBox').innerHTML=`Сейсмическая активность за 30 дней: <b style="color:${lvl[1]}">${lvl[0]}</b> · событий: ${n} · макс. M${max.toFixed(1)} · в радиусе 150 км: ${near}. <span class="muted">Это статистика, а не прогноз.</span>`;
-}
-function checkExternal(){
-  const hour=Date.now()-36e5;
-  const ev=S.quakes.filter(q=>q.time>hour && q.mag>=4.5 && q.d<300000).sort((a,b)=>b.mag-a.mag)[0]||null;
-  const had=!!S.external; S.external=ev;
-  if(ev && !had) toast(`USGS: M${ev.mag.toFixed(1)} в ${fmtD(ev.d)} — уровень WARNING`,6000);
-  if(had!==!!ev){ S.calm=CALM_SAMPLES; }
-}
-$('usgsRefresh').onclick=fetchQuakes;
-
-/* ===================== СТАРТ ===================== */
-function refreshAll(){ drawUser(); renderAssembly(); if(S.quakes.length){ const c=userLoc()||ALMATY; S.quakes.forEach(q=>q.d=dist(c,q)); renderQuakes() } renderEvac() }
-fillForm(); refreshAll(); renderLog();
-setInterval(loop,SAMPLE_MS);
-fetchQuakes(); setInterval(fetchQuakes,120000);
-</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="./site.js?v=2" defer></script>
 </body>
 </html>
