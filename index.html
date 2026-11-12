@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="./site.css?v=2">
+  <link rel="stylesheet" href="./site.css?v=3">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -33,6 +33,7 @@
     <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16zM9 21v-5h6v5M12 7v6M9 10h6"/></symbol>
   </svg>
 
   <header class="site-header">
@@ -92,16 +93,36 @@
     </section>
 
     <section id="page-map" class="page" aria-labelledby="mapHeading" hidden>
-      <div class="page-heading"><div><span class="eyebrow">СЕЙСМИЧЕСКАЯ КАРТА</span><h1 id="mapHeading">Карта Алматы</h1><p>Зарегистрированные землетрясения и демонстрационные ориентиры</p></div><button type="button" class="button button-secondary" id="locateMe"><svg class="icon"><use href="#i-location"></use></svg> Моё местоположение</button></div>
+      <div class="page-heading">
+        <div><span class="eyebrow">СЕЙСМИЧЕСКАЯ КАРТА</span><h1 id="mapHeading">Карта Алматы</h1><p>Землетрясения USGS, больницы, службы помощи и возможные места сбора</p></div>
+        <button type="button" class="button button-secondary" id="locateMe"><svg class="icon"><use href="#i-location"></use></svg> Моё местоположение</button>
+      </div>
+      <div class="map-filter-row" role="group" aria-label="Показать категории объектов">
+        <button type="button" class="map-filter is-active" data-map-filter="all" aria-pressed="true"><span class="filter-glyph all"><svg class="icon"><use href="#i-map"></use></svg></span> Все</button>
+        <button type="button" class="map-filter" data-map-filter="quake" aria-pressed="false"><span class="filter-glyph quake"><svg class="icon"><use href="#i-wave"></use></svg></span> Землетрясения</button>
+        <button type="button" class="map-filter" data-map-filter="hospital" aria-pressed="false"><span class="filter-glyph hospital"><svg class="icon"><use href="#i-hospital"></use></svg></span> Больницы</button>
+        <button type="button" class="map-filter" data-map-filter="assembly" aria-pressed="false"><span class="filter-glyph assembly"><svg class="icon"><use href="#i-group"></use></svg></span> Места сбора</button>
+        <button type="button" class="map-filter" data-map-filter="services" aria-pressed="false"><span class="filter-glyph services"><svg class="icon"><use href="#i-shield"></use></svg></span> МЧС</button>
+      </div>
       <div class="map-workspace">
         <aside class="surface map-sidebar">
-          <div class="sidebar-heading"><h2>Слои карты</h2><span class="source-chip">USGS</span></div>
-          <label class="layer-control"><input type="checkbox" id="showQuakes" checked><span class="legend-dot quake"></span><span>Землетрясения<small>Каталог за 30 дней</small></span></label>
-          <label class="layer-control"><input type="checkbox" id="showAssembly" checked><span class="legend-dot assembly"></span><span>Возможные места сбора<small>Неофициальные ориентиры</small></span></label>
-          <div class="map-side-note"><svg class="icon"><use href="#i-info"></use></svg><p>Показанные парки и площади не проверены как безопасные места сбора. Маршруты и доступность нужно уточнять.</p></div>
+          <div class="sidebar-heading"><h2>Объекты на карте</h2><span class="source-chip">Алматы</span></div>
+          <div class="map-categories-guide">
+            <div><span class="category-glyph quake"><svg class="icon"><use href="#i-wave"></use></svg></span><span><strong>Землетрясения</strong><small>Зарегистрированные события USGS</small></span></div>
+            <div><span class="category-glyph hospital"><svg class="icon"><use href="#i-hospital"></use></svg></span><span><strong>Больницы</strong><small>Предварительные точки, проверить адрес</small></span></div>
+            <div><span class="category-glyph assembly"><svg class="icon"><use href="#i-group"></use></svg></span><span><strong>Места сбора</strong><small>Неофициальные учебные ориентиры</small></span></div>
+            <div><span class="category-glyph services"><svg class="icon"><use href="#i-shield"></use></svg></span><span><strong>МЧС</strong><small>Ориентир службы, координаты проверить</small></span></div>
+          </div>
+          <div class="map-side-note"><svg class="icon"><use href="#i-info"></use></svg><p>Маршруты и точность координат объектов не проверены. Важные объекты уточняйте по официальным источникам. Экстренный номер: <strong>112</strong>.</p></div>
           <div class="map-sidebar-footer"><p id="mapDataInfo" class="muted">Получаем сейсмические данные…</p><button class="button button-secondary wide" type="button" id="mapRefresh"><svg class="icon"><use href="#i-refresh"></use></svg> Обновить события</button></div>
         </aside>
-        <div class="map-canvas-wrap"><div id="map" aria-label="Карта сейсмических событий и ориентиров Алматы" role="region"></div><div class="map-legend-float"><span><i class="legend-dot quake"></i> Событие</span><span><i class="legend-dot assembly"></i> Ориентир</span><span><i class="legend-dot self"></i> Вы</span></div><div id="mapSheet" class="map-sheet" aria-live="polite"><div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на событие или ориентир, чтобы посмотреть сведения.</span></div></div></div>
+        <div class="map-canvas-wrap">
+          <div id="map" aria-label="Интерактивная карта землетрясений, больниц, МЧС и возможных мест сбора Алматы" role="region"></div>
+          <div class="map-legend-float" aria-label="Обозначения карты">
+            <span><i class="legend-dot quake"></i> События</span><span><i class="legend-dot hospital"></i> Больницы</span><span><i class="legend-dot assembly"></i> Сбор</span><span><i class="legend-dot services"></i> МЧС</span><span><i class="legend-dot self"></i> Вы</span>
+          </div>
+          <div id="mapSheet" class="map-sheet" aria-live="polite"><div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на значок больницы, события, места сбора или МЧС, чтобы посмотреть информацию.</span></div></div>
+        </div>
       </div>
     </section>
 
@@ -137,6 +158,6 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по автоматизации и управлению. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="./site.js?v=2" defer></script>
+  <script src="./site.js?v=3" defer></script>
 </body>
 </html>
