@@ -254,3 +254,16 @@
   .ref-topbar-reset .icon{width:19px;height:19px}
   .ref-topbar-reset:focus-visible{outline:3px solid #2676e9;outline-offset:2px}
 }
+
+/* Settings rows use the same compact icon-and-label rhythm as the approved board. */
+.ref-setting-name{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.ref-setting-name .icon{width:21px;height:21px;color:#1769ed;background:#edf4ff;border-radius:10px;box-sizing:content-box;padding:10px}
+.ref-setting-value{display:inline-flex;align-items:center;padding:9px;background:none;color:#1769ed;border:0;font-size:11px;font-weight:800;white-space:nowrap}
+@media(max-width:800px){
+  #page-profile .setting-line{min-height:63px;gap:10px}
+  #page-profile .setting-line>span{display:inline-flex;align-items:center;gap:11px;font-size:11px}
+  #page-profile .ref-setting-name .icon{width:20px;height:20px;padding:8px;border-radius:11px;flex:none}
+  #page-profile .ref-setting-value{padding:8px 0}
+  #page-profile .profile-card{margin-top:1px}
+  #page-profile .profile-form label{font-size:11px}
+}
