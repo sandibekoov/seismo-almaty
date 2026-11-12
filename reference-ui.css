@@ -244,3 +244,13 @@
   #page-profile .profile-card{box-shadow:none}
   #page-event-detail .ref-detail-primary>.button{border-radius:14px}
 }
+/* Keep iconography interactive and visual statuses honest. */
+@media(max-width:800px){
+  .ref-status-card{font:inherit;text-align:left;cursor:pointer;color:#15243b;-webkit-appearance:none;appearance:none}
+  .ref-status-card:focus-visible{outline:3px solid #2676e9;outline-offset:3px}
+  .ref-status-card.is-loading{background:linear-gradient(112deg,#f7fbff,#e7efff);border-color:#d5e6fa}
+  .ref-status-card.is-loading .ref-status-check{background:#6b94c9;box-shadow:0 0 0 9px #deeafa}
+  .ref-topbar-reset{display:grid;place-items:center;border:1px solid #e6edf8;border-radius:50%;background:rgba(255,255,255,.85);color:#315782;width:40px;height:40px}
+  .ref-topbar-reset .icon{width:19px;height:19px}
+  .ref-topbar-reset:focus-visible{outline:3px solid #2676e9;outline-offset:2px}
+}
