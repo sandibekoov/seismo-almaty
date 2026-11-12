@@ -1,0 +1,269 @@
+/* Seismo Almaty — Approved Reference UI / November 2026
+   Mobile composition follows the user's 8-screen approved board.
+   Status indicates USGS data connectivity, NOT earthquake safety.
+   Coordinates of assembly/hospital markers are unverified demo references. */
+
+.ref-home-hero,.ref-topbar,.ref-instructions-panorama,.ref-event-chips,.ref-profile-summary{display:none}
+.ref-places-notice,.ref-places-list,.ref-detail-view{max-width:860px;margin:0 auto}
+.ref-places-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ref-places-heading{max-width:860px;margin:18px auto}
+.ref-places-notice{display:flex;gap:12px;align-items:flex-start;padding:16px 19px;background:#e4f0ff;border:1px solid #d0e4fa;border-radius:15px;color:#4d6687;margin-bottom:20px}
+.ref-places-notice .icon{width:21px;height:21px;color:#1769ed}
+.ref-places-notice p{margin:0;font-size:12px}
+.ref-place-card{display:flex;align-items:center;gap:15px;background:#fff;border:1px solid #dce7f5;border-radius:19px;padding:12px;box-shadow:var(--shadow);min-width:0;text-align:left}
+.ref-place-art{position:relative;flex:none;width:118px;height:94px;border-radius:13px;overflow:hidden;background:linear-gradient(#93cef5 0%,#d3ecfb 55%,#d7e8c0 56%,#73ba85 100%)}
+.ref-place-art:before{content:"";position:absolute;inset:42% 0 -12%;background:linear-gradient(125deg,#98c88b 20%,#469470 22%,#96c598 38%,#91baa0 45%,#e1e0c5 46%,#dad9c7 58%,#7cb17e 59%)}
+.ref-place-art:after{content:"";position:absolute;left:8px;top:22px;width:22px;height:39px;border-radius:50% 50% 18% 18%;background:#4f986e;box-shadow:23px -8px 0 3px #5aa577,55px 3px 0 0 #408f67,78px -5px 0 7px #67ac77}
+.ref-place-info{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.ref-place-info strong{font-size:13px;line-height:1.4;font-weight:800}
+.ref-place-info>small{color:#718399;font-size:10px}
+.ref-place-tag{align-self:flex-start;font-size:10px;background:#e4f6eb;color:#31835c;padding:4px 8px;border-radius:25px}
+.ref-place-card>svg{width:17px;color:#77869a}
+.ref-place-card:hover{border-color:#a5cbfb;background:#fafdff}
+.ref-detail-view{display:grid;grid-template-columns:1.2fr .8fr;gap:17px;align-items:start}
+.ref-detail-primary,.ref-detail-map,.ref-detail-info{background:white;border:1px solid #dfe9f6;border-radius:20px;box-shadow:var(--shadow);padding:22px}
+.ref-detail-main{display:flex;align-items:center;gap:14px;margin:12px 0 15px}
+.ref-detail-main .mag-badge{font-size:23px;height:66px;min-width:100px}
+.ref-detail-main h2{font-size:19px;margin:0 0 4px}
+.ref-detail-main p{font-size:11px;color:#6b7c93;margin:0}
+.ref-detail-metrics{margin-top:17px;display:flex;flex-direction:column;gap:0}
+.ref-detail-metrics>div{display:flex;justify-content:space-between;gap:16px;border-top:1px solid #e6edf7;padding:12px 0;font-size:12px}
+.ref-detail-metrics span{color:#60718b}
+.ref-detail-metrics strong{font-size:12px;text-align:right}
+.ref-detail-map{min-height:190px;background:#e4f1ff url('./assets/almaty-mountain-art.svg') center/cover}
+.ref-detail-info{grid-column:1/-1;background:#f2f7ff}
+.ref-detail-info p{font-size:12px;color:#516b8b;margin:0}
+.ref-detail-primary .button{margin-top:20px}
+.ref-visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+@media(max-width:800px){
+  /* The reference is a native-style composition, not a compressed desktop dashboard. */
+  :root{--bg:#ecf3ff;--paper:#fff;--stroke:#dce7f6}
+  html{scroll-padding-top:0}
+  body{background:#eaf2ff;color:#15243b}
+  .site-header{display:none}
+  main{max-width:520px;padding:0 0 calc(100px + env(safe-area-inset-bottom));min-height:100dvh}
+  .page{min-height:calc(100dvh - 90px);padding:0 13px 20px;background:linear-gradient(180deg,#e5f0ff 0,#eff5ff 56%,#eff5ff 100%)}
+  #page-home{gap:0}
+  #page-home .hero{display:none!important}
+  .ref-home-hero{display:flex;flex-direction:column;position:relative;isolation:isolate;min-height:320px;padding:22px 18px 125px;margin:0 -13px;overflow:hidden;background:linear-gradient(180deg,#ebf5ff 0%,#dcebff 65%,#c7def9 100%)}
+  .ref-home-hero:before{content:"";position:absolute;z-index:-1;inset:70px -5px 0 0;background:url('./assets/almaty-mountain-art.svg') center bottom/auto 240px no-repeat;opacity:.93}
+  .ref-home-hero:after{content:"";position:absolute;inset:auto 0 0;height:46px;z-index:-1;background:linear-gradient(transparent,#e1edff)}
+  .ref-home-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:51px}
+  .ref-logo{display:flex;align-items:center;gap:9px;color:#18283c}
+  .ref-logo .icon{width:34px;height:34px;color:#1769ed;stroke-width:1.7}
+  .ref-logo strong{font-size:15px;line-height:1.06;letter-spacing:-.04em;font-weight:800}
+  .ref-header-buttons{display:flex;align-items:center;gap:9px}
+  .ref-header-buttons button{width:44px;height:44px;display:grid;place-items:center;border:1px solid #e2eafa;background:#fff;border-radius:50%;color:#1b283f;box-shadow:0 4px 12px rgba(42,86,142,.08)}
+  .ref-header-buttons button .icon{width:21px;height:21px}
+  .ref-greeting{display:flex;align-items:flex-end;justify-content:space-between;gap:7px;margin-top:28px}
+  .ref-greeting h2{font-size:26px;line-height:1.2;letter-spacing:-.05em;font-weight:800;margin:0;color:#111f34}
+  .ref-city-chip{display:flex;align-items:center;gap:5px;background:#ffffffc9;backdrop-filter:blur(8px);padding:7px 9px;border-radius:14px;box-shadow:0 4px 14px rgba(47,97,147,.06);white-space:nowrap;color:#3d628b;font-size:10px;font-weight:800}
+  .ref-city-chip .icon{width:17px;height:17px;color:#1769ed}
+  .ref-status-card{position:absolute;z-index:4;bottom:15px;left:17px;right:17px;display:flex;align-items:center;gap:11px;padding:17px 14px;min-height:101px;border-radius:23px;border:1px solid #d8ebf4;background:linear-gradient(112deg,#f7fcff 0%,#e0f8f0 100%);box-shadow:0 9px 24px rgba(46,106,166,.15)}
+  .ref-status-check{width:49px;height:49px;flex:none;display:grid;place-items:center;border-radius:50%;color:#fff;background:#3ec487;box-shadow:0 0 0 9px #d6f5e6}
+  .ref-status-check .icon{height:25px;width:25px;stroke-width:2.5}
+  .ref-status-card>div{flex:1;min-width:0}
+  .ref-status-card>div>span{display:block;color:#244134;font-size:10px;font-weight:800;line-height:1.4}
+  .ref-status-card strong{font-size:17px;display:block;line-height:1.4;font-weight:800;letter-spacing:-.04em}
+  .ref-status-card small{display:block;color:#50697e;font-size:9px;line-height:1.5}
+  .ref-card-arrow{width:19px;height:19px;color:#5c6b7c}
+  .ref-status-card.is-error{background:linear-gradient(110deg,#fffbf3,#fff1d6);border-color:#ffe2b2}
+  .ref-status-card.is-error .ref-status-check{background:#e4aa43;box-shadow:0 0 0 9px #ffebc3}
+  .ref-status-card.is-error .ref-status-check .icon{stroke:white}
+  #page-home .quick-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:13px 0 18px;order:1}
+  #page-home .quick-action{border:1px solid #e5ecf8;border-radius:19px;box-shadow:0 7px 20px rgba(54,87,142,.08);background:#fff;min-height:103px;display:flex;justify-content:center;align-items:center;padding:13px 4px 9px;gap:9px;text-align:center}
+  #page-home .quick-action>span{margin:0;display:grid;place-items:center;width:36px;height:36px;border-radius:13px;background:#ecf4ff;box-shadow:none}
+  #page-home .quick-action>span .icon{width:25px;height:25px;color:#166be9}
+  #page-home .quick-action strong{font-weight:800;line-height:1.15;font-size:10px;letter-spacing:-.025em}
+  #page-home .quick-action small{display:none}
+  #page-home .home-panels{display:flex;flex-direction:column;order:2;gap:12px;margin:0}
+  #page-home .home-panels>.summary-card,#page-home .home-panels>.map-preview{display:none}
+  #page-home .home-panels>.latest-card{display:block;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+  #page-home .latest-card .section-top{align-items:center;margin:0 5px 13px}
+  #page-home .latest-card .eyebrow{display:none}
+  #page-home .latest-card h2{font-size:19px;letter-spacing:-.045em;font-weight:800;margin:0}
+  #page-home .latest-card .text-link{font-size:11px}
+  #page-home .latest-card .feed-list{display:flex;gap:9px}
+  #page-home .feed-item{min-height:83px;background:#fff;border:1px solid #e6edf8;border-radius:19px;padding:12px 11px;box-shadow:0 5px 17px rgba(57,99,160,.055)}
+  #page-home .mag-badge{background:#eaf2ff;color:#2b69bc;min-width:54px;height:52px;border-radius:16px;font-size:13px}
+  #page-home .mag-badge.m4{background:#fff1e4;color:#b57620}
+  #page-home .mag-badge.m5{background:#ffeced;color:#d34a55}
+  #page-home .feed-main strong{font-size:12px}
+  #page-home .feed-main small{font-size:10px}
+  .ref-topbar{height:68px;display:grid;grid-template-columns:47px 1fr 47px;align-items:center;margin:0 -4px;gap:6px}
+  .ref-topbar>strong{text-align:center;font-weight:800;font-size:18px;letter-spacing:-.045em}
+  .ref-back{display:grid;place-items:center;width:40px;height:40px;border:1px solid #e6edf8;border-radius:50%;background:rgba(255,255,255,.85);color:#273247}
+  .ref-back .icon{transform:rotate(180deg);width:20px;height:20px}
+  .ref-topbar-action{display:grid;place-items:center;color:#315782}
+  .ref-topbar-action .icon{width:20px;height:20px}
+  #page-map .page-heading{display:none}
+  #page-map .map-filter-row{margin:1px -5px 10px;overflow-x:auto;padding:4px 5px 9px;gap:7px;scrollbar-width:none;flex-wrap:nowrap}
+  #page-map .map-filter{min-height:42px;border-radius:22px;background:#fff;border-color:#dfeafa;font-size:10px;box-shadow:0 3px 9px #2b5d8e10;padding:6px 12px 6px 7px}
+  #page-map .map-filter.is-active{color:#1769ed;background:#e0edff;border-color:#a8c9ff}
+  #page-map .filter-glyph{width:26px;height:26px;border-radius:50%}
+  #page-map .filter-glyph .icon{width:16px;height:16px}
+  #page-map .map-workspace{display:flex;flex-direction:column;gap:0;min-height:0}
+  #page-map .map-sidebar{display:none}
+  #page-map .map-canvas-wrap{order:0;width:100%;height:calc(100dvh - 235px);max-height:none;min-height:390px;overflow:hidden;border:0;border-radius:21px 21px 16px 16px;box-shadow:0 8px 21px rgba(50,84,142,.08)}
+  #page-map .map-legend-float{left:10px;right:10px;top:10px;max-width:none;gap:5px;justify-content:flex-start}
+  #page-map .map-legend-float span{font-size:9px;border-radius:12px;padding:5px 7px;min-height:26px}
+  #page-map .map-sheet{left:10px;right:10px;bottom:10px;padding:11px 14px 15px;border-radius:26px;max-width:none;max-height:55%;box-shadow:0 7px 25px rgba(33,70,120,.16)}
+  #page-map .sheet-default{min-height:56px;justify-content:center}
+  #page-map .sheet-default strong{font-size:12px}
+  #page-map .sheet-default span{font-size:10px}
+  #page-map .sheet-header{align-items:center;gap:10px}
+  #page-map .sheet-type-icon{border-radius:15px}
+  #page-map .sheet-heading h3{font-size:13px;letter-spacing:-.025em}
+  #page-map .sheet-category{font-size:9px}
+  #page-map .sheet-info{font-size:10px;margin:8px 0}
+  #page-map .sheet-meta{gap:6px;font-size:10px}
+  #page-map .sheet-actions .button{min-height:42px;font-size:11px;border-radius:13px}
+  #page-map .sheet-handle{display:block;width:32px;height:4px;margin:0 auto 9px;background:#d7dfeb;border-radius:10px}
+  #page-events .page-heading{display:none}
+  .ref-event-chips{display:flex;gap:7px;white-space:nowrap;overflow-x:auto;margin:3px -4px 16px;padding:2px 4px 7px;scrollbar-width:none}
+  .ref-event-chips::-webkit-scrollbar{display:none}
+  .ref-event-chips button{flex:none;min-height:37px;background:rgba(255,255,255,.85);border:1px solid #e4eafb;border-radius:23px;padding:7px 17px;color:#526d8b;font-size:11px;font-weight:800}
+  .ref-event-chips button.is-active{color:#fff;background:#1469ed;border-color:#1469ed;box-shadow:0 5px 12px #175eda24}
+  #page-events .event-panel{padding:0;border:0;background:transparent;box-shadow:none;border-radius:0}
+  #page-events .filters{display:none}
+  #page-events .event-feed{display:flex;flex-direction:column;gap:9px}
+  #page-events .feed-item{min-height:75px;border-radius:17px;background:#fff;border:1px solid #e1eaf7;box-shadow:0 5px 16px #366db010;padding:9px 12px}
+  #page-events .mag-badge{min-width:58px;height:47px;border-radius:13px;font-size:14px}
+  #page-events .feed-main strong{font-size:12px}
+  #page-events .feed-main small{font-size:10px}
+  #page-instructions .page-heading{display:none}
+  .ref-instructions-panorama{display:block;height:126px;margin:1px -13px -17px;background:url('./assets/almaty-mountain-art.svg') 50% 65%/auto 205px no-repeat}
+  #page-instructions .instructions-intro{position:relative;z-index:2;display:block;padding:19px;border-radius:21px;margin:0 0 14px;background:#fff;box-shadow:0 6px 19px #366db015;border:1px solid #e0eafd}
+  #page-instructions .instructions-icon{display:none}
+  #page-instructions .instructions-intro strong{font-size:16px}
+  #page-instructions .instructions-intro p{font-size:11px;margin-top:5px}
+  #page-instructions .instruction-tabs{width:100%;max-width:100%;padding:4px;gap:3px;margin:0 0 14px;border-radius:15px;background:#e4eefc}
+  #page-instructions .instruction-tabs button{min-width:0;flex:1;min-height:40px;border-radius:12px;font-size:11px;padding:8px 6px}
+  #page-instructions .instruction-layout{display:flex;flex-direction:column;gap:12px}
+  #page-instructions .guide-cards{display:flex;flex-direction:column;gap:8px;width:100%}
+  #page-instructions .guide-card{min-height:0;display:flex;flex-direction:row;align-items:flex-start;gap:12px;padding:16px;border-radius:16px;border:1px solid #e2eafb;box-shadow:0 4px 12px #326bb00c}
+  #page-instructions .guide-card strong{background:#eaf3ff;border-radius:10px;color:#1769ed;min-width:35px;height:36px;display:grid;place-items:center;font-size:13px}
+  #page-instructions .guide-card p{font-size:12px;margin:0;line-height:1.6}
+  #page-instructions .training-card{width:100%;padding:18px;border-radius:18px}
+  #page-instructions .training-card h2{font-size:15px;margin:8px 0}
+  #page-instructions .training-card>p{font-size:11px}
+  #page-profile .page-heading{display:none}
+  .ref-profile-summary{display:flex;align-items:center;gap:14px;margin:5px 0 17px;padding:18px 15px;background:#fff;border:1px solid #e1eafa;border-radius:20px;box-shadow:0 7px 19px #306c9b11}
+  .ref-profile-avatar{width:53px;height:53px;display:grid;place-items:center;color:#2675d9;background:linear-gradient(145deg,#e2f0ff,#bbd6f6);border-radius:50%}
+  .ref-profile-avatar .icon{width:26px;height:26px}
+  .ref-profile-summary>div:nth-child(2){display:flex;flex-direction:column;flex:1;gap:3px}
+  .ref-profile-summary strong{font-size:15px;font-weight:800}
+  .ref-profile-summary span{font-size:10px;color:#7b8fa7}
+  .ref-profile-summary>svg{width:19px;height:19px;color:#8a9aad}
+  #page-profile .profile-layout{display:flex;flex-direction:column;gap:12px}
+  #page-profile .profile-card{width:100%;padding:18px;border-radius:18px}
+  #page-profile .profile-avatar{display:none}
+  #page-profile .profile-card h2{font-size:15px;margin:0 0 7px}
+  #page-profile .profile-card>.muted{font-size:11px}
+  #page-profile .profile-card label{font-size:11px}
+  #page-profile .profile-card input{min-height:46px}
+  #page-profile .form-actions{flex-wrap:wrap}
+  #page-profile .setting-card{padding:18px;border-radius:18px}
+  #page-profile .setting-card h2{font-size:15px}
+  #page-profile .setting-line{font-size:12px;padding:12px 0}
+  #page-profile .caution-inline.standalone{margin-top:12px;padding:14px}
+  #page-event-detail .ref-detail-view{display:flex;flex-direction:column;gap:13px;margin-top:6px}
+  #page-event-detail .ref-detail-primary{width:100%;padding:17px;border-radius:20px}
+  #page-event-detail .ref-detail-main{margin:11px 0 14px;gap:13px}
+  #page-event-detail .ref-detail-main .mag-badge{height:59px;min-width:91px;font-size:21px;border-radius:17px}
+  #page-event-detail .ref-detail-main h2{font-size:15px}
+  #page-event-detail .ref-detail-main p{font-size:10px}
+  #page-event-detail .ref-detail-metrics>div{padding:11px 0;font-size:11px}
+  #page-event-detail .ref-detail-metrics strong{font-size:11px}
+  #page-event-detail .ref-detail-map{width:100%;min-height:160px;border-radius:19px}
+  #page-event-detail .ref-detail-info{width:100%;border-radius:18px;padding:15px;background:#fff5e8;border-color:#fbe7c9}
+  #page-event-detail .ref-detail-info p{color:#896331;font-size:11px}
+  #page-places .page-heading{display:none}
+  #page-places .ref-places-notice{padding:12px 13px;border-radius:15px;margin:4px 0 17px}
+  #page-places .ref-places-notice p{font-size:11px}
+  #page-places .ref-places-list{display:flex;flex-direction:column;gap:11px}
+  #page-places .ref-place-card{width:100%;padding:10px;min-height:119px;border-radius:18px;box-shadow:0 6px 18px #366eb00e}
+  #page-places .ref-place-art{width:109px;height:94px;border-radius:13px}
+  #page-places .ref-place-info strong{font-size:12px}
+  #page-places .ref-place-info>small{font-size:10px}
+  #page-places .ref-place-tag{font-size:9px;color:#9a702b;background:#fff0d1}
+  .bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(520px,100%);border-top:1px solid #e0eafb;border-radius:24px 24px 0 0;padding:8px 11px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -5px 20px #24568e12;backdrop-filter:blur(18px)}
+  .bottom-link{min-height:53px;font-size:10px;color:#5f718a}
+  .bottom-link.is-active{color:#1468ed}
+  .bottom-link.is-active .icon{background:#1468ed;color:#fff;width:40px;height:32px;border-radius:13px;padding:7px}
+  .site-footer{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+  /* Critical-warning screen is an explicit training scenario, not real notification. */
+  .training-overlay{background:radial-gradient(ellipse at 50% 20%,#ea575e 0,#c9303b 44%,#9e1d2d 85%)}
+  .training-content{max-width:440px}
+  .training-symbol{width:106px;height:106px;border-radius:50%;background:#f05861;box-shadow:0 0 0 18px #ffffff13,0 0 0 37px #ffffff08}
+  .training-content h1{font-size:36px;letter-spacing:-.06em}
+  .training-content>p{font-size:13px;line-height:1.7}
+  .training-steps{padding:6px 16px;border-radius:23px;box-shadow:0 10px 28px #7e1a2430}
+  .training-steps>div{font-size:12px}
+  .training-button{border-radius:19px;min-height:53px}
+}
+@media(max-width:359px){
+  .ref-home-hero{min-height:314px;padding-left:12px;padding-right:12px}
+  .ref-status-card{left:10px;right:10px;padding:12px 9px}
+  .ref-greeting h2{font-size:24px}
+  #page-home .quick-actions{gap:5px}
+  #page-home .quick-action{padding:10px 2px}
+  #page-home .quick-action strong{font-size:9px}
+  .ref-place-art{width:90px!important}
+  .ref-city-chip{font-size:9px}
+}
+@media(min-width:801px) and (max-width:1100px){
+  .ref-places-list{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .ref-home-hero,.ref-status-card,.ref-place-card{transition:none!important}
+}
+
+
+/* Fidelity refinements from the approved instruction, details and profile panels */
+@media(max-width:800px){
+  #page-instructions{display:flex;flex-direction:column}
+  #page-instructions .ref-topbar{order:0;flex:none}
+  #page-instructions .instruction-tabs{order:1;flex:none;margin:3px 0 0}
+  #page-instructions .ref-instructions-panorama{order:2;flex:none;margin:2px -13px -18px;height:141px;background-position:center 64%;background-size:auto 212px}
+  #page-instructions .instructions-intro{order:3;flex:none}
+  #page-instructions .instruction-layout{order:4}
+  #page-event-detail .ref-detail-map{display:none}
+  #page-profile .profile-aside{order:0;width:100%}
+  #page-profile .profile-card{order:1;width:100%}
+  #page-profile .setting-card{box-shadow:0 6px 18px rgba(42,85,152,.06)}
+  #page-profile .setting-line{min-height:56px}
+  #page-profile .setting-line>span{font-weight:750;color:#243a56}
+  #page-profile .setting-line>a,#page-profile .setting-line>strong{font-size:11px}
+  #page-places .ref-place-card:focus-visible{outline:3px solid #1469ed;outline-offset:3px}
+}
+@media(max-width:560px){
+  #page-instructions .instruction-tabs button{font-size:10px}
+  #page-profile .ref-profile-summary{margin-top:2px}
+  #page-profile .profile-card{box-shadow:none}
+  #page-event-detail .ref-detail-primary>.button{border-radius:14px}
+}
+/* Keep iconography interactive and visual statuses honest. */
+@media(max-width:800px){
+  .ref-status-card{font:inherit;text-align:left;cursor:pointer;color:#15243b;-webkit-appearance:none;appearance:none}
+  .ref-status-card:focus-visible{outline:3px solid #2676e9;outline-offset:3px}
+  .ref-status-card.is-loading{background:linear-gradient(112deg,#f7fbff,#e7efff);border-color:#d5e6fa}
+  .ref-status-card.is-loading .ref-status-check{background:#6b94c9;box-shadow:0 0 0 9px #deeafa}
+  .ref-topbar-reset{display:grid;place-items:center;border:1px solid #e6edf8;border-radius:50%;background:rgba(255,255,255,.85);color:#315782;width:40px;height:40px}
+  .ref-topbar-reset .icon{width:19px;height:19px}
+  .ref-topbar-reset:focus-visible{outline:3px solid #2676e9;outline-offset:2px}
+}
+
+/* Settings rows use the same compact icon-and-label rhythm as the approved board. */
+.ref-setting-name{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.ref-setting-name .icon{width:21px;height:21px;color:#1769ed;background:#edf4ff;border-radius:10px;box-sizing:content-box;padding:10px}
+.ref-setting-value{display:inline-flex;align-items:center;padding:9px;background:none;color:#1769ed;border:0;font-size:11px;font-weight:800;white-space:nowrap}
+@media(max-width:800px){
+  #page-profile .setting-line{min-height:63px;gap:10px}
+  #page-profile .setting-line>span{display:inline-flex;align-items:center;gap:11px;font-size:11px}
+  #page-profile .ref-setting-name .icon{width:20px;height:20px;padding:8px;border-radius:11px;flex:none}
+  #page-profile .ref-setting-value{padding:8px 0}
+  #page-profile .profile-card{margin-top:1px}
+  #page-profile .profile-form label{font-size:11px}
+}

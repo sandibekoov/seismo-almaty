@@ -44,7 +44,7 @@
       'Следуйте сообщениям официальных служб; при угрозе жизни звоните 112.'
     ]
   };
-  const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false,mapFilter:'all'};
+  const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false,mapFilter:'all',eventScope:'all',detailBack:'events'};
   let toastTimer;
   function toast(msg){const el=$('toast');el.textContent=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.textContent=''},4800)}
   function dateAlmaty(t){return new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(t))}
@@ -59,11 +59,11 @@
     state.current=page;
     document.querySelectorAll('.page').forEach(p=>{const selected=p===target;p.hidden=!selected;p.classList.toggle('is-active',selected)});
     document.querySelectorAll('[data-page]').forEach(b=>{
-      const active=b.dataset.page===page;
+      const active=b.dataset.page===page || (page==='places'&&b.dataset.page==='map') || (page==='event-detail'&&b.dataset.page==='events');
       if(b.classList.contains('nav-link')||b.classList.contains('bottom-link')){b.classList.toggle('is-active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}
     });
     if(page==='map')requestAnimationFrame(()=>{ensureMap();if(state.map)state.map.invalidateSize()});
-    if(page==='events')renderEvents();
+    if(page==='events')renderEvents();if(page==='places')renderPlaces();
     if(page==='profile')fillProfile();
     window.scrollTo({top:0,behavior:'instant'});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
@@ -87,20 +87,64 @@
     $('statCount').textContent=state.feed==='ok'?String(state.quakes.length):'—';
     $('statMax').textContent=state.feed==='ok'?(state.quakes.length?'M '+Math.max(...state.quakes.map(q=>q.mag)).toFixed(1):'—'):'—';
     $('statRecent').textContent=state.feed==='ok'?(state.quakes.length?ago(state.quakes[0].time):'—'):'—';
+    if($('refFeedTitle')) {
+      $('refFeedTitle').textContent=state.feed==='ok'?'Данные получены':state.feed==='error'?'Нет соединения':'Загрузка данных';
+      $('refFeedSubtitle').textContent=state.feed==='ok'?'USGS · обновлено '+new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',hour:'2-digit',minute:'2-digit'}).format(new Date(state.updated)):state.feed==='error'?'Статус безопасности неизвестен':'Проверяем подключение USGS…';
+      document.querySelector('.ref-status-card')?.classList.toggle('is-error',state.feed==='error');
+      document.querySelector('.ref-status-card')?.classList.toggle('is-loading',state.feed==='loading');
+    }
     renderFeed(state.quakes.slice(0,3),$('homeEvents'),'За 30 дней событий M ≥ 2.5 в каталоге не найдено.');
   }
   function filteredEvents(){
     const days=Number($('periodFilter').value)||30,min=Number($('magnitudeFilter').value)||2.5;
     const cut=Date.now()-days*86400000;
-    return state.quakes.filter(q=>q.time>=cut&&q.mag>=min);
+    return state.quakes.filter(q=>q.time>=cut&&q.mag>=min).filter(q=>state.eventScope==='strong'?q.mag>=4:state.eventScope==='local'?distance(ALMATY,q)<=60:true);
   }
   function renderEvents(){
     const items=filteredEvents();
     $('eventCount').textContent=state.feed==='ok'?'Показано '+items.length+' из '+state.quakes.length:'Состояние: '+(state.feed==='loading'?'загрузка':'нет связи');
     renderFeed(items,$('eventsList'),'События с такими параметрами в каталоге не найдены.');
   }
+  function setEventScope(scope){
+    if(!['all','local','strong'].includes(scope))return;
+    state.eventScope=scope;
+    document.querySelectorAll('[data-event-scope]').forEach(b=>{const yes=b.dataset.eventScope===scope;b.classList.toggle('is-active',yes);b.setAttribute('aria-pressed',String(yes))});
+    renderEvents();
+  }
+  function renderPlaces(){
+    const root=$('placesList');if(!root)return;
+    root.innerHTML=ASSEMBLY.map((p,i)=>{
+      const person=state.profile&&Number.isFinite(state.profile.lat)&&Number.isFinite(state.profile.lng);
+      const dist=person?'≈ '+distance(state.profile,p).toFixed(1)+' км по прямой':'Расположение предварительное';
+      return '<button class="ref-place-card" data-place-index="'+i+'" type="button"><span class="ref-place-art" aria-hidden="true"></span><span class="ref-place-info"><strong>'+esc(p.name)+'</strong><small>'+esc(dist)+'</small><span class="ref-place-tag">Не подтверждено официально</span></span>'+svgIcon('chevron')+'</button>';
+    }).join('');
+  }
+  function openPlace(i){
+    const p=ASSEMBLY[i];if(!p)return;
+    setMapFilter('assembly');nav('map');
+    requestAnimationFrame(()=>{if(state.map){state.map.setView([p.lat,p.lng],14);state.map.invalidateSize()}showMapAssembly(p)});
+  }
+  function mobileEventDetail(q){
+    const src=safeUSGS(q.url);
+    $('refEventDetail').innerHTML='<article class="ref-detail-primary">'
+      +'<span class="eyebrow">ЗАРЕГИСТРИРОВАННОЕ СОБЫТИЕ · USGS</span>'
+      +'<div class="ref-detail-main">'+badge(q.mag)+'<div><h2>'+esc(locLabel(q))+'</h2><p>'+esc(dateAlmaty(q.time))+' · Алматы</p></div></div>'
+      +'<div class="ref-detail-metrics">'
+      +'<div><span>Магнитуда</span><strong>M '+q.mag.toFixed(1)+'</strong></div>'
+      +'<div><span>Расстояние от центра Алматы</span><strong>≈ '+Math.round(distance(ALMATY,q))+' км</strong></div>'
+      +'<div><span>Глубина</span><strong>'+q.depth.toFixed(1)+' км</strong></div>'
+      +'<div><span>Координаты эпицентра</span><strong>'+q.lat.toFixed(4)+'°, '+q.lng.toFixed(4)+'°</strong></div>'
+      +'<div><span>Источник</span><strong>USGS</strong></div></div>'
+      +(src?'<a class="button button-primary wide" href="'+esc(src)+'" target="_blank" rel="noopener noreferrer">Источник USGS '+svgIcon('arrow')+'</a>':'')
+      +'</article><div class="ref-detail-map" role="img" aria-label="Декоративная панорама Алматы, не карта эпицентра"></div>'
+      +'<div class="ref-detail-info"><p>Магнитуда не прогнозирует последствия для отдельного здания. Каталог USGS не является системой раннего оповещения.</p></div>';
+    const back=state.current==='map'?'map':'events';
+    const button=$('page-event-detail').querySelector('.ref-back');if(button)button.dataset.page=back;
+    nav('event-detail');
+  }
   function detail(q){
     if(!q)return;
+    if(window.matchMedia && window.matchMedia('(max-width: 800px)').matches){mobileEventDetail(q);return}
     const url=safeUSGS(q.url);
     $('detailContent').innerHTML='<span class="eyebrow">ЗАРЕГИСТРИРОВАННОЕ СОБЫТИЕ · USGS</span><h2>'+badge(q.mag)+' '+esc(locLabel(q))+'</h2><p>'+esc(dateAlmaty(q.time))+' · время Алматы</p><div class="detail-metrics"><div><small>Магнитуда</small><strong>M '+q.mag.toFixed(1)+'</strong></div><div><small>Глубина</small><strong>'+q.depth.toFixed(1)+' км</strong></div><div><small>Расстояние от центра Алматы</small><strong>≈ '+Math.round(distance(ALMATY,q))+' км</strong></div><div><small>Эпицентр</small><strong>'+q.lat.toFixed(4)+'°, '+q.lng.toFixed(4)+'°</strong></div></div><p>Магнитуда и расстояние не определяют последствия для конкретного здания и не являются прогнозом.</p>'+(url?'<a class="button button-primary wide" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Открыть первоисточник USGS '+svgIcon('arrow')+'</a>':'');
     $('detailDialog').hidden=false;document.body.style.overflow='hidden';$('closeDetail').focus();
@@ -281,11 +325,13 @@
       if(saveProfile()){fillProfile();refreshMapMarkers();toast('Местоположение сохранено');if(state.current==='map'&&state.map)state.map.setView([state.profile.lat,state.profile.lng],13)}
     },()=>toast('Не получилось определить местоположение. Можно ввести координаты вручную.'),{enableHighAccuracy:false,timeout:10000,maximumAge:300000});
   }
-  loadProfile();fillProfile();activateGuide('during');
+  loadProfile();fillProfile();activateGuide('before');renderPlaces();
   document.addEventListener('click',e=>{
     const pager=e.target.closest('[data-page]');
     if(pager){e.preventDefault();if(pager.dataset.mapLayer==='assembly')setMapFilter('assembly');nav(pager.dataset.page);return}
     const evt=e.target.closest('[data-event-index]');if(evt){detail(state.quakes[Number(evt.dataset.eventIndex)]);return}
+    const place=e.target.closest('[data-place-index]');if(place){openPlace(Number(place.dataset.placeIndex));return}
+    const scope=e.target.closest('[data-event-scope]');if(scope){setEventScope(scope.dataset.eventScope);return}
     const guide=e.target.closest('[data-guide]');if(guide){activateGuide(guide.dataset.guide);return}
   });
   document.querySelector('.map-preview').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nav('map')}});
@@ -294,13 +340,17 @@
   document.querySelectorAll('[data-map-filter]').forEach(button=>button.addEventListener('click',()=>setMapFilter(button.dataset.mapFilter)));
   ['mapRefresh','eventsRefresh'].forEach(id=>$(id).addEventListener('click',fetchQuakes));
   ['locateMe','profileGeolocate'].forEach(id=>$(id).addEventListener('click',geolocate));
+  $('openAddressEditor').addEventListener('click',()=>{
+    const editor=$('profileForm');
+    if(editor){editor.scrollIntoView({behavior:'smooth',block:'start'});$('profileAddress').focus({preventScroll:true})}
+  });
   $('profileForm').addEventListener('submit',saveForm);
   $('closeDetail').addEventListener('click',closeDetail);
   $('detailDialog').addEventListener('click',e=>{if(e.target===$('detailDialog'))closeDetail()});
   $('startDrill').addEventListener('click',openDrill);
   ['endDrill','trainingDone'].forEach(id=>$(id).addEventListener('click',closeDrill));
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('detailDialog').hidden)closeDetail();if(!$('trainingOverlay').hidden)closeDrill()}});
-  nav(['home','map','events','instructions','profile'].includes(location.hash.slice(1))?location.hash.slice(1):'home');
+  nav(['home','map','events','instructions','profile','places'].includes(location.hash.slice(1))?location.hash.slice(1):'home');
   fetchQuakes();
   setInterval(fetchQuakes,300000);
 })();
