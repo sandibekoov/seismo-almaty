@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="./site.css?v=2">
+  <link rel="stylesheet" href="../site.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -87,7 +87,7 @@
         <button class="quick-action" type="button" data-page="map"><span><svg class="icon"><use href="#i-map"></use></svg></span><strong>Карта</strong><small>Сейсмические события</small></button>
         <button class="quick-action" type="button" data-page="instructions"><span><svg class="icon"><use href="#i-book"></use></svg></span><strong>Инструкции</strong><small>До, во время и после</small></button>
         <button class="quick-action" type="button" data-page="map" data-map-layer="assembly"><span><svg class="icon"><use href="#i-group"></use></svg></span><strong>Места сбора</strong><small>Учебные ориентиры</small></button>
-        <a class="quick-action" href="./engineering/"><span><svg class="icon"><use href="#i-wave"></use></svg></span><strong>Engineering</strong><small>Датчики и сценарии</small></a>
+        <a class="quick-action" href="../engineering/"><span><svg class="icon"><use href="#i-wave"></use></svg></span><strong>Engineering</strong><small>Датчики и сценарии</small></a>
       </div>
     </section>
 
@@ -114,13 +114,13 @@
       <div class="page-heading"><div><span class="eyebrow">РЕКОМЕНДАЦИИ ПО БЕЗОПАСНОСТИ</span><h1 id="instructionsHeading">Что делать при землетрясении</h1><p>Общие рекомендации. Следуйте официальным указаниям экстренных служб.</p></div></div>
       <div class="instructions-intro"><span class="instructions-icon"><svg class="icon"><use href="#i-shield"></use></svg></span><div><strong>Заранее изучите план безопасности</strong><p>Во время сильных толчков приоритет — укрыться и защитить голову, а не бежать наружу.</p></div></div>
       <div class="instruction-tabs" role="tablist" aria-label="Этапы безопасности"><button class="is-active" data-guide="during" role="tab" aria-selected="true" type="button">Во время</button><button data-guide="before" role="tab" aria-selected="false" type="button">До</button><button data-guide="after" role="tab" aria-selected="false" type="button">После</button></div>
-      <div class="instruction-layout"><div class="guide-cards" id="guideCards"></div><aside class="surface training-card"><span class="eyebrow">УЧЕБНЫЙ РЕЖИМ</span><h2>Проверьте интерфейс тревоги</h2><p>Откройте демонстрационный экран с инструкциями. Он не связан с реальным датчиком и не отправляет сообщения.</p><button class="button button-danger wide" id="startDrill" type="button"><svg class="icon"><use href="#i-alert"></use></svg> Запустить тренировку</button><a href="./engineering/" class="text-link engineering-link">Открыть инженерный мониторинг <svg class="icon"><use href="#i-arrow"></use></svg></a></aside></div>
+      <div class="instruction-layout"><div class="guide-cards" id="guideCards"></div><aside class="surface training-card"><span class="eyebrow">УЧЕБНЫЙ РЕЖИМ</span><h2>Проверьте интерфейс тревоги</h2><p>Откройте демонстрационный экран с инструкциями. Он не связан с реальным датчиком и не отправляет сообщения.</p><button class="button button-danger wide" id="startDrill" type="button"><svg class="icon"><use href="#i-alert"></use></svg> Запустить тренировку</button><a href="../engineering/" class="text-link engineering-link">Открыть инженерный мониторинг <svg class="icon"><use href="#i-arrow"></use></svg></a></aside></div>
     </section>
 
     <section id="page-profile" class="page" aria-labelledby="profileHeading" hidden>
       <div class="page-heading"><div><span class="eyebrow">НАСТРОЙКИ</span><h1 id="profileHeading">Мой профиль</h1><p>Сохраняется только на этом устройстве. Для просмотра карты регистрация не нужна.</p></div></div>
       <div class="profile-layout"><div class="surface profile-card"><div class="profile-avatar"><svg class="icon"><use href="#i-user"></use></svg></div><h2>Местоположение</h2><p class="muted">Можно указать район или координаты, чтобы видеть расстояние до объектов на карте.</p><form id="profileForm"><label>Адрес или ориентир (необязательно)<input id="profileAddress" maxlength="150" placeholder="Например, проспект Абая"></label><div class="profile-two"><label>Широта<input id="profileLat" type="number" min="-90" max="90" step="any" placeholder="43.238"></label><label>Долгота<input id="profileLng" type="number" min="-180" max="180" step="any" placeholder="76.945"></label></div><div class="form-actions"><button class="button button-primary" type="submit">Сохранить</button><button class="button button-secondary" type="button" id="profileGeolocate"><svg class="icon"><use href="#i-location"></use></svg> Определить</button></div><p class="form-feedback" id="profileStatus" aria-live="polite"></p></form></div>
-      <div class="profile-aside"><div class="surface setting-card"><h2>О приложении</h2><div class="setting-line"><span>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div><div class="setting-line"><span>Регион мониторинга</span><strong>Алматы · 500 км</strong></div><div class="setting-line"><span>Инженерный режим</span><a href="./engineering/">Открыть ↗</a></div><div class="setting-line"><span>Версия веб-интерфейса</span><strong>Resident UI 1.0</strong></div></div><div class="caution-inline standalone"><svg class="icon"><use href="#i-info"></use></svg><p>Приложение не прогнозирует землетрясения, не заменяет официальные оповещения и не отправляет SOS. Экстренная служба Казахстана: <strong>112</strong>.</p></div></div></div>
+      <div class="profile-aside"><div class="surface setting-card"><h2>О приложении</h2><div class="setting-line"><span>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div><div class="setting-line"><span>Регион мониторинга</span><strong>Алматы · 500 км</strong></div><div class="setting-line"><span>Инженерный режим</span><a href="../engineering/">Открыть ↗</a></div><div class="setting-line"><span>Версия веб-интерфейса</span><strong>Resident UI 1.0</strong></div></div><div class="caution-inline standalone"><svg class="icon"><use href="#i-info"></use></svg><p>Приложение не прогнозирует землетрясения, не заменяет официальные оповещения и не отправляет SOS. Экстренная служба Казахстана: <strong>112</strong>.</p></div></div></div>
     </section>
   </main>
 
@@ -137,6 +137,6 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по автоматизации и управлению. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="./site.js?v=2" defer></script>
+  <script src="../site.js?v=2" defer></script>
 </body>
 </html>
