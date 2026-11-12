@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="../site.css?v=3">
+  <link rel="stylesheet" href="../reference-ui.css?v=1">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -53,6 +54,12 @@
 
   <main id="main">
     <section id="page-home" class="page is-active" aria-labelledby="homeHeading">
+      <div class="ref-home-hero">
+        <div class="ref-home-toolbar"><span class="ref-logo"><svg class="icon"><use href="#i-wave"></use></svg><strong>Seismo<br>Almaty</strong></span>
+          <span class="ref-header-buttons"><button type="button" data-page="events" aria-label="История событий"><svg class="icon"><use href="#i-events"></use></svg></button><button type="button" data-page="profile" aria-label="Профиль"><svg class="icon"><use href="#i-user"></use></svg></button></span></div>
+        <div class="ref-greeting"><h2>Здравствуйте!</h2><span class="ref-city-chip"><svg class="icon"><use href="#i-location"></use></svg> Алматы</span></div>
+        <div class="ref-status-card"><span class="ref-status-check"><svg class="icon"><use href="#i-check"></use></svg></span><div><span>Сейсмическая обстановка</span><strong id="refFeedTitle">Загрузка данных</strong><small id="refFeedSubtitle">Проверяем подключение USGS…</small></div><svg class="icon ref-card-arrow"><use href="#i-chevron"></use></svg></div>
+      </div>
       <div class="hero">
         <div class="hero-copy">
           <div class="eyebrow">SEISMO / ALMATY <span>●</span> УЧЕБНЫЙ ПРОЕКТ</div>
@@ -84,15 +91,16 @@
           <div id="homeEvents" class="feed-list"><div class="empty-state">Загружаем каталог USGS…</div></div>
         </article>
       </div>
-      <div class="quick-actions" aria-label="Разделы приложения">
-        <button class="quick-action" type="button" data-page="map"><span><svg class="icon"><use href="#i-map"></use></svg></span><strong>Карта</strong><small>Сейсмические события</small></button>
+            <div class="quick-actions" aria-label="Разделы приложения">
+        <button class="quick-action" type="button" data-page="events"><span><svg class="icon"><use href="#i-wave"></use></svg></span><strong>Мониторинг</strong><small>Землетрясения USGS</small></button>
+        <button class="quick-action" type="button" data-page="map"><span><svg class="icon"><use href="#i-map"></use></svg></span><strong>Карта</strong><small>Интерактивная карта</small></button>
+        <button class="quick-action" type="button" data-page="places"><span><svg class="icon"><use href="#i-group"></use></svg></span><strong>Места сбора</strong><small>Учебные ориентиры</small></button>
         <button class="quick-action" type="button" data-page="instructions"><span><svg class="icon"><use href="#i-book"></use></svg></span><strong>Инструкции</strong><small>До, во время и после</small></button>
-        <button class="quick-action" type="button" data-page="map" data-map-layer="assembly"><span><svg class="icon"><use href="#i-group"></use></svg></span><strong>Места сбора</strong><small>Учебные ориентиры</small></button>
-        <a class="quick-action" href="../engineering/"><span><svg class="icon"><use href="#i-wave"></use></svg></span><strong>Engineering</strong><small>Датчики и сценарии</small></a>
       </div>
     </section>
 
     <section id="page-map" class="page" aria-labelledby="mapHeading" hidden>
+      <div class="ref-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Карта</strong><span class="ref-topbar-action"><svg class="icon"><use href="#i-filter"></use></svg></span></div>
       <div class="page-heading">
         <div><span class="eyebrow">СЕЙСМИЧЕСКАЯ КАРТА</span><h1 id="mapHeading">Карта Алматы</h1><p>Землетрясения USGS, больницы, службы помощи и возможные места сбора</p></div>
         <button type="button" class="button button-secondary" id="locateMe"><svg class="icon"><use href="#i-location"></use></svg> Моё местоположение</button>
@@ -127,22 +135,41 @@
     </section>
 
     <section id="page-events" class="page" aria-labelledby="eventsHeading" hidden>
+      <div class="ref-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>События</strong><span class="ref-topbar-action"><svg class="icon"><use href="#i-filter"></use></svg></span></div>
+      <div class="ref-event-chips" role="group" aria-label="Выбрать события"><button type="button" class="is-active" data-event-scope="all" aria-pressed="true">Все</button><button type="button" data-event-scope="local" aria-pressed="false">Рядом с Алматы</button><button type="button" data-event-scope="strong" aria-pressed="false">M ≥ 4.0</button></div>
       <div class="page-heading"><div><span class="eyebrow">КАТАЛОГ СЕЙСМИЧЕСКИХ СОБЫТИЙ</span><h1 id="eventsHeading">История землетрясений</h1><p>Данные USGS в радиусе 500 км от Алматы, M ≥ 2.5</p></div><button class="button button-secondary" id="eventsRefresh" type="button"><svg class="icon"><use href="#i-refresh"></use></svg> Обновить</button></div>
       <div class="surface event-panel"><div class="filters"><label>Период<select id="periodFilter"><option value="30">Последние 30 дней</option><option value="7">Последние 7 дней</option><option value="1">За сутки</option></select></label><label>Магнитуда<select id="magnitudeFilter"><option value="2.5">M ≥ 2.5</option><option value="3">M ≥ 3.0</option><option value="4">M ≥ 4.0</option><option value="5">M ≥ 5.0</option></select></label><span class="filter-meta" id="eventCount">Загружаем…</span></div><div id="eventsList" class="feed-list event-feed"><div class="empty-state">Загружаем данные…</div></div></div>
     </section>
 
     <section id="page-instructions" class="page" aria-labelledby="instructionsHeading" hidden>
+      <div class="ref-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Инструкции</strong><span class="ref-topbar-action"></span></div>
+      <div class="ref-instructions-panorama" aria-hidden="true"></div>
       <div class="page-heading"><div><span class="eyebrow">РЕКОМЕНДАЦИИ ПО БЕЗОПАСНОСТИ</span><h1 id="instructionsHeading">Что делать при землетрясении</h1><p>Общие рекомендации. Следуйте официальным указаниям экстренных служб.</p></div></div>
       <div class="instructions-intro"><span class="instructions-icon"><svg class="icon"><use href="#i-shield"></use></svg></span><div><strong>Заранее изучите план безопасности</strong><p>Во время сильных толчков приоритет — укрыться и защитить голову, а не бежать наружу.</p></div></div>
-      <div class="instruction-tabs" role="tablist" aria-label="Этапы безопасности"><button class="is-active" data-guide="during" role="tab" aria-selected="true" type="button">Во время</button><button data-guide="before" role="tab" aria-selected="false" type="button">До</button><button data-guide="after" role="tab" aria-selected="false" type="button">После</button></div>
+      <div class="instruction-tabs" role="tablist" aria-label="Этапы безопасности"><button data-guide="before" role="tab" aria-selected="false" type="button">До</button><button class="is-active" data-guide="during" role="tab" aria-selected="true" type="button">Во время</button><button data-guide="after" role="tab" aria-selected="false" type="button">После</button></div>
       <div class="instruction-layout"><div class="guide-cards" id="guideCards"></div><aside class="surface training-card"><span class="eyebrow">УЧЕБНЫЙ РЕЖИМ</span><h2>Проверьте интерфейс тревоги</h2><p>Откройте демонстрационный экран с инструкциями. Он не связан с реальным датчиком и не отправляет сообщения.</p><button class="button button-danger wide" id="startDrill" type="button"><svg class="icon"><use href="#i-alert"></use></svg> Запустить тренировку</button><a href="../engineering/" class="text-link engineering-link">Открыть инженерный мониторинг <svg class="icon"><use href="#i-arrow"></use></svg></a></aside></div>
     </section>
 
     <section id="page-profile" class="page" aria-labelledby="profileHeading" hidden>
+      <div class="ref-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Профиль</strong><span class="ref-topbar-action"></span></div>
+      <div class="ref-profile-summary"><div class="ref-profile-avatar"><svg class="icon"><use href="#i-user"></use></svg></div><div><strong>Профиль жителя</strong><span>Алматы · данные только на устройстве</span></div><svg class="icon"><use href="#i-chevron"></use></svg></div>
       <div class="page-heading"><div><span class="eyebrow">НАСТРОЙКИ</span><h1 id="profileHeading">Мой профиль</h1><p>Сохраняется только на этом устройстве. Для просмотра карты регистрация не нужна.</p></div></div>
       <div class="profile-layout"><div class="surface profile-card"><div class="profile-avatar"><svg class="icon"><use href="#i-user"></use></svg></div><h2>Местоположение</h2><p class="muted">Можно указать район или координаты, чтобы видеть расстояние до объектов на карте.</p><form id="profileForm"><label>Адрес или ориентир (необязательно)<input id="profileAddress" maxlength="150" placeholder="Например, проспект Абая"></label><div class="profile-two"><label>Широта<input id="profileLat" type="number" min="-90" max="90" step="any" placeholder="43.238"></label><label>Долгота<input id="profileLng" type="number" min="-180" max="180" step="any" placeholder="76.945"></label></div><div class="form-actions"><button class="button button-primary" type="submit">Сохранить</button><button class="button button-secondary" type="button" id="profileGeolocate"><svg class="icon"><use href="#i-location"></use></svg> Определить</button></div><p class="form-feedback" id="profileStatus" aria-live="polite"></p></form></div>
       <div class="profile-aside"><div class="surface setting-card"><h2>О приложении</h2><div class="setting-line"><span>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div><div class="setting-line"><span>Регион мониторинга</span><strong>Алматы · 500 км</strong></div><div class="setting-line"><span>Инженерный режим</span><a href="../engineering/">Открыть ↗</a></div><div class="setting-line"><span>Версия веб-интерфейса</span><strong>Resident UI 1.0</strong></div></div><div class="caution-inline standalone"><svg class="icon"><use href="#i-info"></use></svg><p>Приложение не прогнозирует землетрясения, не заменяет официальные оповещения и не отправляет SOS. Экстренная служба Казахстана: <strong>112</strong>.</p></div></div></div>
     </section>
+    <section id="page-event-detail" class="page" aria-labelledby="refDetailHeading" hidden>
+      <div class="ref-topbar"><button class="ref-back" type="button" data-page="events" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Событие</strong><span class="ref-topbar-action"></span></div>
+      <h1 id="refDetailHeading" class="ref-visually-hidden">Детали землетрясения</h1>
+      <div id="refEventDetail" class="ref-detail-view"><div class="empty-state">Выберите событие из списка или на карте.</div></div>
+    </section>
+
+    <section id="page-places" class="page" aria-labelledby="placesHeading" hidden>
+      <div class="ref-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Места сбора</strong><span class="ref-topbar-action"><svg class="icon"><use href="#i-map"></use></svg></span></div>
+      <div class="page-heading ref-places-heading"><div><span class="eyebrow">УЧЕБНЫЕ ОРИЕНТИРЫ</span><h1 id="placesHeading">Возможные места сбора</h1><p>Координаты и безопасность объектов не подтверждены.</p></div></div>
+      <div class="ref-places-notice"><svg class="icon"><use href="#i-info"></use></svg><p>Эти парки и площади показаны для учебной демонстрации. Они не являются официально подтверждёнными пунктами эвакуации.</p></div>
+      <div class="ref-places-list" id="placesList"></div>
+    </section>
+
   </main>
 
   <nav class="bottom-nav" aria-label="Мобильная навигация">
@@ -158,6 +185,6 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по автоматизации и управлению. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="../site.js?v=3" defer></script>
+  <script src="../site.js?v=4" defer></script>
 </body>
 </html>
