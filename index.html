@@ -125,7 +125,7 @@ footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
           <div><label>Этаж *</label><input id="fFloor" type="number" min="0" max="60" required value="1"></div>
           <div><label>Квартира</label><input id="fApt" placeholder="12"></div>
         </div>
-        <div class="small muted" style="margin-top:8px">🧪 Демо-режим: SOS в больницы и МЧС только симулируется и записывается в журнал — никуда реально не отправляется. Данные хранятся только на этом устройстве.</div>
+        <div class="small muted" style="margin-top:8px">Учебный режим: события SOS сохраняются только в этом браузере и не отправляются в МЧС или больницы.</div>
         <div class="row" style="margin-top:10px">
           <button class="primary" type="submit">Сохранить</button>
           <button type="button" id="pickBtn">Выбрать на карте</button>
@@ -195,7 +195,7 @@ footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
 </div>
 
     <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
-      <div class="card">
+      <div class="card" id="assemblyCard">
         <h2>Места сбора / ориентиры</h2>
         <div id="apList" class="muted small">Зарегистрируйтесь, чтобы увидеть ближайшие к вам места сбора.</div>
       </div>
@@ -311,12 +311,12 @@ function toast(msg,ms=3500){ const t=$('toast'); t.textContent=msg; t.style.disp
 /* ===================== КАРТА ===================== */
 const map = L.map('map').setView([ALMATY.lat,ALMATY.lng], 12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
-const icon = (e,cls='') => L.divIcon({className:'', html:`<div class="ico ${cls}">${e}</div>`, iconSize:[22,22], iconAnchor:[11,11]});
+const icon = (e,cls='') => L.divIcon({className:'', html:`<div class="map-pin ${cls}">${e}</div>`, iconSize:[27,27], iconAnchor:[13,13]});
 const layers = {ap:L.layerGroup().addTo(map), hosp:L.layerGroup().addTo(map), quakes:L.layerGroup().addTo(map), route:L.layerGroup().addTo(map)};
 let userMarker=null;
-ASSEMBLY.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('🟩')}).bindPopup(`<b>Место сбора</b><br>${esc(p.name)}<br><small>${esc(p.note)}</small>`).addTo(layers.ap));
-HOSPITALS.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('🏥')}).bindPopup(`<b>${esc(p.name)}</b><br>Скорая: ${p.phone}`).addTo(layers.hosp));
-MCHS.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('🚒')}).bindPopup(`<b>${esc(p.name)}</b><br>Тел.: ${p.phone}`).addTo(layers.hosp));
+ASSEMBLY.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('A')}).bindPopup(`<b>Возможное место сбора</b><br>${esc(p.name)}<br><small>${esc(p.note)}</small>`).addTo(layers.ap));
+HOSPITALS.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('+','hospital')}).bindPopup(`<b>${esc(p.name)}</b><br>Скорая: ${p.phone}`).addTo(layers.hosp));
+MCHS.forEach(p=>L.marker([p.lat,p.lng],{icon:icon('S','services')}).bindPopup(`<b>${esc(p.name)}</b><br>Тел.: ${p.phone}`).addTo(layers.hosp));
 L.control.layers(null,{'Места сбора':layers.ap,'Больницы и МЧС':layers.hosp,'Землетрясения USGS':layers.quakes,'Маршрут':layers.route},{collapsed:true}).addTo(map);
 
 map.on('click', e=>{
@@ -328,7 +328,7 @@ map.on('click', e=>{
 function drawUser(){
   if(userMarker) map.removeLayer(userMarker);
   const u=userLoc(); if(!u) return;
-  userMarker=L.marker([u.lat,u.lng],{icon:icon('🏠'),zIndexOffset:1000}).bindPopup(`<b>${esc(profile.name)}</b><br>${esc(profile.address)}, этаж ${profile.floor}`).addTo(map);
+  userMarker=L.marker([u.lat,u.lng],{icon:icon('•','user'),zIndexOffset:1000}).bindPopup(`<b>${esc(profile.name)}</b><br>${esc(profile.address)}, этаж ${profile.floor}`).addTo(map);
 }
 
 /* ===================== РЕГИСТРАЦИЯ ===================== */
@@ -525,7 +525,7 @@ function renderEvac(){
         '<li>Держитесь дальше от зданий, ЛЭП и деревьев. Возможны повторные толчки.</li></ul>';
       if(best && !S._routeShown){ S._routeShown=true; showRoute(0) }
     }
-    if(S.dispatched) html += '<div class="small" style="margin-top:6px">📨 SOS отправлен в больницы и МЧС (см. журнал).</div>';
+    if(S.dispatched) html += '<div class="small" style="margin-top:6px">📨 SOS записан локально (демо).</div>';
   }
   if($('evacTitle').textContent!==title) $('evacTitle').textContent=title;
   if($('evacBody').innerHTML!==html){ $('evacBody').innerHTML=html; $('evacBody').classList.toggle('muted',S.level==='NORMAL') }
@@ -558,9 +558,9 @@ async function dispatch(mode){
   closeModal(); if(S.dispatched) return; S.dispatched=true;
   const u=userLoc(); const msg=buildMsg();
   const recipients=[...nearest(HOSPITALS,u,3).map(h=>({...h,type:'Больница'})), ...nearest(MCHS,u,1).map(m=>({...m,type:'МЧС'}))];
-  const ok=true, status='Отправлено (симуляция)';
+  const ok=true, status='Записано локально (демо)';
   recipients.forEach(r=>addLog({to:r.name,type:r.type,d:r.d,phone:r.phone,status,ok,msg}));
-  toast(`📨 SOS ${mode==='auto'?'автоматически ':''}отправлен: ${recipients.length} получателя`,5000);
+  toast("SOS записан в локальный журнал (демо)",5000);
   renderEvac();
 }
 function addLog(e){
