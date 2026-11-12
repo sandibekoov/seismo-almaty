@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 410" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Стилизованная панорама гор Алматы">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e7f3ff"/><stop offset=".48" stop-color="#c9e3ff"/><stop offset="1" stop-color="#ecf6ff"/></linearGradient>
+ <linearGradient id="back" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e4f4ff"/><stop offset=".45" stop-color="#9cc9f7"/><stop offset="1" stop-color="#719bd5"/></linearGradient>
+ <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a5cbef"/><stop offset=".6" stop-color="#6599d5"/><stop offset="1" stop-color="#8fb6e3"/></linearGradient>
+ <linearGradient id="front" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#719fcc"/><stop offset="1" stop-color="#b7d9f4"/></linearGradient>
+ <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#d7eaff"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1000" height="410" fill="url(#sky)"/>
+<ellipse cx="490" cy="86" rx="460" ry="210" fill="url(#glow)"/>
+<path fill="url(#back)" d="M0 295 91 240 136 261 215 183 274 219 387 66 430 120 485 44 548 157 618 86 665 149 715 115 772 202 839 119 921 240 968 211 1000 234v176H0z"/>
+<g fill="#f9fdff" opacity=".94">
+<path d="m324 131 63-65 44 78-35-18-23 21-14-18-22 12Z"/>
+<path d="m443 103 42-59 51 94-35-22-14 20-22-20-11 8Z"/>
+<path d="m578 143 40-57 38 67-25-13-15 20-22-17Z"/>
+<path d="m810 161 29-42 30 55-21-13-12 10-8-12Z"/>
+<path d="m201 208 14-25 21 28-13-9-11 9Z"/>
+</g>
+<g fill="#87afe0" opacity=".42">
+<path d="M387 66 432 142 416 178 387 133 360 183 343 149Z"/>
+<path d="m485 44 63 113-42-27-16 77-24-97-26 49Z"/>
+<path d="m619 86 44 66-16 40-28-62-16 57-29-36Z"/>
+</g>
+<path fill="url(#mid)" d="M0 306 87 257 154 274 221 220 291 258 375 173 440 243 521 156 607 244 697 177 787 261 867 193 924 248 1000 218v192H0z"/>
+<g fill="#dbeeff" opacity=".6"><path d="m329 209 46-36 39 52-30-16-16 14-18-15Z"/><path d="m478 200 43-44 51 61-48-26-23 21Z"/><path d="m671 205 26-28 41 49-30-13-14 10Z"/></g>
+<path fill="url(#front)" d="M0 343 80 298 144 320 237 279 304 314 389 275 459 325 566 278 640 329 731 286 820 325 911 281 1000 317v93H0z"/>
+<path fill="#c9e1f8" d="M0 350c94-13 155 7 242-6 103-17 168 0 246-1 123-4 180-26 288-6 86 15 158-6 224 2v71H0z" opacity=".86"/>
+<g fill="#7da1be" opacity=".48">
+<path d="M0 410v-38h16v-21h19v14h16v-28h24v17h10v-34h26v46h14v-18h21v23h13v-31h21v32h12v-18h27v35h14v-51h17v23h19v-18h16v50h18v-40h29v36h20v-25h20v18h19v-24h27v38h20v-34h20v17h18v-29h31v34h17v-38h28v40h21v-25h24v33h29v-28h26v30h17v-38h19v38h20v-32h19v32h25v-34h22v30h20v-43h24v38h15v-35h20v40h25v-26h18v30h18v-40h26v38h18v-25h23v29h20v-35h20v37h19v-30h19v32h32v-23h29v25Z"/>
+</g>
+<path fill="url(#fade)" d="M0 308h1000v102H0z"/>
+<g transform="translate(815 78)" stroke="#5c83ae" stroke-linecap="round" fill="none">
+ <path d="M0 0v255M-10 112h20M-5 65h10M-16 166h32" stroke-width="3"/>
+ <path d="m0 30-12 140 12 0 12 0Z" fill="#7da3c5" fill-opacity=".6" stroke-width="1"/>
+ <path d="M-6 98h12M-12 146h24M-10 196h20" stroke-width="3"/>
+ <path d="M0 -12V0" stroke-width="2"/>
+ <ellipse cx="0" cy="86" rx="9" ry="4" fill="#e5f4ff" stroke-width="1"/>
+</g>
+</svg>
