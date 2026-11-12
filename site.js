@@ -124,12 +124,36 @@
     }catch(error){state.feed='error';state.quakes=[];}
     finally{clearTimeout(timeout);renderHome();renderEvents();refreshMapMarkers()}
   }
+
+  // Consistent category icons. The source catalogue is not a seismic warning system.
   function markerHTML(type,label){
-    const cls=type==='quake'?'quake-marker':type==='assembly'?'assembly-marker':'self-marker';
-    return '<span class="'+cls+'">'+esc(label)+'</span>';
+    const paths={
+      quake:'<path d="M2 12h4l2-6 4 12 3-8 2 4h5"/>',
+      hospital:'<path d="M12 4v16M4 12h16"/>',
+      assembly:'<circle cx="8" cy="8" r="2.6"/><circle cx="17" cy="9" r="2.2"/><path d="M2 20a6 6 0 0 1 12 0M14 16a4.3 4.3 0 0 1 8 4"/>',
+      services:'<path d="m12 2 9 4v6c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V6z"/><path d="M12 7v6m0 3h.01"/>',
+      self:'<circle cx="12" cy="12" r="4.4"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>'
+    };
+    if(!Object.prototype.hasOwnProperty.call(paths,type))return '';
+    const icon='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+paths[type]+'</svg>';
+    return '<span class="map-pin map-pin--'+type+'"><span class="map-pin__core">'+icon+'</span>'+(type==='quake'&&label?'<span class="map-pin__mag">M'+esc(label)+'</span>':'')+'</span>';
   }
   function leafletIcon(type,label){
-    return L.divIcon({className:'',html:markerHTML(type,label),iconSize:[25,25],iconAnchor:[12,12]});
+    return L.divIcon({className:'seismo-map-icon',html:markerHTML(type,label),iconSize:[40,52],iconAnchor:[20,27]});
+  }
+  function defaultMapSheet(){
+    $('mapSheet').innerHTML='<div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на маркер, чтобы увидеть категорию, название и подробности.</span></div>';
+  }
+  function setMapFilter(filter){
+    if(!['all','quake','hospital','assembly','services'].includes(filter))return;
+    state.mapFilter=filter;
+    document.querySelectorAll('[data-map-filter]').forEach(button=>{
+      const selected=button.dataset.mapFilter===filter;
+      button.classList.toggle('is-active',selected);
+      button.setAttribute('aria-pressed',String(selected));
+    });
+    defaultMapSheet();
+    refreshMapMarkers();
   }
   function ensureMap(){
     if(state.map)return;
@@ -137,7 +161,9 @@
     state.map=L.map('map',{zoomControl:false}).setView([ALMATY.lat,ALMATY.lng],11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(state.map);
     L.control.zoom({position:'topright'}).addTo(state.map);
-    state.layers={quake:L.layerGroup().addTo(state.map),assembly:L.layerGroup().addTo(state.map),self:L.layerGroup().addTo(state.map)};
+    state.layers={quake:L.layerGroup().addTo(state.map),hospital:L.layerGroup().addTo(state.map),
+      assembly:L.layerGroup().addTo(state.map),services:L.layerGroup().addTo(state.map),
+      self:L.layerGroup().addTo(state.map)};
     state.map.on('click',e=>{
       if(!state.pickOnMap)return;
       state.pickOnMap=false;state.profile={...(state.profile||{}),lat:e.latlng.lat,lng:e.latlng.lng};
@@ -147,32 +173,74 @@
   }
   function refreshMapMarkers(){
     if(!state.map||!state.layers)return;
-    Object.values(state.layers).forEach(l=>l.clearLayers());
-    if($('showQuakes').checked&&state.feed==='ok'){
+    Object.values(state.layers).forEach(layer=>layer.clearLayers());
+    const show=type=>state.mapFilter==='all'||state.mapFilter===type;
+    if(show('quake')&&state.feed==='ok'){
       state.quakes.forEach((q,i)=>{
-        L.marker([q.lat,q.lng],{icon:leafletIcon('quake','!'),title:'M '+q.mag.toFixed(1)+' · '+q.place})
+        L.marker([q.lat,q.lng],{icon:leafletIcon('quake',q.mag.toFixed(1)),title:'Землетрясение M '+q.mag.toFixed(1)})
           .on('click',()=>showMapQuake(q,i)).addTo(state.layers.quake);
       });
     }
-    if($('showAssembly').checked){
-      ASSEMBLY.forEach((p,i)=>L.marker([p.lat,p.lng],{icon:leafletIcon('assembly','A'),title:p.name})
-        .on('click',()=>showMapAssembly(p,i)).addTo(state.layers.assembly));
+    if(show('hospital')){
+      HOSPITALS.forEach(p=>L.marker([p.lat,p.lng],{icon:leafletIcon('hospital'),title:'Больница (координаты предварительные): '+p.name})
+        .on('click',()=>showMapHospital(p)).addTo(state.layers.hospital));
+    }
+    if(show('assembly')){
+      ASSEMBLY.forEach(p=>L.marker([p.lat,p.lng],{icon:leafletIcon('assembly'),title:'Место сбора (не проверено): '+p.name})
+        .on('click',()=>showMapAssembly(p)).addTo(state.layers.assembly));
+    }
+    if(show('services')){
+      SERVICES.forEach(p=>L.marker([p.lat,p.lng],{icon:leafletIcon('services'),title:'МЧС (координаты предварительные): '+p.name})
+        .on('click',()=>showMapServices(p)).addTo(state.layers.services));
     }
     if(state.profile&&Number.isFinite(state.profile.lat)&&Number.isFinite(state.profile.lng)){
-      L.marker([state.profile.lat,state.profile.lng],{icon:leafletIcon('self','●'),title:'Сохранённое положение'})
-       .on('click',()=>showMapLocation('Ваше местоположение (задано вами)',state.profile)).addTo(state.layers.self);
+      L.marker([state.profile.lat,state.profile.lng],{icon:leafletIcon('self'),title:'Ваше сохранённое местоположение'})
+        .on('click',()=>showMapLocation('Ваше местоположение',state.profile)).addTo(state.layers.self);
     }
-    $('mapDataInfo').textContent=state.feed==='ok'?'USGS: '+state.quakes.length+' событий (M ≥ 2.5) за 30 дней':state.feed==='loading'?'Загрузка событий USGS…':'USGS недоступен — не показываются события';
+    $('mapDataInfo').textContent=state.feed==='ok'
+      ?'USGS: '+state.quakes.length+' событий · Больницы: '+HOSPITALS.length+' · МЧС: '+SERVICES.length
+      :state.feed==='loading'?'Загрузка USGS; объекты предварительные':'USGS недоступен. Объекты предварительные.';
+  }
+  function sheetHeader(type,title,subtitle){
+    return '<div class="sheet-handle" aria-hidden="true"></div><div class="sheet-header"><span class="sheet-type-icon sheet-type--'+type+'">'+markerHTML(type)+'</span><div class="sheet-heading"><span class="sheet-category">'+esc(subtitle)+'</span><h3>'+esc(title)+'</h3></div></div>';
+  }
+  function searchMaps(name){
+    const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(name+', Алматы, Казахстан');
+    return '<a class="button button-secondary" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Найти в Google Картах '+svgIcon('arrow')+'</a>';
+  }
+  function profileDistance(point){
+    const p=state.profile;
+    return p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)
+      ?'<span>≈ '+distance(p,point).toFixed(1)+' км по прямой</span>'
+      :'<span>Укажите местоположение для расчёта расстояния</span>';
   }
   function showMapQuake(q,i){
-    $('mapSheet').innerHTML='<div class="sheet-title">'+badge(q.mag)+'<div><h3>'+esc(locLabel(q))+'</h3><p>USGS · '+esc(ago(q.time))+'</p></div></div><div class="sheet-info">Глубина '+q.depth.toFixed(1)+' км · ≈ '+Math.round(distance(ALMATY,q))+' км от центра Алматы</div><div class="sheet-actions"><button class="button button-primary" type="button" data-event-index="'+i+'">Подробнее '+svgIcon('arrow')+'</button></div>';
+    $('mapSheet').innerHTML=sheetHeader('quake','M '+q.mag.toFixed(1)+' · '+locLabel(q),'Землетрясение · каталог USGS')
+      +'<div class="sheet-meta"><span>Глубина '+q.depth.toFixed(1)+' км</span><span>'+esc(ago(q.time))+'</span><span>≈ '+Math.round(distance(ALMATY,q))+' км от центра Алматы</span></div>'
+      +'<div class="sheet-actions"><button class="button button-primary" type="button" data-event-index="'+i+'">Подробнее '+svgIcon('arrow')+'</button></div>';
+  }
+  function showMapHospital(p){
+    $('mapSheet').innerHTML=sheetHeader('hospital',p.name,'Больница · координаты предварительные')
+      +'<p class="sheet-info">Адрес и точность отметки не подтверждены. Перед поездкой проверьте актуальное местоположение и режим работы.</p>'
+      +'<div class="sheet-meta">'+profileDistance(p)+'</div>'
+      +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
   function showMapAssembly(p){
-    const personal=state.profile&&Number.isFinite(state.profile.lat)&&Number.isFinite(state.profile.lng);
-    const km=personal?distance(state.profile,p):null;
-    $('mapSheet').innerHTML='<div class="sheet-title"><span class="mag-badge">A</span><div><h3>'+esc(p.name)+'</h3><p>Возможный ориентир · не подтверждён</p></div></div><div class="sheet-info">'+esc(p.note)+(km!==null?' · по прямой ≈ '+km.toFixed(1)+' км':'')+'. Это не проверенный маршрут или официально назначенный пункт сбора.</div>';
+    $('mapSheet').innerHTML=sheetHeader('assembly',p.name,'Возможное место сбора · не подтверждено')
+      +'<p class="sheet-info">'+esc(p.note)+'. Не является проверенным пунктом эвакуации или безопасным маршрутом.</p>'
+      +'<div class="sheet-meta">'+profileDistance(p)+'</div>'
+      +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
-  function showMapLocation(label,loc){$('mapSheet').innerHTML='<div class="sheet-title"><span class="mag-badge">●</span><h3>'+esc(label)+'</h3></div><div class="sheet-info">'+Number(loc.lat).toFixed(5)+', '+Number(loc.lng).toFixed(5)+'</div>';}
+  function showMapServices(p){
+    $('mapSheet').innerHTML=sheetHeader('services',p.name,'МЧС · координаты предварительные')
+      +'<p class="sheet-info">Местоположение учреждения требует проверки. Экстренный номер РК: 112 (общий, не прямой телефон этого учреждения).</p>'
+      +'<div class="sheet-meta">'+profileDistance(p)+'</div>'
+      +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
+  }
+  function showMapLocation(label,loc){
+    $('mapSheet').innerHTML=sheetHeader('self',label,'Ваше сохранённое местоположение')
+      +'<p class="sheet-info">'+Number(loc.lat).toFixed(5)+', '+Number(loc.lng).toFixed(5)+'</p>';
+  }
   function activateGuide(mode){
     document.querySelectorAll('[data-guide]').forEach(b=>{const yes=b.dataset.guide===mode;b.classList.toggle('is-active',yes);b.setAttribute('aria-selected',String(yes))});
     $('guideCards').innerHTML=(GUIDES[mode]||GUIDES.during).map((s,i)=>'<article class="guide-card"><strong>0'+(i+1)+'</strong><p>'+esc(s)+'</p></article>').join('');
