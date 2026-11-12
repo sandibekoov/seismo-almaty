@@ -21,6 +21,13 @@ Mobile-first educational UI for seismic event monitoring and building-safety sim
 | Engineering sensors, automatic response, SOS | **Simulation only** in `/engineering/`. SOS is not actually sent |
 | Android APK / Windows EXE in repository | Legacy builds; **not automatically updated** when the website changes |
 
+
+## Strict mobile design reference
+
+The approved eight-screen light-blue mobile direction is recorded in [DESIGN_REFERENCE.md](DESIGN_REFERENCE.md). The implementation uses a dedicated [reference-ui.css](reference-ui.css) layer and local vector [Almaty mountain artwork](assets/almaty-mountain-art.svg) to preserve the reference composition across phones. This SVG is an approximation of the photographic mountain illustration in the approved mockup; a pixel-for-pixel visual check on real mobile devices is still outstanding.
+
+Responsive resident pages: Home, Map, Events, Event Details, Places, Instructions, Profile, and explicitly-labelled Training Emergency. Engineering console remains separate at `/engineering/`.
+
 ## UI / UX
 
 - Matches the approved light-blue Seismo Almaty mobile direction, with a restrained desktop adaptation.
