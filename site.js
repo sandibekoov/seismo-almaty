@@ -190,7 +190,7 @@
     };
     if(!Object.prototype.hasOwnProperty.call(paths,type))return '';
     const icon='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+paths[type]+'</svg>';
-    return '<span class="map-pin map-pin--'+type+'"><span class="map-pin__core">'+icon+'</span>'+(type==='quake'&&label?'<span class="map-pin__mag">M'+esc(label)+'</span>':'')+'</span>';
+    return '<span class="map-pin map-pin--'+type+'"><span class="map-pin__core">'+icon+'</span>'+(type==='quake'&&label?'<span class="map-pin__mag">M'+esc(label)+'</span>':type==='demo'?'<span class="map-pin__mag">ТЕСТ</span>':'')+'</span>';
   }
   function leafletIcon(type,label){
     return L.divIcon({className:'seismo-map-icon',html:markerHTML(type,label),iconSize:[40,52],iconAnchor:[20,27]});
