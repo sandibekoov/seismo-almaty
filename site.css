@@ -484,3 +484,98 @@ h2{font-size:19px;letter-spacing:-.035em;line-height:1.3}
   .sheet-actions{margin-top:8px}
   .sheet-actions .button{width:100%;font-size:11px}
 }
+
+
+/* Approved mobile concept alignment: app-first, mountain hero and compact actions */
+@media (max-width:800px){
+  #page-home{display:flex;flex-direction:column;gap:0}
+  #page-home .hero{order:0}
+  #page-home .quick-actions{order:1}
+  #page-home .home-panels{order:2}
+  #page-home .quick-actions{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    align-items:start;gap:8px;margin:18px 0 5px;
+  }
+  #page-home .quick-action{
+    min-width:0;min-height:94px;align-items:center;justify-content:flex-start;
+    padding:8px 3px;border:0;box-shadow:none;background:transparent;
+    text-align:center;gap:5px;
+  }
+  #page-home .quick-action>span{
+    width:53px;height:53px;flex:none;border-radius:18px;
+    background:#e6f0ff;color:#1667e8;
+    box-shadow:0 5px 10px rgba(46,100,173,.07);
+    margin-bottom:3px;
+  }
+  #page-home .quick-action>span .icon{width:25px;height:25px}
+  #page-home .quick-action strong{font-size:11px;font-weight:800;line-height:1.3}
+  #page-home .quick-action small{display:none}
+  #page-home .home-panels{margin-top:7px}
+  #page-home .map-preview-art{height:210px}
+  #page-map .map-categories-guide{display:none}
+  #page-map .map-side-note{margin-top:3px}
+  #page-map .map-sidebar{gap:7px;padding:12px 14px}
+  #page-map .sidebar-heading{display:none}
+}
+@media (max-width:560px){
+  #page-home .hero{
+    min-height:410px;padding:26px 21px 148px;overflow:hidden;
+    background:linear-gradient(169deg,#edf6ff 0%,#ddebff 48%,#b5d5fb 100%);
+    border:1px solid #d4e7ff;border-radius:25px;
+  }
+  #page-home .hero-copy{z-index:4}
+  #page-home .hero h1{
+    font-size:29px;max-width:340px;line-height:1.18;
+    letter-spacing:-.054em;margin:12px 0 9px;
+  }
+  #page-home .hero h1 em{display:block;color:#1b63c9}
+  #page-home .hero-copy>p{
+    max-width:310px;font-size:11px;line-height:1.7;color:#506b91;
+  }
+  #page-home .hero-actions{margin-top:15px;gap:7px}
+  #page-home .hero-actions .button{
+    min-height:42px;padding:9px 12px;font-size:10px;border-radius:13px;
+  }
+  #page-home .mountain-visual{
+    width:150%;height:49%;right:-23%;bottom:42px;opacity:1;z-index:1;
+  }
+  #page-home .sky-disc{
+    width:300px;height:300px;top:-75px;right:30%;
+    background:radial-gradient(circle,#fff9,transparent 70%);
+  }
+  #page-home .hero-status{
+    left:12px;right:12px;bottom:12px;top:auto;z-index:5;
+    padding:14px 13px;min-height:76px;border-radius:18px;
+    border:1px solid #e0eefe;box-shadow:0 7px 25px rgba(31,87,165,.12);
+    backdrop-filter:blur(9px);
+  }
+  #page-home .state-symbol{width:47px;height:47px;border-radius:15px}
+  #page-home .state-symbol .icon{width:25px;height:25px}
+  #page-home .hero-status strong{font-size:14px;font-weight:800}
+  #page-home .hero-status small{font-size:10px}
+  #page-home .quick-actions{margin:15px 0 0;gap:3px}
+  #page-home .quick-action{min-height:91px;padding:7px 0}
+  #page-home .quick-action>span{width:49px;height:49px;border-radius:16px}
+  #page-home .quick-action>span .icon{width:22px;height:22px}
+  #page-home .quick-action strong{font-size:10px}
+  #page-home .home-panels>.surface{padding:19px;border-radius:20px}
+  #page-home .home-panels{gap:12px}
+  #page-home .section-top{margin-bottom:12px}
+  #page-home .stat strong{font-size:25px}
+  #page-home .map-preview-art{height:192px;border-radius:16px}
+  #page-map .map-sidebar{
+    border-radius:15px;padding:10px 12px;gap:8px;
+    background:#edf4ff;border-color:#dceafb;
+  }
+  #page-map .map-side-note{padding:9px 10px;margin:0;border-radius:12px}
+  #page-map .map-side-note p{font-size:10px}
+  #page-map .map-sidebar-footer{gap:9px}
+  #page-map .map-sidebar-footer .button{min-height:38px}
+  .bottom-nav{
+    border-top:1px solid #dce9fb;
+    box-shadow:0 -8px 26px rgba(30,77,135,.08);
+  }
+  .bottom-link{min-height:52px;font-size:10px}
+  .bottom-link.is-active .icon{border-radius:13px}
+  #page-map .map-canvas-wrap{min-height:390px}
+}
