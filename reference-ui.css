@@ -219,3 +219,28 @@
 @media(prefers-reduced-motion:reduce){
   .ref-home-hero,.ref-status-card,.ref-place-card{transition:none!important}
 }
+
+
+/* Fidelity refinements from the approved instruction, details and profile panels */
+@media(max-width:800px){
+  #page-instructions{display:flex;flex-direction:column}
+  #page-instructions .ref-topbar{order:0;flex:none}
+  #page-instructions .instruction-tabs{order:1;flex:none;margin:3px 0 0}
+  #page-instructions .ref-instructions-panorama{order:2;flex:none;margin:2px -13px -18px;height:141px;background-position:center 64%;background-size:auto 212px}
+  #page-instructions .instructions-intro{order:3;flex:none}
+  #page-instructions .instruction-layout{order:4}
+  #page-event-detail .ref-detail-map{display:none}
+  #page-profile .profile-aside{order:0;width:100%}
+  #page-profile .profile-card{order:1;width:100%}
+  #page-profile .setting-card{box-shadow:0 6px 18px rgba(42,85,152,.06)}
+  #page-profile .setting-line{min-height:56px}
+  #page-profile .setting-line>span{font-weight:750;color:#243a56}
+  #page-profile .setting-line>a,#page-profile .setting-line>strong{font-size:11px}
+  #page-places .ref-place-card:focus-visible{outline:3px solid #1469ed;outline-offset:3px}
+}
+@media(max-width:560px){
+  #page-instructions .instruction-tabs button{font-size:10px}
+  #page-profile .ref-profile-summary{margin-top:2px}
+  #page-profile .profile-card{box-shadow:none}
+  #page-event-detail .ref-detail-primary>.button{border-radius:14px}
+}
