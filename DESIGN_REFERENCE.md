@@ -47,6 +47,11 @@ Mobile uses **Home / Map / Events / Profile** as the four fixed bottom destinati
 - Emergency numbers and SOS must not be misrepresented as a real dispatch.
 - No fake weather, clock, real-time counts, injury or sensor measurements.
 
+
+## Additional course-approved workflow — IoT Simulation Mode
+
+Accessible through Profile (and Instructions). An extra screen in the same reference-style light-blue visual language contains three test scenarios, a deliberately synthetic signal trace, a scenario-status card, demo building-state labels, and links to the map/events. Map pins are purple and explicitly labelled TEST; event history has a separate SIMULATION card. The source feed and USGS event counters remain unchanged. M6 opens the explicitly labelled training-only red screen. Details: [IOT_SIMULATION.md](IOT_SIMULATION.md).
+
 ## Acceptance checklist
 
 1. Check reference match visually at 390 × 844 and 375 × 812; then 320, 360, 430 and 768 px.

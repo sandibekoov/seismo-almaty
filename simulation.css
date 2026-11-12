@@ -1,0 +1,120 @@
+/* IoT Simulation Mode | Seismo Almaty
+   Strictly inherits approved pale-blue mobile reference.
+   This is a deterministic training model, not connected to physical hardware. */
+:root{--sim-purple:#7759bb;--sim-purple-soft:#f1ecff}
+.sim-home-banner,.sim-event-row{background:#f5f0ff;border:1px solid #ded0ff;color:#48317a;border-radius:19px;box-shadow:0 7px 22px rgba(68,53,133,.07)}
+.sim-home-banner{display:flex;align-items:center;gap:11px;padding:12px 15px;margin:13px 0 0}
+.sim-home-banner>.icon{color:var(--sim-purple);width:27px;height:27px}
+.sim-home-banner>span{flex:1;min-width:0}
+.sim-home-banner strong{font-size:12px;font-weight:800;display:block}
+.sim-home-banner small{font-size:10px;color:#79639e;display:block;margin-top:3px}
+.sim-home-banner button{border:0;background:#e8dcff;color:#6747a8;font-weight:800;border-radius:11px;padding:10px;font-size:11px;min-height:40px}
+.sim-event-row{display:grid;grid-template-columns:1fr auto;gap:7px 13px;padding:15px 18px;margin:0 0 13px}
+.sim-event-label{display:flex;align-items:center;gap:11px;font-size:11px;grid-column:1/-1;color:#624590;font-weight:700}
+.sim-demo-chip{display:inline-flex;align-items:center;background:#7c5bbb;color:#fff;font-size:9px;letter-spacing:.035em;font-weight:800;padding:5px 9px;border-radius:8px}
+.sim-event-info{display:flex;flex-direction:column;gap:3px}
+.sim-event-info strong{font-size:13px}
+.sim-event-info small{font-size:10px;color:#786996}
+.sim-event-row .button{font-size:11px;min-height:42px;padding:8px 12px;align-self:center;background:white;border-color:#dbd0f4}
+.legend-dot.demo{background:var(--sim-purple)}
+.map-pin--demo .map-pin__core{background:var(--sim-purple);border-radius:14px}
+.map-pin--demo .map-pin__mag{color:#63439c;border-color:#dfd0fa;min-width:37px;white-space:nowrap}
+.sheet-type--demo{background:var(--sim-purple-soft)}
+.sim-header{margin:12px 0 22px}
+.sim-eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:10px;letter-spacing:.075em;font-weight:800;color:#6d55a2;padding:8px 12px;border-radius:13px;background:var(--sim-purple-soft)}
+.sim-eyebrow .icon{width:17px;height:17px}
+.sim-header h1{font-size:clamp(26px,3vw,38px);line-height:1.18;letter-spacing:-.05em;margin:14px 0 10px}
+.sim-header>p{font-size:13px;color:#607390;max-width:690px;line-height:1.75}
+.sim-disclaimer{display:flex;align-items:flex-start;gap:12px;background:#f2edff;color:#664c91;border:1px solid #e3d8f8;border-radius:16px;padding:13px 15px;max-width:880px;line-height:1.6;font-size:11px}
+.sim-disclaimer strong{font-weight:800}
+.sim-disclaimer .icon{width:19px;height:19px;flex:none}
+.sim-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:21px}
+.sim-primary,.sim-secondary{min-width:0}
+.sim-primary>h2,.sim-secondary h2{font-size:18px;line-height:1.3;font-weight:800;letter-spacing:-.035em;margin:0 0 15px}
+.sim-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px}
+.sim-preset{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:14px;position:relative;min-height:135px;border:1px solid #dfe9f7;background:#fff;padding:17px 13px;border-radius:19px;box-shadow:var(--shadow);color:#15243b}
+.sim-preset:hover{border-color:#bacdf0;background:#fcfdff}
+.sim-preset.is-active{outline:2px solid #2476ed;border-color:#2476ed}
+.sim-preset--warning.is-active{outline-color:#d1a040;border-color:#d1a040}
+.sim-preset--critical.is-active{outline-color:#d54c54;border-color:#d54c54}
+.sim-preset>.icon{position:absolute;right:11px;top:20px;width:17px;height:17px;color:#7b8ba5}
+.sim-preset-icon{display:grid;place-items:center;width:39px;height:39px;background:#e8f3ff;border-radius:13px;color:#216de0}
+.sim-preset--warning .sim-preset-icon{background:#fff2dc;color:#c48b30}
+.sim-preset--critical .sim-preset-icon{background:#ffeaed;color:#d84850}
+.sim-preset-icon .icon{width:23px;height:23px}
+.sim-preset-copy{display:flex;flex-direction:column;gap:6px}
+.sim-preset-copy strong{font-size:19px;line-height:1;font-weight:800;letter-spacing:-.05em}
+.sim-preset-copy>span{font-size:10px;color:#75859a;font-weight:700;line-height:1.5}
+.sim-active-status{padding:22px;border:1px solid #dae7f6;border-radius:21px;box-shadow:var(--shadow);background:#fff}
+.sim-active-status[data-state=WARNING]{border-color:#eddaa5;background:linear-gradient(180deg,#fff,#fffdf6)}
+.sim-active-status[data-state=EMERGENCY]{border-color:#f0c1c4;background:linear-gradient(180deg,#fff,#fff5f5)}
+.sim-active-heading{display:flex;align-items:center;gap:9px;min-height:30px}
+.sim-live-dot{width:10px;height:10px;flex:none;background:#a2b4c8;border-radius:50%}
+.sim-active-status[data-state=NORMAL] .sim-live-dot{background:#2ca47b}
+.sim-active-status[data-state=WARNING] .sim-live-dot{background:#d49a38}
+.sim-active-status[data-state=EMERGENCY] .sim-live-dot{background:#db4f5b}
+.sim-active-heading strong{font-size:15px;font-weight:800;flex:1;letter-spacing:-.025em}
+.sim-active-heading>span:last-child{background:#eef2f8;color:#70819b;padding:6px 9px;font:800 10px/1.3 var(--font);border-radius:10px}
+.sim-active-status[data-state=WARNING] .sim-active-heading>span:last-child{background:#fff1d7;color:#a7722e}
+.sim-active-status[data-state=EMERGENCY] .sim-active-heading>span:last-child{background:#ffe2e4;color:#b9444c}
+.sim-active-status>p{font-size:12px;line-height:1.7;color:#586b87;margin:8px 0 16px}
+.sim-wave-wrapper{padding:14px 12px;border-radius:15px;background:#f3f8ff;border:1px solid #e2ecf8}
+.sim-wave-top{display:flex;justify-content:space-between;gap:12px;font-size:10px;font-weight:800;color:#60718e}
+.sim-wave-top>span:last-child{color:#2362b5}
+.sim-wave{display:block;width:100%;height:94px;margin:7px 0 3px}
+.sim-wave-wrapper small{display:block;font-size:10px;line-height:1.5;color:#7b90a8}
+.sim-actions{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}
+.sim-actions .button{flex:1;min-height:46px;font-size:11px;padding:10px 12px}
+.sim-stop{border-color:#f1d3d5;background:#ffeff0;color:#bb444c}
+.sim-stop:hover{background:#ffe4e7}
+.sim-secondary{display:flex;flex-direction:column;gap:15px}
+.sim-secondary .surface{padding:22px;border-radius:20px}
+.sim-secondary .eyebrow{font-size:9px}
+.sim-secondary h2{margin:8px 0 14px}
+.sim-secondary p{font-size:11px;color:#687c96;line-height:1.8;margin:14px 0 8px}
+.sim-iot-flow .text-link{font-size:11px}
+.sim-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sim-flow>span{background:#eaf2ff;color:#255a9a;border-radius:10px;padding:9px 10px;font-weight:800;font-size:10px}
+.sim-flow>.icon{height:17px;width:17px;color:#7798bf}
+.sim-device-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:12px 0;border-top:1px solid #e6edf7;font-size:11px}
+.sim-device-row>span{color:#61728d}
+.sim-device-row>strong{max-width:62%;text-align:right;font-size:11px;font-weight:800}
+.sim-training-link{margin-bottom:10px}
+@media(max-width:800px){
+  #page-home .sim-home-banner{order:1;margin:9px 0 12px;padding:11px 12px}
+  #page-home .quick-actions{order:2}
+  #page-home .home-panels{order:3}
+  #page-simulation{padding-top:0}
+  #page-simulation .sim-header{margin:2px 0 17px}
+  #page-simulation .sim-header h1{font-size:25px;margin:12px 0}
+  #page-simulation .sim-header>p{font-size:12px;line-height:1.7}
+  #page-simulation .sim-disclaimer{border-radius:14px;padding:12px;font-size:10px;gap:9px}
+  #page-simulation .sim-layout{display:flex;flex-direction:column;gap:12px}
+  #page-simulation .sim-primary>h2{font-size:15px;margin:0 0 11px}
+  #page-simulation .sim-presets{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  #page-simulation .sim-preset{width:100%;min-height:76px;border-radius:17px;display:flex;flex-direction:row;align-items:center;gap:12px;padding:12px 17px}
+  #page-simulation .sim-preset>.icon{position:static;margin-left:auto}
+  #page-simulation .sim-preset-icon{width:43px;height:43px;border-radius:13px}
+  #page-simulation .sim-preset-copy strong{font-size:17px}
+  #page-simulation .sim-preset-copy>span{font-size:10px}
+  #page-simulation .sim-active-status{padding:17px;border-radius:19px}
+  #page-simulation .sim-active-heading strong{font-size:13px}
+  #page-simulation .sim-active-status>p{font-size:11px}
+  #page-simulation .sim-wave{height:77px}
+  #page-simulation .sim-secondary .surface{padding:17px;border-radius:18px}
+  #page-simulation .sim-actions .button{min-height:44px}
+  #page-events .sim-event-row{margin-top:8px}
+}
+@media(max-width:560px){
+  .sim-home-banner strong{font-size:11px}
+  .sim-home-banner button{font-size:10px}
+  .sim-event-row{padding:12px;grid-template-columns:1fr auto}
+  .sim-event-info strong{font-size:11px}
+  .sim-event-row .button{grid-column:2;grid-row:2}
+  .sim-event-row .button{font-size:10px;min-height:40px}
+  #page-simulation .sim-actions{display:grid;grid-template-columns:1fr 1fr}
+  #page-simulation .sim-actions .sim-stop{grid-column:1/-1}
+  #page-simulation .sim-disclaimer{font-size:10px}
+  #page-simulation .sim-flow{gap:4px}
+  #page-simulation .sim-flow>span{font-size:9px;padding:8px}
+}

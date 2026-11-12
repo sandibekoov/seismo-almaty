@@ -11,7 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="../site.css?v=3">
-  <link rel="stylesheet" href="../reference-ui.css?v=1">
+  <link rel="stylesheet" href="../reference-ui.css?v=2">
+  <link rel="stylesheet" href="../simulation.css?v=1">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -40,7 +41,7 @@
   <header class="site-header">
     <a class="brand" href="#home" data-page="home" aria-label="Seismo Almaty — главная">
       <span class="brand-icon"><svg class="icon"><use href="#i-wave"></use></svg></span>
-      <span><strong>Seismo Almaty</strong><small>Мониторинг · Алматы</small></span>
+      <span><strong>Seismo Almaty</strong><small>Internet of Things · Алматы</small></span>
     </a>
     <nav class="desktop-nav" aria-label="Главная навигация">
       <button class="nav-link is-active" data-page="home" type="button">Главная</button>
@@ -74,6 +75,7 @@
         </div>
       </div>
 
+      <div id="simulationHomeBanner" class="sim-home-banner" hidden><svg class="icon"><use href="#i-wave"></use></svg><span><strong id="simulationHomeTitle">Учебный сценарий</strong><small>СИМУЛЯЦИЯ — не реальное землетрясение</small></span><button data-page="simulation" type="button">Управлять →</button></div>
       <div class="home-panels">
         <article class="surface summary-card">
           <div class="section-top"><div><span class="eyebrow">ОБЗОР ДАННЫХ</span><h2>Сейсмическая активность</h2></div><span class="source-chip">USGS · 30 дней</span></div>
@@ -127,6 +129,7 @@
         <div class="map-canvas-wrap">
           <div id="map" aria-label="Интерактивная карта землетрясений, больниц, МЧС и возможных мест сбора Алматы" role="region"></div>
           <div class="map-legend-float" aria-label="Обозначения карты">
+            <span id="simMapLegend" hidden><i class="legend-dot demo"></i> СИМУЛЯЦИЯ</span>
             <span><i class="legend-dot quake"></i> События</span><span><i class="legend-dot hospital"></i> Больницы</span><span><i class="legend-dot assembly"></i> Сбор</span><span><i class="legend-dot services"></i> МЧС</span><span><i class="legend-dot self"></i> Вы</span>
           </div>
           <div id="mapSheet" class="map-sheet" aria-live="polite"><div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на значок больницы, события, места сбора или МЧС, чтобы посмотреть информацию.</span></div></div>
@@ -138,6 +141,7 @@
       <div class="ref-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>События</strong><span class="ref-topbar-action"><button class="ref-topbar-reset" type="button" data-event-scope="all" title="Показать все события" aria-label="Показать все события"><svg class="icon"><use href="#i-filter"></use></svg></button></span></div>
       <div class="ref-event-chips" role="group" aria-label="Выбрать события"><button type="button" class="is-active" data-event-scope="all" aria-pressed="true">Все</button><button type="button" data-event-scope="local" aria-pressed="false">Рядом с Алматы</button><button type="button" data-event-scope="strong" aria-pressed="false">M ≥ 4.0</button></div>
       <div class="page-heading"><div><span class="eyebrow">КАТАЛОГ СЕЙСМИЧЕСКИХ СОБЫТИЙ</span><h1 id="eventsHeading">История землетрясений</h1><p>Данные USGS в радиусе 500 км от Алматы, M ≥ 2.5</p></div><button class="button button-secondary" id="eventsRefresh" type="button"><svg class="icon"><use href="#i-refresh"></use></svg> Обновить</button></div>
+      <div id="simulationEventCard" class="sim-event-row" hidden aria-label="Активное учебное событие"></div>
       <div class="surface event-panel"><div class="filters"><label>Период<select id="periodFilter"><option value="30">Последние 30 дней</option><option value="7">Последние 7 дней</option><option value="1">За сутки</option></select></label><label>Магнитуда<select id="magnitudeFilter"><option value="2.5">M ≥ 2.5</option><option value="3">M ≥ 3.0</option><option value="4">M ≥ 4.0</option><option value="5">M ≥ 5.0</option></select></label><span class="filter-meta" id="eventCount">Загружаем…</span></div><div id="eventsList" class="feed-list event-feed"><div class="empty-state">Загружаем данные…</div></div></div>
     </section>
 
@@ -147,7 +151,7 @@
       <div class="page-heading"><div><span class="eyebrow">РЕКОМЕНДАЦИИ ПО БЕЗОПАСНОСТИ</span><h1 id="instructionsHeading">Что делать при землетрясении</h1><p>Общие рекомендации. Следуйте официальным указаниям экстренных служб.</p></div></div>
       <div class="instructions-intro"><span class="instructions-icon"><svg class="icon"><use href="#i-shield"></use></svg></span><div><strong>Заранее изучите план безопасности</strong><p>Во время сильных толчков приоритет — укрыться и защитить голову, а не бежать наружу.</p></div></div>
       <div class="instruction-tabs" role="tablist" aria-label="Этапы безопасности"><button data-guide="before" role="tab" aria-selected="false" type="button">До</button><button class="is-active" data-guide="during" role="tab" aria-selected="true" type="button">Во время</button><button data-guide="after" role="tab" aria-selected="false" type="button">После</button></div>
-      <div class="instruction-layout"><div class="guide-cards" id="guideCards"></div><aside class="surface training-card"><span class="eyebrow">УЧЕБНЫЙ РЕЖИМ</span><h2>Проверьте интерфейс тревоги</h2><p>Откройте демонстрационный экран с инструкциями. Он не связан с реальным датчиком и не отправляет сообщения.</p><button class="button button-danger wide" id="startDrill" type="button"><svg class="icon"><use href="#i-alert"></use></svg> Запустить тренировку</button><a href="../engineering/" class="text-link engineering-link">Открыть инженерный мониторинг <svg class="icon"><use href="#i-arrow"></use></svg></a></aside></div>
+      <div class="instruction-layout"><div class="guide-cards" id="guideCards"></div><aside class="surface training-card"><span class="eyebrow">УЧЕБНЫЙ РЕЖИМ</span><h2>Проверьте интерфейс тревоги</h2><p>Учебный экран не связан с реальным датчиком и не отправляет сообщения. Полный сценарий доступен в Simulation Mode.</p><button type="button" class="button button-secondary wide sim-training-link" data-page="simulation">Simulation Mode · IoT</button><button class="button button-danger wide" id="startDrill" type="button"><svg class="icon"><use href="#i-alert"></use></svg> Запустить тренировку</button><a href="../engineering/" class="text-link engineering-link">Открыть инженерный мониторинг <svg class="icon"><use href="#i-arrow"></use></svg></a></aside></div>
     </section>
 
     <section id="page-profile" class="page" aria-labelledby="profileHeading" hidden>
@@ -159,10 +163,32 @@
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-map"></use></svg>Мой адрес</span><button type="button" id="openAddressEditor" class="ref-setting-value">Изменить →</button></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-events"></use></svg>Уведомления</span><strong>Не подключены</strong></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-book"></use></svg>Язык интерфейса</span><strong>Русский</strong></div>
-    <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-info"></use></svg>О приложении</span><strong>Прототип 2.0</strong></div>
+    <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-info"></use></svg>О приложении</span><strong>IoT · прототип 2.1</strong></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div>
+    <div class="setting-line sim-settings-link"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Simulation Mode</span><button class="ref-setting-value" data-page="simulation" type="button">Запустить →</button></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-shield"></use></svg>Engineering Demo</span><a href="../engineering/">Открыть ↗</a></div>
    </div><div class="caution-inline standalone"><svg class="icon"><use href="#i-info"></use></svg><p>Приложение не прогнозирует землетрясения, не заменяет официальные оповещения и не отправляет SOS. Экстренная служба Казахстана: <strong>112</strong>.</p></div></div></div>
+    </section>
+        <section id="page-simulation" class="page" aria-labelledby="simulationHeading" hidden>
+      <div class="ref-topbar"><button class="ref-back" data-page="profile" type="button" aria-label="Назад в профиль"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Simulation Mode</strong><span class="ref-topbar-action"><svg class="icon"><use href="#i-wave"></use></svg></span></div>
+      <div class="sim-header"><span class="sim-eyebrow"><svg class="icon"><use href="#i-wave"></use></svg> INTERNET OF THINGS · УЧЕБНЫЙ РЕЖИМ</span><h1 id="simulationHeading">Имитировать землетрясение</h1><p>Выбери один из трёх сценариев, чтобы увидеть условный сигнал датчика, состояние системы и поведение интерфейса.</p>
+        <div class="sim-disclaimer"><svg class="icon"><use href="#i-info"></use></svg><span><strong>Только демонстрация.</strong> Сценарии вымышлены: это не события USGS, не прогноз и не управление реальным зданием. Значения M не измеряются датчиком.</span></div>
+      </div>
+      <div class="sim-layout">
+        <div class="sim-primary"><h2>Выбери сценарий</h2><div class="sim-presets" role="group" aria-label="Учебные сценарии">
+          <button class="sim-preset sim-preset--soft" type="button" data-sim-level="3" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-wave"></use></svg></span><span class="sim-preset-copy"><strong>M 3.0</strong><span>Слабый · наблюдение</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
+          <button class="sim-preset sim-preset--warning" type="button" data-sim-level="4.5" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-alert"></use></svg></span><span class="sim-preset-copy"><strong>M 4.5</strong><span>Умеренный · WARNING</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
+          <button class="sim-preset sim-preset--critical" type="button" data-sim-level="6" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-shield"></use></svg></span><span class="sim-preset-copy"><strong>M 6.0</strong><span>Сильный · EMERGENCY</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
+        </div>
+        <div class="sim-active-status" id="simActivePanel" aria-live="polite">
+          <div class="sim-active-heading"><span class="sim-live-dot"></span><strong id="simState">Нет активной симуляции</strong><span id="simModeLabel">OFF</span></div>
+          <p id="simDescription">Выберите сценарий выше. Отдельная учебная карточка появится в событиях, а тестовая точка — на карте.</p>
+          <div class="sim-wave-wrapper"><div class="sim-wave-top"><span>Синтетический сигнал датчика</span><span id="simAmplitude">0 / 100</span></div><svg id="simWave" class="sim-wave" viewBox="0 0 340 76" preserveAspectRatio="none" aria-label="График условного сигнала"><path id="simWavePath" d="M0 38 H340" fill="none" stroke="#377fe7" stroke-width="2.5"/></svg><small>Не реальные измерения. Амплитуда не рассчитывается из магнитуды.</small></div>
+          <div class="sim-actions"><button id="simOpenMap" type="button" class="button button-secondary" disabled><svg class="icon"><use href="#i-map"></use></svg> На карте</button><button id="simOpenEvents" type="button" class="button button-secondary" disabled><svg class="icon"><use href="#i-events"></use></svg> В событиях</button><button id="simStop" type="button" class="button sim-stop" disabled>Сбросить</button></div>
+        </div></div>
+        <aside class="sim-secondary"><article class="surface sim-iot-flow"><span class="eyebrow">INTERNET OF THINGS</span><h2>Как работает модель</h2><div class="sim-flow"><span>Датчик</span><svg class="icon"><use href="#i-arrow"></use></svg><span>Обработка</span><svg class="icon"><use href="#i-arrow"></use></svg><span>IoT-интерфейс</span></div><p>На этой странице программная имитация. Работа реального Arduino / Flex Sensor демонстрируется отдельно в Engineering Demo.</p><a href="../engineering/" class="text-link">Инженерный симулятор <svg class="icon"><use href="#i-arrow"></use></svg></a></article>
+        <article class="surface sim-building"><span class="eyebrow">УЧЕБНАЯ ЗАЩИТА ЗДАНИЯ</span><h2>Состояния элементов</h2><div class="sim-device-row"><span>Газоснабжение</span><strong id="simGas">Обычный режим</strong></div><div class="sim-device-row"><span>Электропитание</span><strong id="simPower">Обычный режим</strong></div><div class="sim-device-row"><span>Лифты</span><strong id="simLift">Обычный режим</strong></div><div class="sim-device-row"><span>Аварийные двери</span><strong id="simDoors">Обычный режим</strong></div><p>Эти статусы не подключены к оборудованию здания. Реальные решения зависят от инженерного проекта и его проверки.</p></article></aside>
+      </div>
     </section>
     <section id="page-event-detail" class="page" aria-labelledby="refDetailHeading" hidden>
       <div class="ref-topbar"><button class="ref-back" type="button" data-page="events" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Событие</strong><span class="ref-topbar-action"></span></div>
@@ -189,9 +215,9 @@
   <div class="dialog-backdrop" id="detailDialog" hidden><section class="detail-dialog surface" role="dialog" aria-modal="true" aria-labelledby="detailHeading"><button class="dialog-close icon-button" type="button" id="closeDetail" aria-label="Закрыть"><svg class="icon"><use href="#i-close"></use></svg></button><div id="detailContent"></div></section></div>
   <div id="trainingOverlay" class="training-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="trainingTitle"><div class="training-content"><div class="training-top"><span><svg class="icon"><use href="#i-wave"></use></svg> Seismo Almaty · Тренировка</span><button id="endDrill" class="training-close" type="button" aria-label="Закрыть учебный сценарий"><svg class="icon"><use href="#i-close"></use></svg></button></div><div class="training-symbol"><svg class="icon"><use href="#i-alert"></use></svg></div><div class="eyebrow">ДЕМОНСТРАЦИЯ · НЕ РЕАЛЬНАЯ ТРЕВОГА</div><h1 id="trainingTitle">Сильные толчки</h1><p>Пригнитесь, укройтесь, держитесь. Не выбегайте из здания во время тряски.</p><div class="training-steps"><div><strong>01</strong><span>Укройтесь под прочной мебелью и защитите голову.</span></div><div><strong>02</strong><span>Не используйте лифты и не бегите по лестнице во время толчков.</span></div><div><strong>03</strong><span>После окончания толчков оцените обстановку и следуйте официальным указаниям.</span></div></div><button type="button" class="button training-button" id="trainingDone">Завершить тренировку</button><small>При реальной чрезвычайной ситуации звоните 112.</small></div></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <footer class="site-footer">Seismo Almaty · Учебный проект по автоматизации и управлению. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Экстренный номер: 112.</footer>
+  <footer class="site-footer">Seismo Almaty · Учебный проект по Internet of Things (IoT) и автоматизации. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="../site.js?v=4" defer></script>
+  <script src="../site.js?v=5" defer></script>
 </body>
 </html>

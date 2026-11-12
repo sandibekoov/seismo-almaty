@@ -8,6 +8,13 @@ Mobile-first educational UI for seismic event monitoring and building-safety sim
 - **Engineering demonstration:** `/engineering/` — original Arduino/Flex Sensor visualisation, simulated emergency shutdown, SOS demonstration, oscilloscope.
 - **Preview:** `/resident/` — copy of the resident UI served from a subpath.
 
+
+## Internet of Things (IoT) — Simulation Mode
+
+Seismo Almaty is an educational **Internet of Things** project. The resident UI now includes **Profile → Simulation Mode**, with three fictional scenarios (M 3.0 / 4.5 / 6.0), synthetic vibration waveforms, scenario-specific controller states, a **purple TEST** marker on the map and a separate **SIMULATION** entry in the events screen. Reset fully clears the scenario and does not modify USGS earthquake data.
+
+The M values are **scenario names**, not measured sensor values or earthquake forecasts. Building-control outputs are demo labels only; this simulation does not communicate with actual Arduino / PLC hardware or send warnings. See [IOT_SIMULATION.md](IOT_SIMULATION.md) for complete usage and limitations.
+
 ## Live vs simulated features
 
 | Feature | Status |
