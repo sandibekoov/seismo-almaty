@@ -340,6 +340,10 @@
   document.querySelectorAll('[data-map-filter]').forEach(button=>button.addEventListener('click',()=>setMapFilter(button.dataset.mapFilter)));
   ['mapRefresh','eventsRefresh'].forEach(id=>$(id).addEventListener('click',fetchQuakes));
   ['locateMe','profileGeolocate'].forEach(id=>$(id).addEventListener('click',geolocate));
+  $('openAddressEditor').addEventListener('click',()=>{
+    const editor=$('profileForm');
+    if(editor){editor.scrollIntoView({behavior:'smooth',block:'start'});$('profileAddress').focus({preventScroll:true})}
+  });
   $('profileForm').addEventListener('submit',saveForm);
   $('closeDetail').addEventListener('click',closeDetail);
   $('detailDialog').addEventListener('click',e=>{if(e.target===$('detailDialog'))closeDetail()});
