@@ -91,6 +91,7 @@
       $('refFeedTitle').textContent=state.feed==='ok'?'Данные получены':state.feed==='error'?'Нет соединения':'Загрузка данных';
       $('refFeedSubtitle').textContent=state.feed==='ok'?'USGS · обновлено '+new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',hour:'2-digit',minute:'2-digit'}).format(new Date(state.updated)):state.feed==='error'?'Статус безопасности неизвестен':'Проверяем подключение USGS…';
       document.querySelector('.ref-status-card')?.classList.toggle('is-error',state.feed==='error');
+      document.querySelector('.ref-status-card')?.classList.toggle('is-loading',state.feed==='loading');
     }
     renderFeed(state.quakes.slice(0,3),$('homeEvents'),'За 30 дней событий M ≥ 2.5 в каталоге не найдено.');
   }
