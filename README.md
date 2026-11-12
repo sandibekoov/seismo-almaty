@@ -15,6 +15,11 @@ Seismo Almaty is an educational **Internet of Things** project. The resident UI 
 
 The M values are **scenario names**, not measured sensor values or earthquake forecasts. Building-control outputs are demo labels only; this simulation does not communicate with actual Arduino / PLC hardware or send warnings. See [IOT_SIMULATION.md](IOT_SIMULATION.md) for complete usage and limitations.
 
+
+## Real photos for places on the map
+
+The six named demonstration landmarks now show **real, source-matched Wikimedia Commons photographs** in the mobile **Места сбора** listings and the map's selected-object Bottom Sheet. Every photograph shows its author, license and source link; unavailable photos fall back to plain text rather than unrelated stock imagery. See [PHOTO_CREDITS.md](PHOTO_CREDITS.md). Hospital and MCHS thumbnails are deliberately omitted until their exact facility identity and photo rights can be verified. Photographs are historical and do **not** certify evacuation safety, operational status or current appearance.
+
 ## Live vs simulated features
 
 | Feature | Status |

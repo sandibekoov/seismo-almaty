@@ -1,0 +1,40 @@
+/* Real documentary photographs for place cards and map sheets.
+   Images are external licensed Wikimedia Commons files. No generated imagery. */
+.ref-place-result{min-width:0;width:100%}
+.ref-place-result .ref-place-card{width:100%;min-width:0}
+.ref-place-art.place-photo-frame,
+.sheet-place-photo.place-photo-frame{
+  display:block;position:relative;overflow:hidden;flex:none;
+  background:#edf3fa;color:#63758f;
+}
+.ref-place-art.place-photo-frame::before,
+.ref-place-art.place-photo-frame::after{content:none!important;display:none!important}
+.place-photo{display:block;width:100%;height:100%;object-fit:cover;object-position:center;filter:none}
+.place-photo-fallback{display:none;font-size:10px;line-height:1.35;text-align:center;padding:12px;color:#62748c}
+.place-photo-frame.photo-unavailable .place-photo{display:none}
+.place-photo-frame.photo-unavailable .place-photo-fallback{display:grid;place-items:center;position:absolute;inset:0}
+.place-photo-credit{
+  display:inline-block;margin:6px 8px 0;max-width:calc(100% - 16px);
+  color:#61748e;font-size:9px;line-height:1.5;text-decoration:underline;
+  text-decoration-color:#b5c6db;text-underline-offset:2px;overflow-wrap:anywhere;
+}
+.place-photo-credit:hover{color:#1769ed}
+.map-place-figure{margin:11px 0 0;min-width:0}
+.sheet-place-photo.place-photo-frame{
+  width:100%;height:154px;border-radius:14px;border:1px solid #e4ebf5;
+}
+.map-place-figure figcaption{font-size:9px;line-height:1.5;margin:5px 0 0;color:#73869e}
+.map-place-figure .place-photo-credit{margin:0}
+.map-sheet.has-place-photo{max-height:78%;overflow-y:auto;overscroll-behavior:contain}
+@media(max-width:800px){
+  .ref-place-result .ref-place-card{width:100%}
+  .ref-place-result .place-photo-credit{margin:6px 7px 0;font-size:9px}
+  .map-sheet.has-place-photo{max-height:73%;padding-bottom:12px}
+  .sheet-place-photo.place-photo-frame{height:133px;border-radius:13px}
+}
+@media(max-width:560px){
+  .sheet-place-photo.place-photo-frame{height:121px}
+  .map-place-figure{margin-top:9px}
+  .map-place-figure figcaption{font-size:9px}
+  .ref-place-art.place-photo-frame{object-fit:cover}
+}
