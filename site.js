@@ -14,6 +14,16 @@
     {name:'Парк Первого Президента',lat:43.1890,lng:76.8860,note:'Учебный ориентир, пригодность не подтверждена'},
     {name:'Площадь у Центрального стадиона',lat:43.2376,lng:76.9205,note:'Учебный ориентир, пригодность не подтверждена'}
   ];
+  // Legacy engineering-demo coordinates; positions are not independently verified.
+  const HOSPITALS=[
+    {name:'Больница скорой неотложной помощи (БСНП)',lat:43.2570,lng:76.9160},
+    {name:'Центральная городская клиническая больница',lat:43.2450,lng:76.9130},
+    {name:'Городская клиническая больница №4',lat:43.2850,lng:76.9560},
+    {name:'Городская клиническая больница №5',lat:43.2420,lng:76.8900},
+    {name:'Городская клиническая больница №7',lat:43.2290,lng:76.7900},
+    {name:'Городская клиническая больница №1',lat:43.2290,lng:76.8530}
+  ];
+  const SERVICES=[{name:'Департамент по чрезвычайным ситуациям города Алматы',lat:43.2600,lng:76.9400}];
   const GUIDES={
     during:[
       'Пригнитесь, укройтесь под прочной мебелью и держитесь за неё до окончания толчков.',
@@ -34,7 +44,7 @@
       'Следуйте сообщениям официальных служб; при угрозе жизни звоните 112.'
     ]
   };
-  const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false};
+  const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false,mapFilter:'all'};
   let toastTimer;
   function toast(msg){const el=$('toast');el.textContent=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.textContent=''},4800)}
   function dateAlmaty(t){return new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(t))}
@@ -206,14 +216,14 @@
   loadProfile();fillProfile();activateGuide('during');
   document.addEventListener('click',e=>{
     const pager=e.target.closest('[data-page]');
-    if(pager){e.preventDefault();if(pager.dataset.mapLayer==='assembly'){$('showQuakes').checked=false;$('showAssembly').checked=true}nav(pager.dataset.page);return}
+    if(pager){e.preventDefault();if(pager.dataset.mapLayer==='assembly')setMapFilter('assembly');nav(pager.dataset.page);return}
     const evt=e.target.closest('[data-event-index]');if(evt){detail(state.quakes[Number(evt.dataset.eventIndex)]);return}
     const guide=e.target.closest('[data-guide]');if(guide){activateGuide(guide.dataset.guide);return}
   });
   document.querySelector('.map-preview').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nav('map')}});
   window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if($('page-'+h))nav(h)});
   ['periodFilter','magnitudeFilter'].forEach(id=>$(id).addEventListener('change',renderEvents));
-  ['showQuakes','showAssembly'].forEach(id=>$(id).addEventListener('change',refreshMapMarkers));
+  document.querySelectorAll('[data-map-filter]').forEach(button=>button.addEventListener('click',()=>setMapFilter(button.dataset.mapFilter)));
   ['mapRefresh','eventsRefresh'].forEach(id=>$(id).addEventListener('click',fetchQuakes));
   ['locateMe','profileGeolocate'].forEach(id=>$(id).addEventListener('click',geolocate));
   $('profileForm').addEventListener('submit',saveForm);
