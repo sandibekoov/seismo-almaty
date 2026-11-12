@@ -95,29 +95,28 @@ th{color:var(--muted);font-weight:600}
 .ico{font-size:20px;line-height:1;text-shadow:0 0 3px #000}
 footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
 </style>
+<link rel="stylesheet" href="./ui.css">
 </head>
 <body data-level="NORMAL">
 
 <header>
-  <div>
-    <h1>🌍 Алматы — система сейсмооповещения и аварийного отключения</h1>
-    <div class="sub">🧪 ДЕМО / симуляция · учебный прототип · данные USGS · не является сертифицированной системой оповещения</div>
-  </div>
-  <div class="status" id="statusBox"><span class="dot"></span><span id="statusText">NORMAL</span></div>
+<div class="brand"><div class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="brand-copy"><div class="brand-eyebrow">SEISMO / ALMATY · МОНИТОРИНГ</div><h1>Seismo <span>Almaty</span></h1><div class="sub">Сейсмические события · контроль здания · точки сбора</div></div></div>
+<div class="head-actions"><nav class="top-nav" aria-label="Разделы"><a href="#mapCard">Карта</a><a href="#signalCard">Датчики</a><a href="#systemCard">Система</a><a href="#profileCard">Адрес</a></nav><div class="status" id="statusBox" role="status" aria-live="polite"><span class="dot"></span><span id="statusText">NORMAL</span></div></div>
+<div class="disclaimer"><strong>DEMO MODE</strong> Учебная модель. Не предсказывает землетрясения, не отправляет SOS в экстренные службы и не подтверждает безопасность эвакуационных маршрутов.</div>
 </header>
 
-<div class="levels">
-  <div class="lvl NORMAL on" data-l="NORMAL"><b>🟢 NORMAL</b>Опасных колебаний нет, идёт мониторинг</div>
-  <div class="lvl WARNING" data-l="WARNING"><b>🟡 WARNING</b>Повышенные колебания, предупреждение</div>
-  <div class="lvl EMERGENCY" data-l="EMERGENCY"><b>🔴 EMERGENCY</b>Опасные толчки: отключение, сигнал SOS</div>
-  <div class="lvl FAULT" data-l="FAULT"><b>🟣 FAULT</b>Неисправность датчика</div>
+<div class="levels" role="group" aria-label="Режимы системы">
+<div class="lvl NORMAL on" data-l="NORMAL"><b><span class="level-indicator"></span>NORMAL</b>Мониторинг</div>
+<div class="lvl WARNING" data-l="WARNING"><b><span class="level-indicator"></span>WARNING</b>Повышенная активность</div>
+<div class="lvl EMERGENCY" data-l="EMERGENCY"><b><span class="level-indicator"></span>EMERGENCY</b>Аварийный режим</div>
+<div class="lvl FAULT" data-l="FAULT"><b><span class="level-indicator"></span>FAULT</b>Ошибка датчика</div>
 </div>
-
+<nav class="mobile-nav" aria-label="Навигация"><a href="#mapCard">Карта</a><a href="#evacCard">Инструкции</a><a href="#signalCard">Сигнал</a><a href="#profileCard">Адрес</a></nav>
 <main>
   <!-- LEFT COLUMN -->
-  <div class="col">
+  <div class="col control-rail">
     <div class="card" id="profileCard">
-      <h2>Регистрация жителя</h2>
+      <h2>Местоположение / профиль</h2>
       <form id="regForm">
         <label>Имя и фамилия *</label><input id="fName" required placeholder="Айгерим Нурланова">
         <label>Телефон</label><input id="fPhone" placeholder="+7 7__ ___ __ __">
@@ -129,14 +128,14 @@ footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
         <div class="small muted" style="margin-top:8px">🧪 Демо-режим: SOS в больницы и МЧС только симулируется и записывается в журнал — никуда реально не отправляется. Данные хранятся только на этом устройстве.</div>
         <div class="row" style="margin-top:10px">
           <button class="primary" type="submit">Сохранить</button>
-          <button type="button" id="pickBtn">📍 Указать на карте</button>
+          <button type="button" id="pickBtn">Выбрать на карте</button>
         </div>
         <div id="geoStatus" class="small muted" style="margin-top:6px"></div>
       </form>
     </div>
 
-    <div class="card">
-      <h2>Датчик вибрации (осциллограф)</h2>
+    <div class="card" id="signalCard">
+      <h2>Сигнал / осциллограф</h2>
       <canvas id="scope" width="600" height="150"></canvas>
       <div class="row" style="margin-top:8px;justify-content:space-between">
         <span>Интенсивность: <b id="intVal">0</b>/100</span>
@@ -153,9 +152,9 @@ footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
         <label>Амплитуда симуляции: <b id="ampVal">5</b></label>
         <input type="range" id="amp" min="0" max="100" value="5" style="padding:0">
         <div class="row" style="margin-top:8px">
-          <button class="small" data-amp="5">😌 Спокойно</button>
-          <button class="small" data-amp="42">〰️ Толчки</button>
-          <button class="small" data-amp="88">💥 Сильное землетрясение</button>
+          <button class="small" data-amp="5">Низкий сигнал</button>
+          <button class="small" data-amp="42">Средний сигнал</button>
+          <button class="small" data-amp="88">Высокий сигнал</button>
         </div>
       </div>
       <div id="serialBox" class="small muted" style="display:none;margin-top:6px">
@@ -164,51 +163,46 @@ footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
       </div>
     </div>
 
-    <div class="card">
-      <h2>Аварийное отключение (симуляция)</h2>
+    <div class="card" id="systemCard">
+      <h2>Управление зданием / симуляция</h2>
       <div class="chips">
-        <div class="chip" id="cGas"><b>🔥 Газ</b><span>подача открыта</span></div>
-        <div class="chip" id="cPower"><b>⚡ Электричество</b><span>включено</span></div>
-        <div class="chip" id="cLift"><b>🛗 Лифты</b><span>работают</span></div>
-        <div class="chip" id="cDoors"><b>🚪 Эвакуац. двери</b><span>закрыты</span></div>
+        <div class="chip" id="cGas"><b>Газ</b><span>подача открыта</span></div>
+        <div class="chip" id="cPower"><b>Электропитание</b><span>включено</span></div>
+        <div class="chip" id="cLift"><b>Лифты</b><span>работают</span></div>
+        <div class="chip" id="cDoors"><b>Аварийные выходы</b><span>закрыты</span></div>
       </div>
       <div class="row" style="margin-top:10px">
-        <button id="ackBtn">🔕 Подтвердить тревогу</button>
-        <button id="resetBtn">↺ Сброс системы</button>
+        <button id="ackBtn">Подтвердить (ACK)</button>
+        <button id="resetBtn">Сброс (RESET)</button>
         <button id="faultBtn">⚠ Симулировать сбой</button>
         <button id="muteBtn">🔊 Звук вкл.</button>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT COLUMN -->
-  <div class="col">
+  <!-- MAIN WORKSPACE -->
+  <div class="col data-workspace">
     <div class="card evac" id="evacCard">
       <h3 id="evacTitle">Всё спокойно</h3>
       <div id="evacBody" class="muted">Система мониторит датчик и сейсмические данные USGS для региона Алматы.</div>
     </div>
 
-    <div class="card">
-      <div class="row" style="justify-content:space-between;margin-bottom:8px">
-        <h2 style="margin:0">Карта: места сбора, больницы, МЧС, землетрясения</h2>
-        <div class="row small">
-          <a href="https://earthquake.usgs.gov/earthquakes/map/?extent=39.5,70&extent=47,84&listOnlyShown=true" target="_blank" rel="noopener">USGS Earthquake Map ↗</a>
-          <a href="https://www.emsc-csem.org/Earthquake_information/" target="_blank" rel="noopener">EMSC ↗</a>
-        </div>
-      </div>
-      <div id="map"></div>
-      <div class="small muted" style="margin-top:6px">🏠 вы · 🟩 место сбора · 🏥 больница · 🚒 МЧС · ● землетрясения USGS (размер = магнитуда). Координаты объектов ориентировочные — проверьте перед реальным использованием.</div>
-    </div>
+    <div class="card" id="mapCard">
+<div class="map-head"><div><h2>Сейсмическая карта Алматы</h2><p>События USGS, инфраструктура и точки сбора</p></div><div class="map-tools"><a href="https://earthquake.usgs.gov/earthquakes/map/?extent=39.5,70&extent=47,84&listOnlyShown=true" target="_blank" rel="noopener">Источник USGS ↗</a><a href="https://www.emsc-csem.org/Earthquake_information/" target="_blank" rel="noopener">EMSC ↗</a></div></div>
+<div id="map" role="region" aria-label="Сейсмическая карта Алматы"></div>
+<div class="map-legend"><span><i></i>Место сбора*</span><span><i class="l-hosp"></i>Медпомощь</span><span><i class="l-quake"></i>Событие</span><span><i class="l-user"></i>Ваш адрес</span></div>
+<div class="map-disclosure">* Учебные ориентиры, не подтверждённые официальные безопасные зоны. Прямая линия до объекта не является проверенным маршрутом.</div>
+</div>
 
     <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
       <div class="card">
-        <h2>Ближайшие места сбора</h2>
+        <h2>Места сбора / ориентиры</h2>
         <div id="apList" class="muted small">Зарегистрируйтесь, чтобы увидеть ближайшие к вам места сбора.</div>
       </div>
       <div class="card">
         <div class="row" style="justify-content:space-between;margin-bottom:8px">
-          <h2 style="margin:0">Журнал SOS-отправки</h2>
-          <button class="small" id="testSos">Тест отправки</button>
+          <h2 style="margin:0">Журнал SOS / симуляция</h2>
+          <button class="small" id="testSos">Запустить тест</button>
         </div>
         <div class="log" id="log"><div class="muted small">Пока ничего не отправлялось.</div></div>
       </div>
@@ -216,7 +210,7 @@ footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
 
     <div class="card">
       <div class="row" style="justify-content:space-between;margin-bottom:8px">
-        <h2 style="margin:0">Землетрясения в радиусе 500 км (USGS, 30 дней)</h2>
+        <h2 style="margin:0">Сейсмические события / USGS · 500 км · 30 дней</h2>
         <div class="row"><span class="small muted" id="usgsUpd"></span><button class="small" id="usgsRefresh">⟳</button></div>
       </div>
       <div id="riskBox" class="small" style="margin-bottom:8px"></div>
@@ -235,13 +229,13 @@ footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
 
 <div class="modal" id="sosModal">
   <div class="box">
-    <h2 style="color:var(--emerg)">🚨 Обнаружено сильное землетрясение</h2>
-    <div>Автоматическая отправка SOS в ближайшие больницы и МЧС через:</div>
+    <h2 style="color:var(--emerg)">Аварийный сигнал · DEMO</h2>
+    <div>Автоматическая запись в учебный журнал через:</div>
     <div class="count" id="countNum">10</div>
     <div class="small muted" id="sosPreview"></div>
     <div class="row" style="margin-top:12px;justify-content:center">
-      <button class="danger" id="sendNow">Отправить сейчас</button>
-      <button id="cancelSos">Отмена — ложная тревога</button>
+      <button class="danger" id="sendNow">Записать в журнал</button>
+      <button id="cancelSos">Отменить тест SOS</button>
     </div>
   </div>
 </div>
