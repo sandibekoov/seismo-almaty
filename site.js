@@ -6,14 +6,43 @@
   const $ = id => document.getElementById(id);
   const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const ALMATY={lat:43.2380,lng:76.9450};
+  // Real site-specific documentary photographs; no stock photos, AI images or
+  // fabricated picture / place matching. Attribution is displayed in the UI.
+  // Photos describe places, not the current condition or safety of those places.
   const ASSEMBLY=[
-    {name:'Парк имени 28 гвардейцев-панфиловцев',lat:43.2587,lng:76.9534,note:'Учебный ориентир, пригодность не подтверждена'},
-    {name:'Центральный парк культуры и отдыха',lat:43.2622,lng:76.9722,note:'Учебный ориентир, пригодность не подтверждена'},
-    {name:'Площадь Республики',lat:43.2383,lng:76.9456,note:'Учебный ориентир, пригодность не подтверждена'},
-    {name:'Главный ботанический сад',lat:43.2215,lng:76.9130,note:'Учебный ориентир, пригодность не подтверждена'},
-    {name:'Парк Первого Президента',lat:43.1890,lng:76.8860,note:'Учебный ориентир, пригодность не подтверждена'},
-    {name:'Площадь у Центрального стадиона',lat:43.2376,lng:76.9205,note:'Учебный ориентир, пригодность не подтверждена'}
+    {name:'Парк имени 28 гвардейцев-панфиловцев',lat:43.2587,lng:76.9534,note:'Учебный ориентир, пригодность не подтверждена',
+      photo:{file:'Park of the 28 Panfilov Guardsmen Almaty.jpg',author:'Radosław Botev',license:'CC BY 3.0 PL',caption:'Парк имени 28 гвардейцев-панфиловцев, снимок 2017 года'}},
+    {name:'Центральный парк культуры и отдыха',lat:43.2622,lng:76.9722,note:'Учебный ориентир, пригодность не подтверждена',
+      photo:{file:'Центральный Парк, Алматы, Казахстан.jpg',author:'Gulsana Battakova',license:'CC BY-SA 4.0',caption:'Главный вход в Центральный парк Алматы, 2018 год'}},
+    {name:'Площадь Республики',lat:43.2383,lng:76.9456,note:'Учебный ориентир, пригодность не подтверждена',
+      photo:{file:'Republic Square, Almaty 1.jpg',author:'mibuchat',license:'CC BY-SA 2.0',caption:'Площадь Республики в Алматы, 2016 год'}},
+    {name:'Главный ботанический сад',lat:43.2215,lng:76.9130,note:'Учебный ориентир, пригодность не подтверждена',
+      photo:{file:'Central Botanical Garden Almaty.jpg',author:'Dauren Nabijan',license:'CC0 1.0',caption:'Пруд в Ботаническом саду Алматы, май 2024 года'}},
+    {name:'Парк Первого Президента',lat:43.1890,lng:76.8860,note:'Учебный ориентир, пригодность не подтверждена',
+      photo:{file:'Park of the Foundation of the First President of Almaty.jpg',author:'Radosław Botev',license:'CC BY 3.0 PL',caption:'Парк Первого Президента, Алматы, 2017 год'}},
+    {name:'Площадь у Центрального стадиона',lat:43.2376,lng:76.9205,note:'Учебный ориентир, пригодность не подтверждена',
+      photo:{file:'Ortalyq-Almaty 2022a.jpg',author:'CD / Wikimedia Commons',license:'CC BY-SA 4.0',caption:'Фото Центрального стадиона (ориентир рядом с площадью), декабрь 2022 года'}}
   ];
+  // Wikimedia Commons redirects to optimized thumbnails. Each card links to
+  // the author/license page and shows a textual fallback if the image fails.
+  function placePhotoUrl(p){
+    return p?.photo?'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(p.photo.file.replaceAll(' ','_'))+'?width=640':'';
+  }
+  function placePhotoSource(p){
+    return p?.photo?'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(p.photo.file.replaceAll(' ','_')):'';
+  }
+  function placePhotoFigure(p,variant){
+    if(!p.photo)return '';
+    const cl=variant==='sheet'?'sheet-place-photo':'ref-place-art';
+    return '<span class="'+cl+' place-photo-frame">'
+      +'<img class="place-photo" src="'+esc(placePhotoUrl(p))+'" alt="'+esc(p.photo.caption)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
+      +'<span class="place-photo-fallback">Фотография недоступна</span></span>';
+  }
+  function photoCredit(p){
+    if(!p.photo)return '';
+    return '<a class="place-photo-credit" href="'+esc(placePhotoSource(p))+'" target="_blank" rel="noopener noreferrer">'
+      +'Фото: '+esc(p.photo.author)+' · '+esc(p.photo.license)+' · Wikimedia Commons ↗</a>';
+  }
   // Legacy engineering-demo coordinates; positions are not independently verified.
   const HOSPITALS=[
     {name:'Больница скорой неотложной помощи (БСНП)',lat:43.2570,lng:76.9160},
@@ -125,7 +154,9 @@
     root.innerHTML=ASSEMBLY.map((p,i)=>{
       const person=state.profile&&Number.isFinite(state.profile.lat)&&Number.isFinite(state.profile.lng);
       const dist=person?'≈ '+distance(state.profile,p).toFixed(1)+' км по прямой':'Расположение предварительное';
-      return '<button class="ref-place-card" data-place-index="'+i+'" type="button"><span class="ref-place-art" aria-hidden="true"></span><span class="ref-place-info"><strong>'+esc(p.name)+'</strong><small>'+esc(dist)+'</small><span class="ref-place-tag">Не подтверждено официально</span></span>'+svgIcon('chevron')+'</button>';
+      return '<article class="ref-place-result"><button class="ref-place-card" data-place-index="'+i+'" type="button">'
+        +placePhotoFigure(p,'list')+'<span class="ref-place-info"><strong>'+esc(p.name)+'</strong><small>'+esc(dist)+'</small><span class="ref-place-tag">Не подтверждено официально</span></span>'+svgIcon('chevron')+'</button>'
+        +photoCredit(p)+'</article>';
     }).join('');
   }
   function openPlace(i){
@@ -196,6 +227,7 @@
     return L.divIcon({className:'seismo-map-icon',html:markerHTML(type,label),iconSize:[40,52],iconAnchor:[20,27]});
   }
   function defaultMapSheet(){
+    $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML='<div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на маркер, чтобы увидеть категорию, название и подробности.</span></div>';
   }
   function setMapFilter(filter){
@@ -274,11 +306,13 @@
       :'<span>Укажите местоположение для расчёта расстояния</span>';
   }
   function showMapQuake(q,i){
+    $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('quake','M '+q.mag.toFixed(1)+' · '+locLabel(q),'Землетрясение · каталог USGS')
       +'<div class="sheet-meta"><span>Глубина '+q.depth.toFixed(1)+' км</span><span>'+esc(ago(q.time))+'</span><span>≈ '+Math.round(distance(ALMATY,q))+' км от центра Алматы</span></div>'
       +'<div class="sheet-actions"><button class="button button-primary" type="button" data-event-index="'+i+'">Подробнее '+svgIcon('arrow')+'</button></div>';
   }
   function showMapSimulation(){
+    $('mapSheet').classList.remove('has-place-photo');
     if(!state.sim)return;
     const v=state.sim;
     $('mapSheet').innerHTML=sheetHeader('demo','СИМУЛЯЦИЯ · M '+v.mag.toFixed(1),'Учебный сценарий · НЕ USGS')
@@ -287,24 +321,29 @@
       +'<div class="sheet-actions"><button class="button button-primary" data-page="simulation" type="button">Управление симуляцией '+svgIcon('arrow')+'</button></div>';
   }
   function showMapHospital(p){
+    $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('hospital',p.name,'Больница · координаты предварительные')
       +'<p class="sheet-info">Адрес и точность отметки не подтверждены. Перед поездкой проверьте актуальное местоположение и режим работы.</p>'
       +'<div class="sheet-meta">'+profileDistance(p)+'</div>'
       +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
   function showMapAssembly(p){
+    $('mapSheet').classList.add('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('assembly',p.name,'Возможное место сбора · не подтверждено')
-      +'<p class="sheet-info">'+esc(p.note)+'. Не является проверенным пунктом эвакуации или безопасным маршрутом.</p>'
+      +'<figure class="map-place-figure">'+placePhotoFigure(p,'sheet')+'<figcaption>'+photoCredit(p)+'</figcaption></figure>'
+      +'<p class="sheet-info">'+esc(p.note)+'. Фотография сделана ранее и не подтверждает текущую доступность. Это не проверенный пункт эвакуации или безопасный маршрут.</p>'
       +'<div class="sheet-meta">'+profileDistance(p)+'</div>'
       +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
   function showMapServices(p){
+    $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('services',p.name,'МЧС · координаты предварительные')
       +'<p class="sheet-info">Местоположение учреждения требует проверки. Экстренный номер РК: 112 (общий, не прямой телефон этого учреждения).</p>'
       +'<div class="sheet-meta">'+profileDistance(p)+'</div>'
       +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
   function showMapLocation(label,loc){
+    $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('self',label,'Ваше сохранённое местоположение')
       +'<p class="sheet-info">'+Number(loc.lat).toFixed(5)+', '+Number(loc.lng).toFixed(5)+'</p>';
   }
@@ -449,6 +488,11 @@
   $('detailDialog').addEventListener('click',e=>{if(e.target===$('detailDialog'))closeDetail()});
   $('startDrill').addEventListener('click',openDrill);
   ['endDrill','trainingDone'].forEach(id=>$(id).addEventListener('click',closeDrill));
+  document.addEventListener('error',e=>{
+    if(e.target instanceof HTMLImageElement && e.target.classList.contains('place-photo')){
+      e.target.closest('.place-photo-frame')?.classList.add('photo-unavailable');
+    }
+  },true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('detailDialog').hidden)closeDetail();if(!$('trainingOverlay').hidden)closeDrill()}});
   nav(['home','map','events','instructions','profile','places','simulation'].includes(location.hash.slice(1))?location.hash.slice(1):'home');
   renderSimulation();
