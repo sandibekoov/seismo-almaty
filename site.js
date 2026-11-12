@@ -24,6 +24,12 @@
     {name:'Городская клиническая больница №1',lat:43.2290,lng:76.8530}
   ];
   const SERVICES=[{name:'Департамент по чрезвычайным ситуациям города Алматы',lat:43.2600,lng:76.9400}];
+  // Presets are UX demonstrations, not a physical magnitude-to-acceleration model.
+  const SIM_PRESETS={
+    '3':{mag:3.0,amp:16,level:'NORMAL',caption:'Слабый учебный сценарий. Мониторинг без команды защитных действий.'},
+    '4.5':{mag:4.5,amp:49,level:'WARNING',caption:'Учебное предупреждение: система предлагает проверить обстановку.'},
+    '6':{mag:6.0,amp:83,level:'EMERGENCY',caption:'Учебная авария: показываются условные команды защитной логики и тренировочный экран.'}
+  };
   const GUIDES={
     during:[
       'Пригнитесь, укройтесь под прочной мебелью и держитесь за неё до окончания толчков.',
@@ -44,7 +50,7 @@
       'Следуйте сообщениям официальных служб; при угрозе жизни звоните 112.'
     ]
   };
-  const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false,mapFilter:'all',eventScope:'all',detailBack:'events'};
+  const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false,mapFilter:'all',eventScope:'all',detailBack:'events',sim:null};
   let toastTimer;
   function toast(msg){const el=$('toast');el.textContent=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.textContent=''},4800)}
   function dateAlmaty(t){return new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(t))}
@@ -59,11 +65,12 @@
     state.current=page;
     document.querySelectorAll('.page').forEach(p=>{const selected=p===target;p.hidden=!selected;p.classList.toggle('is-active',selected)});
     document.querySelectorAll('[data-page]').forEach(b=>{
-      const active=b.dataset.page===page || (page==='places'&&b.dataset.page==='map') || (page==='event-detail'&&b.dataset.page==='events');
+      const active=b.dataset.page===page || (page==='places'&&b.dataset.page==='map') || (page==='event-detail'&&b.dataset.page==='events') || (page==='simulation'&&b.dataset.page==='profile');
       if(b.classList.contains('nav-link')||b.classList.contains('bottom-link')){b.classList.toggle('is-active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}
     });
     if(page==='map')requestAnimationFrame(()=>{ensureMap();if(state.map)state.map.invalidateSize()});
     if(page==='events')renderEvents();if(page==='places')renderPlaces();
+    if(page==='simulation')renderSimulation();
     if(page==='profile')fillProfile();
     window.scrollTo({top:0,behavior:'instant'});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
@@ -94,6 +101,7 @@
       document.querySelector('.ref-status-card')?.classList.toggle('is-loading',state.feed==='loading');
     }
     renderFeed(state.quakes.slice(0,3),$('homeEvents'),'За 30 дней событий M ≥ 2.5 в каталоге не найдено.');
+    renderSimHome();
   }
   function filteredEvents(){
     const days=Number($('periodFilter').value)||30,min=Number($('magnitudeFilter').value)||2.5;
@@ -104,6 +112,7 @@
     const items=filteredEvents();
     $('eventCount').textContent=state.feed==='ok'?'Показано '+items.length+' из '+state.quakes.length:'Состояние: '+(state.feed==='loading'?'загрузка':'нет связи');
     renderFeed(items,$('eventsList'),'События с такими параметрами в каталоге не найдены.');
+    renderSimEvent();
   }
   function setEventScope(scope){
     if(!['all','local','strong'].includes(scope))return;
@@ -173,6 +182,7 @@
   function markerHTML(type,label){
     const paths={
       quake:'<path d="M2 12h4l2-6 4 12 3-8 2 4h5"/>',
+      demo:'<path d="M3 12h4l2-5 4 10 3-7 2 2h3"/><path d="M4 20h16"/>',
       hospital:'<path d="M12 4v16M4 12h16"/>',
       assembly:'<circle cx="8" cy="8" r="2.6"/><circle cx="17" cy="9" r="2.2"/><path d="M2 20a6 6 0 0 1 12 0M14 16a4.3 4.3 0 0 1 8 4"/>',
       services:'<path d="m12 2 9 4v6c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V6z"/><path d="M12 7v6m0 3h.01"/>',
@@ -207,7 +217,7 @@
     L.control.zoom({position:'topright'}).addTo(state.map);
     state.layers={quake:L.layerGroup().addTo(state.map),hospital:L.layerGroup().addTo(state.map),
       assembly:L.layerGroup().addTo(state.map),services:L.layerGroup().addTo(state.map),
-      self:L.layerGroup().addTo(state.map)};
+      self:L.layerGroup().addTo(state.map),demo:L.layerGroup().addTo(state.map)};
     state.map.on('click',e=>{
       if(!state.pickOnMap)return;
       state.pickOnMap=false;state.profile={...(state.profile||{}),lat:e.latlng.lat,lng:e.latlng.lng};
@@ -225,6 +235,11 @@
           .on('click',()=>showMapQuake(q,i)).addTo(state.layers.quake);
       });
     }
+    if(state.sim&&show('quake')){
+      L.marker([ALMATY.lat,ALMATY.lng],{icon:leafletIcon('demo',state.sim.mag.toFixed(1)),title:'СИМУЛЯЦИЯ M '+state.sim.mag.toFixed(1)+' — не реальное землетрясение',zIndexOffset:1200})
+        .on('click',showMapSimulation).addTo(state.layers.demo);
+    }
+    $('simMapLegend').hidden=!state.sim||!show('quake');
     if(show('hospital')){
       HOSPITALS.forEach(p=>L.marker([p.lat,p.lng],{icon:leafletIcon('hospital'),title:'Больница (координаты предварительные): '+p.name})
         .on('click',()=>showMapHospital(p)).addTo(state.layers.hospital));
@@ -263,6 +278,14 @@
       +'<div class="sheet-meta"><span>Глубина '+q.depth.toFixed(1)+' км</span><span>'+esc(ago(q.time))+'</span><span>≈ '+Math.round(distance(ALMATY,q))+' км от центра Алматы</span></div>'
       +'<div class="sheet-actions"><button class="button button-primary" type="button" data-event-index="'+i+'">Подробнее '+svgIcon('arrow')+'</button></div>';
   }
+  function showMapSimulation(){
+    if(!state.sim)return;
+    const v=state.sim;
+    $('mapSheet').innerHTML=sheetHeader('demo','СИМУЛЯЦИЯ · M '+v.mag.toFixed(1),'Учебный сценарий · НЕ USGS')
+      +'<p class="sheet-info">Вымышленный эпицентр для демонстрации возле центра Алматы. Магнитуда условная. Датчик не измеряет её.</p>'
+      +'<div class="sheet-meta"><span>Режим: '+esc(v.level)+'</span><span>Старт: '+esc(dateAlmaty(v.time))+'</span></div>'
+      +'<div class="sheet-actions"><button class="button button-primary" data-page="simulation" type="button">Управление симуляцией '+svgIcon('arrow')+'</button></div>';
+  }
   function showMapHospital(p){
     $('mapSheet').innerHTML=sheetHeader('hospital',p.name,'Больница · координаты предварительные')
       +'<p class="sheet-info">Адрес и точность отметки не подтверждены. Перед поездкой проверьте актуальное местоположение и режим работы.</p>'
@@ -284,6 +307,71 @@
   function showMapLocation(label,loc){
     $('mapSheet').innerHTML=sheetHeader('self',label,'Ваше сохранённое местоположение')
       +'<p class="sheet-info">'+Number(loc.lat).toFixed(5)+', '+Number(loc.lng).toFixed(5)+'</p>';
+  }
+  function syntheticSignal(amp){
+    if(!amp)return 'M0 38 H340';
+    const pts=[];
+    // Deterministic synthetic waveform (not data acquired from sensors).
+    for(let x=0;x<=340;x+=3){
+      const phase=x/340*Math.PI*9;
+      const n=(Math.sin(phase)*.65+Math.sin(phase*2.33+.7)*.22+Math.sin(phase*4.9+1.4)*.13);
+      pts.push((x===0?'M':'L')+x+' '+(38-n*amp*.34).toFixed(2));
+    }
+    return pts.join(' ');
+  }
+  function renderSimHome(){
+    const banner=$('simulationHomeBanner');
+    if(!banner)return;
+    banner.hidden=!state.sim;
+    if(state.sim)$('simulationHomeTitle').textContent='УЧЕБНАЯ СИМУЛЯЦИЯ · M '+state.sim.mag.toFixed(1)+' · '+state.sim.level;
+  }
+  function renderSimEvent(){
+    const card=$('simulationEventCard');
+    if(!card)return;
+    card.hidden=!state.sim;
+    if(!state.sim){card.innerHTML='';return}
+    const v=state.sim;
+    card.innerHTML='<div class="sim-event-label"><span class="sim-demo-chip">СИМУЛЯЦИЯ</span><span>Сценарий M '+v.mag.toFixed(1)+' · '+esc(v.level)+'</span></div>'
+      +'<div class="sim-event-info"><strong>Учебное землетрясение · Алматы</strong><small>'+esc(dateAlmaty(v.time))+' · тестовое событие, не из USGS</small></div>'
+      +'<button type="button" data-page="simulation" class="button button-secondary">Подробнее →</button>';
+  }
+  function renderSimulation(){
+    const v=state.sim,active=Boolean(v);
+    $('simActivePanel').dataset.state=v?v.level:'OFF';
+    $('simState').textContent=v?'СИМУЛЯЦИЯ · M '+v.mag.toFixed(1):'Нет активной симуляции';
+    $('simModeLabel').textContent=v?v.level:'OFF';
+    $('simDescription').textContent=v?v.caption:'Выберите сценарий выше. Отдельная учебная карточка появится в событиях, а тестовая точка — на карте.';
+    $('simAmplitude').textContent=v?v.amp+' / 100':'0 / 100';
+    $('simWavePath').setAttribute('d',syntheticSignal(v?v.amp:0));
+    $('simWavePath').setAttribute('stroke',v?.level==='EMERGENCY'?'#dd4b56':v?.level==='WARNING'?'#d39b38':'#347bea');
+    document.querySelectorAll('[data-sim-level]').forEach(btn=>{
+      const selected=active&&Number(btn.dataset.simLevel)===v.mag;
+      btn.classList.toggle('is-active',selected);btn.setAttribute('aria-pressed',String(selected));
+    });
+    for(const id of ['simOpenMap','simOpenEvents','simStop'])$(id).disabled=!active;
+    const modes={
+      'OFF':['Обычный режим','Обычный режим','Обычный режим','Обычный режим'],
+      NORMAL:['Норма (демо)','Норма (демо)','Норма (демо)','Норма (демо)'],
+      WARNING:['Мониторинг (демо)','Мониторинг (демо)','Проверка (демо)','Проверка (демо)'],
+      EMERGENCY:['Запрос закрытия (демо)','Запрос безопасного отключения (демо)','Запрос остановки (демо)','Запрос разблокировки (демо)']
+    };
+    const states=modes[v?v.level:'OFF'];
+    ['simGas','simPower','simLift','simDoors'].forEach((id,i)=>$(id).textContent=states[i]);
+    renderSimHome();renderSimEvent();refreshMapMarkers();
+  }
+  function runSimulation(key){
+    if(!Object.prototype.hasOwnProperty.call(SIM_PRESETS,key))return;
+    const p=SIM_PRESETS[key];
+    state.sim={...p,time:Date.now()};
+    renderSimulation();
+    if(p.level==='EMERGENCY')openDrill();
+    else toast('Запущена учебная симуляция M '+p.mag.toFixed(1)+' · '+p.level);
+  }
+  function stopSimulation(){
+    if(!state.sim)return;
+    state.sim=null;
+    renderSimulation();defaultMapSheet();
+    toast('Учебный сценарий завершён. Реальные данные USGS не менялись.');
   }
   function activateGuide(mode){
     document.querySelectorAll('[data-guide]').forEach(b=>{const yes=b.dataset.guide===mode;b.classList.toggle('is-active',yes);b.setAttribute('aria-selected',String(yes))});
@@ -330,6 +418,8 @@
     const pager=e.target.closest('[data-page]');
     if(pager){e.preventDefault();if(pager.dataset.mapLayer==='assembly')setMapFilter('assembly');nav(pager.dataset.page);return}
     const evt=e.target.closest('[data-event-index]');if(evt){detail(state.quakes[Number(evt.dataset.eventIndex)]);return}
+    const scenario=e.target.closest('[data-sim-level]');
+    if(scenario){runSimulation(scenario.dataset.simLevel);return}
     const place=e.target.closest('[data-place-index]');if(place){openPlace(Number(place.dataset.placeIndex));return}
     const scope=e.target.closest('[data-event-scope]');if(scope){setEventScope(scope.dataset.eventScope);return}
     const guide=e.target.closest('[data-guide]');if(guide){activateGuide(guide.dataset.guide);return}
@@ -344,13 +434,24 @@
     const editor=$('profileForm');
     if(editor){editor.scrollIntoView({behavior:'smooth',block:'start'});$('profileAddress').focus({preventScroll:true})}
   });
+  $('simOpenMap').addEventListener('click',()=>{
+    if(!state.sim)return;
+    setMapFilter('all');nav('map');
+    requestAnimationFrame(()=>{
+      if(state.map){state.map.setView([ALMATY.lat,ALMATY.lng],12);state.map.invalidateSize()}
+      showMapSimulation();
+    });
+  });
+  $('simOpenEvents').addEventListener('click',()=>{if(state.sim)nav('events')});
+  $('simStop').addEventListener('click',stopSimulation);
   $('profileForm').addEventListener('submit',saveForm);
   $('closeDetail').addEventListener('click',closeDetail);
   $('detailDialog').addEventListener('click',e=>{if(e.target===$('detailDialog'))closeDetail()});
   $('startDrill').addEventListener('click',openDrill);
   ['endDrill','trainingDone'].forEach(id=>$(id).addEventListener('click',closeDrill));
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('detailDialog').hidden)closeDetail();if(!$('trainingOverlay').hidden)closeDrill()}});
-  nav(['home','map','events','instructions','profile','places'].includes(location.hash.slice(1))?location.hash.slice(1):'home');
+  nav(['home','map','events','instructions','profile','places','simulation'].includes(location.hash.slice(1))?location.hash.slice(1):'home');
+  renderSimulation();
   fetchQuakes();
   setInterval(fetchQuakes,300000);
 })();
