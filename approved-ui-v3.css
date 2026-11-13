@@ -308,3 +308,42 @@
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 }
+
+/* Final alignment and usability fixes for both desktop and Safari/iOS. */
+@media(max-width:800px){
+  #page-map .map-sheet-close{top:12px;right:13px;bottom:auto;width:31px;height:31px}
+  #page-map .sheet-header{padding-right:35px}
+  #page-map .quake-sheet-heading>b{margin-right:34px}
+  #page-map .map-user-locate{top:46%;bottom:auto;right:12px}
+  #page-map .map-sheet{padding-right:15px}
+  #page-map .quake-sheet-action{margin-top:2px}
+  #page-instructions .guide-icon{border-radius:11px}
+  #page-home .hero-photo-credit a:focus-visible{outline:2px solid #186de8;outline-offset:2px}
+}
+@media(min-width:801px){
+  #page-map .ref-map-topbar{display:flex;justify-content:flex-end;align-items:center;height:55px}
+  #page-map .ref-map-topbar>.ref-back,#page-map .ref-map-topbar>strong{display:none}
+  #page-map .map-top-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;width:auto}
+  #page-map .map-top-actions .ref-topbar-reset{display:grid;place-items:center;border:1px solid #dfe8f5;
+    border-radius:50%;background:#fff;width:42px;height:42px}
+  #page-map .ref-topbar-reset .icon{width:19px;height:19px}
+  #page-map{position:relative}
+  #page-map .map-filter-panel{position:absolute;z-index:720;right:20px;top:65px;background:#fff;
+    width:min(400px,95%);border:1px solid #dce7f7;border-radius:20px;padding:18px;
+    box-shadow:0 12px 40px #2a518a36}
+  #page-map .map-filter-panel[hidden]{display:none!important}
+  #page-map .map-filter-panel strong{font-size:13px}
+  #page-map .map-filter-panel p{font-size:11px;color:#72829b}
+  #page-map .map-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}
+  #page-map .map-legend-float[hidden]{display:none!important}
+  #page-map .map-sheet[hidden]{display:none!important}
+  #page-map .map-sheet-close{right:23px;bottom:120px}
+  #page-map .map-sheet-close:not([hidden]){display:grid}
+  .hero .mountain-visual{
+    background-image:linear-gradient(90deg,#e4f1ff70,#d6e8ff73),
+      url("https://commons.wikimedia.org/wiki/Special:FilePath/Snow_covered_mountains_in_Almaty_%28Unsplash%29.jpg?width=1280");
+    background-size:cover;background-position:center center;
+    opacity:.78;
+  }
+  .hero .mountain-visual>svg,.hero .mountain-visual .sky-disc{display:none}
+}
