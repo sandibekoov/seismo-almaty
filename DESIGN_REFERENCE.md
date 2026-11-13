@@ -64,3 +64,8 @@ Accessible through Profile (and Instructions). An extra screen in the same refer
 8. Re-check keyboard navigation, focus visibility, reduced motion and status text contrast.
 
 **Implementation verification:** Static JavaScript syntax and DOM-ID checks were performed during authoring. Real-device screenshots / pixel-by-pixel reference comparisons require a browser and have not yet been completed.
+
+
+## Final brand / map-icon decision (2026-11-13)
+
+The brand logo is the **original blue seismic waveform** (mobile header, desktop header, Monitoring shortcut and favicon). It must **not** be replaced with the medical interlaced emblem. The interlaced rounded multi-spoke medical emblem is reserved for **hospital markers** and the hospital filter only. Earthquake, assembly, emergency service and demo markers use their own recognizable, round, bold-stroke pictograms on consistently-sized colored circular pins. Real-user location retains its blue locator-dot halo. Hospital coordinates remain preliminary; this is not verified emergency navigation.
