@@ -1,14 +1,35 @@
-/* Seismo Almaty v4 · geometric brand and VISIBLE documentary mountains.
-   User reference: robust interlaced rounded medical/emergency pictogram.
-   Seismo mark is a custom vector variation, not a copy of the third-party logo.
-   The background photo is real, by Sergey Zigle (Unsplash License), NO generated media.
+/* Seismo Almaty: visible authentic raster mountains and original waveform brand.
+   The intertwined rounded medical symbol is now used ONLY for hospital pins.
+   Distinct icons share a coherent circular marker design, without using generated images.
 */
 :root{--brand-v4:#1d67cf;--brand-dark:#192b44}
 .icon{stroke-linecap:round;stroke-linejoin:round}
-.seismo-mark-icon{display:block;flex:none;overflow:visible;stroke:none;fill:none}
-.brand-icon .seismo-mark-icon{width:30px;height:30px;color:#fff}
-.ref-logo .seismo-mark-icon{color:#1c3761}
-.quick-action .seismo-mark-icon{color:#176cea}
+.brand-icon>.icon{width:30px;height:30px;stroke-width:2}
+.ref-logo>.icon{width:32px;height:32px;stroke-width:2}
+.quick-action .icon{stroke-width:2.2}
+/* Desktop and map-sheet baseline for category markers.
+   Mobile pin geometry lives in approved-ui-v3.css so it stays reference-aligned. */
+#page-map .map-pin{--pin-bg:#4086ce;--pin-halo:rgba(64,134,206,.14);
+  width:40px;min-height:42px;position:relative;display:grid;place-items:center;color:#fff}
+#page-map .map-pin__core{display:grid;place-items:center;width:36px;height:36px;flex:none;
+  background:var(--pin-bg);color:#fff;border:3px solid #fff;border-radius:50%;
+  box-shadow:0 3px 13px rgba(23,52,95,.24),0 0 0 4px var(--pin-halo)}
+#page-map .map-pin__core svg{display:block;width:23px;height:23px;overflow:visible}
+#page-map .map-pin--hospital{--pin-bg:#2c83d5;--pin-halo:rgba(44,131,213,.14)}
+#page-map .map-pin--assembly{--pin-bg:#27a879;--pin-halo:rgba(39,168,121,.14)}
+#page-map .map-pin--quake{--pin-bg:#e44d5a;--pin-halo:rgba(228,77,90,.17)}
+#page-map .map-pin--services{--pin-bg:#8b63b8;--pin-halo:rgba(139,99,184,.14)}
+#page-map .map-pin--demo{--pin-bg:#9564c2;--pin-halo:rgba(149,100,194,.24)}
+#page-map .map-pin--hospital .map-pin__core{width:39px;height:39px}
+#page-map .map-pin--hospital .map-pin__core svg{width:28px;height:28px}
+#page-map .map-pin__core .medical-mark-cut{stroke:var(--pin-bg)}
+#page-map .map-pin--quake .map-pin__mag{display:none}
+#page-map .map-pin--demo .map-pin__mag{display:block;position:absolute;top:35px;left:50%;
+  transform:translateX(-50%);color:#70479e;background:#fff;border:1px solid #e3d6ef;
+  border-radius:7px;font-size:9px;padding:2px 5px;font-weight:800;white-space:nowrap}
+#page-map .map-pin--self .map-pin__core{width:24px;height:24px;border:4px solid #fff;
+  background:#2387fa;border-radius:50%;box-shadow:0 0 0 12px rgba(40,128,246,.16),0 3px 12px rgba(23,57,123,.24)}
+#page-map .map-pin--self .map-pin__core svg{display:none}
 @media(max-width:800px){
   /* Unsplash snow mountains: explicit <img> prevents a CSS-only foggy hero. */
   #page-home .ref-home-hero{position:relative;isolation:isolate;overflow:hidden;
