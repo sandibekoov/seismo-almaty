@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f4f8ff">
   <meta name="description" content="Seismo Almaty — учебный интерфейс мониторинга зарегистрированных землетрясений, карты Алматы и инструкций безопасности.">
   <title>Seismo Almaty — сейсмический мониторинг</title>
-  <link rel="icon" href="../assets/seismo-mark.svg" type="image/svg+xml">
+  <link rel="icon" href="../assets/seismo-wave.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,13 +15,13 @@
   <link rel="stylesheet" href="../reference-ui.css?v=2">
   <link rel="stylesheet" href="../simulation.css?v=1">
   <link rel="stylesheet" href="../location-photos.css?v=1">
-  <link rel="stylesheet" href="../approved-ui-v3.css?v=1">
-  <link rel="stylesheet" href="../brand-hero-v4.css?v=1">
+  <link rel="stylesheet" href="../approved-ui-v3.css?v=2">
+  <link rel="stylesheet" href="../brand-hero-v4.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
   <svg aria-hidden="true" class="svg-defs" xmlns="http://www.w3.org/2000/svg">
-        <symbol id="i-seismo-mark" viewBox="0 0 64 64">
+        <symbol id="i-medical-mark" viewBox="0 0 64 64">
       <g fill="none" stroke="currentColor" stroke-width="13.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M32 9v46M9 32h46M16 16l32 32M48 16 16 48"/>
       </g>
@@ -48,12 +48,16 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
     <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></symbol>
-    <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16zM9 21v-5h6v5M12 7v6M9 10h6"/></symbol>
+    <symbol id="i-hospital" viewBox="0 0 64 64">
+      <g fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M32 9v46M9 32h46M16 16l32 32M48 16 16 48"/></g>
+      <path d="M30 8C27 15 40 20 35 28C31 35 25 35 27 42C30 49 40 50 36 57" fill="none" stroke="#e6f1ff" stroke-width="5.8" stroke-linecap="round"/>
+      <path d="M39 10C39 17 26 22 29 30C33 38 40 37 38 44C37 49 33 52 31 56" fill="none" stroke="#e6f1ff" stroke-width="3.9" stroke-linecap="round"/>
+    </symbol>
   </svg>
 
   <header class="site-header">
     <a class="brand" href="#home" data-page="home" aria-label="Seismo Almaty — главная">
-      <span class="brand-icon"><svg class="icon seismo-mark-icon"><use href="#i-seismo-mark"></use></svg></span>
+      <span class="brand-icon"><svg class="icon"><use href="#i-wave"></use></svg></span>
       <span><strong>Seismo Almaty</strong><small>Internet of Things · Алматы</small></span>
     </a>
     <nav class="desktop-nav" aria-label="Главная навигация">
@@ -69,7 +73,7 @@
   <main id="main">
     <section id="page-home" class="page is-active" aria-labelledby="homeHeading">
       <div class="ref-home-hero"><img class="ref-hero-mountains" src="https://images.unsplash.com/photo-1682703638082-3d975a8eec4e?auto=format&fit=crop&w=1400&q=85" alt="" aria-hidden="true" fetchpriority="high" decoding="async"><span class="hero-photo-credit"><a href="https://unsplash.com/photos/uma-cordilheira-coberta-de-neve-sob-um-ceu-azul-WFiuUnN-3Y8" target="_blank" rel="noopener noreferrer">Фото гор: Sergey Zigle · Unsplash</a></span>
-        <div class="ref-home-toolbar"><span class="ref-logo"><svg class="icon seismo-mark-icon" aria-label="Знак Seismo Almaty"><use href="#i-seismo-mark"></use></svg><strong>Seismo<br>Almaty</strong></span>
+        <div class="ref-home-toolbar"><span class="ref-logo"><svg class="icon" aria-hidden="true"><use href="#i-wave"></use></svg><strong>Seismo<br>Almaty</strong></span>
           <span class="ref-header-buttons"><button type="button" data-page="events" aria-label="История событий"><svg class="icon"><use href="#i-events"></use></svg></button><button type="button" data-page="profile" aria-label="Профиль"><svg class="icon"><use href="#i-user"></use></svg></button></span></div>
         <div class="ref-greeting"><h2 id="refGreetingName">Здравствуйте!</h2><span class="ref-city-chip" aria-label="Погода в Алматы"><span id="weatherIcon" aria-hidden="true">☁</span><span class="weather-copy"><strong id="weatherTemp">—°</strong><small id="weatherCity">Алматы</small></span></span></div>
         <button type="button" class="ref-status-card" data-page="events" aria-label="Перейти к данным о сейсмических событиях"><span class="ref-status-check"><svg class="icon"><use href="#i-check"></use></svg></span><div><span>Сейсмическая обстановка</span><strong id="refFeedTitle">Загрузка данных</strong><small id="refFeedSubtitle">Проверяем подключение USGS…</small></div><svg class="icon ref-card-arrow"><use href="#i-chevron"></use></svg></button>
@@ -107,7 +111,7 @@
         </article>
       </div>
             <div class="quick-actions" aria-label="Разделы приложения">
-        <button class="quick-action" type="button" data-page="events"><span><svg class="icon seismo-mark-icon"><use href="#i-seismo-mark"></use></svg></span><strong>Мониторинг</strong><small>Землетрясения USGS</small></button>
+        <button class="quick-action" type="button" data-page="events"><span><svg class="icon"><use href="#i-wave"></use></svg></span><strong>Мониторинг</strong><small>Землетрясения USGS</small></button>
         <button class="quick-action" type="button" data-page="map"><span><svg class="icon"><use href="#i-map"></use></svg></span><strong>Карта</strong><small>Интерактивная карта</small></button>
         <button class="quick-action" type="button" data-page="places"><span><svg class="icon"><use href="#i-group"></use></svg></span><strong>Места сбора</strong><small>Учебные ориентиры</small></button>
         <button class="quick-action" type="button" data-page="instructions"><span><svg class="icon"><use href="#i-book"></use></svg></span><strong>Инструкции</strong><small>До, во время и после</small></button>
@@ -231,6 +235,6 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по Internet of Things (IoT) и автоматизации. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Погода: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Фотография гор: <a href="https://unsplash.com/photos/uma-cordilheira-coberta-de-neve-sob-um-ceu-azul-WFiuUnN-3Y8" target="_blank" rel="noopener noreferrer">Sergey Zigle (Unsplash License)</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="../site.js?v=7" defer></script>
+  <script src="../site.js?v=8" defer></script>
 </body>
 </html>
