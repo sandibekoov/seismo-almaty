@@ -1,4 +1,5 @@
 # Seismo Almaty — Visible Mountains & Rounded Geometric Icon Family (v4)
+> **Superseded branding decision (2026-11-13):** The earlier experiment with a geometric logo was reverted at the user's request. The Seismo Almaty brand and favicon use the original seismic waveform again. The interlaced geometric medical-inspired icon is now used only for hospitals. The unused experimental brand asset was deleted. Mountain photography from this revision remains in use. See DESIGN_REFERENCE.md.
 
 ## Why this change
 The user compared the existing iPhone screenshot to the approved UI. The mountain panorama was almost invisible because the previously selected **Snow covered mountains in Almaty** photo shows actual peaks hidden by heavy fog. Its thumbnail rendered as a bland grey field. The brand mark was also still the older thin oscillation-line logo.
