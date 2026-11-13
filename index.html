@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="./reference-ui.css?v=2">
   <link rel="stylesheet" href="./simulation.css?v=1">
   <link rel="stylesheet" href="./location-photos.css?v=1">
+  <link rel="stylesheet" href="./approved-ui-v3.css?v=1">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -36,6 +37,8 @@
     <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></symbol>
     <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16zM9 21v-5h6v5M12 7v6M9 10h6"/></symbol>
   </svg>
 
@@ -56,10 +59,10 @@
 
   <main id="main">
     <section id="page-home" class="page is-active" aria-labelledby="homeHeading">
-      <div class="ref-home-hero">
+      <div class="ref-home-hero"><span class="hero-photo-credit"><a href="https://commons.wikimedia.org/wiki/File:Snow_covered_mountains_in_Almaty_(Unsplash).jpg" target="_blank" rel="noopener noreferrer">Фото гор: N. Rakysh · CC0</a></span>
         <div class="ref-home-toolbar"><span class="ref-logo"><svg class="icon"><use href="#i-wave"></use></svg><strong>Seismo<br>Almaty</strong></span>
           <span class="ref-header-buttons"><button type="button" data-page="events" aria-label="История событий"><svg class="icon"><use href="#i-events"></use></svg></button><button type="button" data-page="profile" aria-label="Профиль"><svg class="icon"><use href="#i-user"></use></svg></button></span></div>
-        <div class="ref-greeting"><h2>Здравствуйте!</h2><span class="ref-city-chip"><svg class="icon"><use href="#i-location"></use></svg> Алматы</span></div>
+        <div class="ref-greeting"><h2>Здравствуйте!</h2><span class="ref-city-chip" aria-label="Погода в Алматы"><span id="weatherIcon" aria-hidden="true">☁</span><span class="weather-copy"><strong id="weatherTemp">—°</strong><small id="weatherCity">Алматы</small></span></span></div>
         <button type="button" class="ref-status-card" data-page="events" aria-label="Перейти к данным о сейсмических событиях"><span class="ref-status-check"><svg class="icon"><use href="#i-check"></use></svg></span><div><span>Сейсмическая обстановка</span><strong id="refFeedTitle">Загрузка данных</strong><small id="refFeedSubtitle">Проверяем подключение USGS…</small></div><svg class="icon ref-card-arrow"><use href="#i-chevron"></use></svg></button>
       </div>
       <div class="hero">
@@ -103,18 +106,18 @@
     </section>
 
     <section id="page-map" class="page" aria-labelledby="mapHeading" hidden>
-      <div class="ref-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Карта</strong><span class="ref-topbar-action"><button class="ref-topbar-reset" type="button" data-map-filter="all" title="Показать все категории" aria-label="Показать все категории карты"><svg class="icon"><use href="#i-filter"></use></svg></button></span></div>
+      <div class="ref-topbar ref-map-topbar"><button class="ref-back" type="button" data-page="home" aria-label="Назад"><svg class="icon"><use href="#i-chevron"></use></svg></button><strong>Карта</strong><span class="ref-topbar-action map-top-actions"><button class="ref-topbar-reset" type="button" id="toggleMapFilters" aria-label="Фильтры объектов" aria-expanded="false" aria-controls="mapFilterPanel"><svg class="icon"><use href="#i-filter"></use></svg></button><button class="ref-topbar-reset" type="button" id="toggleMapLayers" aria-label="Слои карты" aria-expanded="false" aria-controls="mapFilterPanel"><svg class="icon"><use href="#i-layers"></use></svg></button></span></div>
       <div class="page-heading">
         <div><span class="eyebrow">СЕЙСМИЧЕСКАЯ КАРТА</span><h1 id="mapHeading">Карта Алматы</h1><p>Землетрясения USGS, больницы, службы помощи и возможные места сбора</p></div>
         <button type="button" class="button button-secondary" id="locateMe"><svg class="icon"><use href="#i-location"></use></svg> Моё местоположение</button>
       </div>
-      <div class="map-filter-row" role="group" aria-label="Показать категории объектов">
+      <div class="map-filter-panel" id="mapFilterPanel" hidden><strong>Что показывать на карте</strong><div class="map-filter-row" role="group" aria-label="Показать категории объектов">
         <button type="button" class="map-filter is-active" data-map-filter="all" aria-pressed="true"><span class="filter-glyph all"><svg class="icon"><use href="#i-map"></use></svg></span> Все</button>
         <button type="button" class="map-filter" data-map-filter="quake" aria-pressed="false"><span class="filter-glyph quake"><svg class="icon"><use href="#i-wave"></use></svg></span> Землетрясения</button>
         <button type="button" class="map-filter" data-map-filter="hospital" aria-pressed="false"><span class="filter-glyph hospital"><svg class="icon"><use href="#i-hospital"></use></svg></span> Больницы</button>
         <button type="button" class="map-filter" data-map-filter="assembly" aria-pressed="false"><span class="filter-glyph assembly"><svg class="icon"><use href="#i-group"></use></svg></span> Места сбора</button>
         <button type="button" class="map-filter" data-map-filter="services" aria-pressed="false"><span class="filter-glyph services"><svg class="icon"><use href="#i-shield"></use></svg></span> МЧС</button>
-      </div>
+      </div><p>Адреса больниц и ориентиры мест сбора требуют проверки.</p></div>
       <div class="map-workspace">
         <aside class="surface map-sidebar">
           <div class="sidebar-heading"><h2>Объекты на карте</h2><span class="source-chip">Алматы</span></div>
@@ -128,12 +131,12 @@
           <div class="map-sidebar-footer"><p id="mapDataInfo" class="muted">Получаем сейсмические данные…</p><button class="button button-secondary wide" type="button" id="mapRefresh"><svg class="icon"><use href="#i-refresh"></use></svg> Обновить события</button></div>
         </aside>
         <div class="map-canvas-wrap">
-          <div id="map" aria-label="Интерактивная карта землетрясений, больниц, МЧС и возможных мест сбора Алматы" role="region"></div>
-          <div class="map-legend-float" aria-label="Обозначения карты">
+          <div id="map" aria-label="Интерактивная карта землетрясений, больниц, МЧС и возможных мест сбора Алматы" role="region"></div><button class="map-user-locate" id="mapUserLocate" type="button" aria-label="Найти моё местоположение"><svg class="icon"><use href="#i-location"></use></svg></button>
+          <div class="map-legend-float" aria-label="Обозначения карты" hidden>
             <span id="simMapLegend" hidden><i class="legend-dot demo"></i> СИМУЛЯЦИЯ</span>
             <span><i class="legend-dot quake"></i> События</span><span><i class="legend-dot hospital"></i> Больницы</span><span><i class="legend-dot assembly"></i> Сбор</span><span><i class="legend-dot services"></i> МЧС</span><span><i class="legend-dot self"></i> Вы</span>
           </div>
-          <div id="mapSheet" class="map-sheet" aria-live="polite"><div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на значок больницы, события, места сбора или МЧС, чтобы посмотреть информацию.</span></div></div>
+          <div id="mapSheet" class="map-sheet" aria-live="polite" hidden></div><button id="mapSheetDismiss" class="map-sheet-close" type="button" aria-label="Закрыть информацию об объекте" hidden><svg class="icon"><use href="#i-close"></use></svg></button>
         </div>
       </div>
     </section>
@@ -164,7 +167,7 @@
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-map"></use></svg>Мой адрес</span><button type="button" id="openAddressEditor" class="ref-setting-value">Изменить →</button></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-events"></use></svg>Уведомления</span><strong>Не подключены</strong></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-book"></use></svg>Язык интерфейса</span><strong>Русский</strong></div>
-    <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-info"></use></svg>О приложении</span><strong>IoT · прототип 2.1</strong></div>
+    <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-info"></use></svg>О приложении</span><strong>IoT · прототип 3.0</strong></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div>
     <div class="setting-line sim-settings-link"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Simulation Mode</span><button class="ref-setting-value" data-page="simulation" type="button">Запустить →</button></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-shield"></use></svg>Engineering Demo</span><a href="./engineering/">Открыть ↗</a></div>
@@ -219,6 +222,6 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по Internet of Things (IoT) и автоматизации. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="./site.js?v=6" defer></script>
+  <script src="./site.js?v=7" defer></script>
 </body>
 </html>
