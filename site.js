@@ -462,11 +462,19 @@
     try{const saved=JSON.parse(localStorage.getItem('seismo_resident_profile_v1')||'null');
       if(saved&&typeof saved==='object'){
         const lat=saved.lat===null?null:Number(saved.lat),lng=saved.lng===null?null:Number(saved.lng);
-        state.profile={address:String(saved.address||'').slice(0,150),lat:lat!==null&&Number.isFinite(lat)&&Math.abs(lat)<=90?lat:null,lng:lng!==null&&Number.isFinite(lng)&&Math.abs(lng)<=180?lng:null};
+        state.profile={name:String(saved.name||'').slice(0,48),address:String(saved.address||'').slice(0,150),lat:lat!==null&&Number.isFinite(lat)&&Math.abs(lat)<=90?lat:null,lng:lng!==null&&Number.isFinite(lng)&&Math.abs(lng)<=180?lng:null};
       }
     }catch(e){state.profile=null}
   }
+  function updateProfileLabel(){
+    const raw=(state.profile?.name||'').trim();
+    const name=raw.replace(/[\r\n<>]/g,' ').slice(0,48);
+    $('refProfileName').textContent=name||'Профиль жителя';
+    $('refGreetingName').textContent=name?'Здравствуйте,\n'+name+'!':'Здравствуйте!';
+  }
   function fillProfile(){
+    $('profileName').value=state.profile?.name||'';
+    updateProfileLabel();
     $('profileAddress').value=state.profile?.address||'';
     $('profileLat').value=Number.isFinite(state.profile?.lat)?String(state.profile.lat):'';
     $('profileLng').value=Number.isFinite(state.profile?.lng)?String(state.profile.lng):'';
@@ -481,8 +489,8 @@
     if((a&&!b)||(!a&&b)){$('profileStatus').textContent='Укажите обе координаты или оставьте оба поля пустыми.';return}
     const lat=a?Number(a):null,lng=b?Number(b):null;
     if(lat!==null&&(lat < -90||lat >90||!Number.isFinite(lat))||lng!==null&&(lng < -180||lng >180||!Number.isFinite(lng))){$('profileStatus').textContent='Проверьте координаты широты и долготы.';return}
-    state.profile={address:$('profileAddress').value.trim(),lat,lng};
-    if(saveProfile()){$('profileStatus').textContent='Сохранено на этом устройстве.';refreshMapMarkers()}
+    state.profile={name:$('profileName').value.trim().slice(0,48),address:$('profileAddress').value.trim(),lat,lng};
+    if(saveProfile()){$('profileStatus').textContent='Сохранено на этом устройстве.';updateProfileLabel();refreshMapMarkers()}
   }
   function geolocate(){
     if(!navigator.geolocation){toast('Геолокация недоступна в этом браузере');return}
