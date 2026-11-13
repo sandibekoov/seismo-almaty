@@ -104,15 +104,41 @@
     window.scrollTo({top:0,behavior:'instant'});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
   }
+  function eventIcon(mag){
+    const tone=mag>=4?'is-strong':'';
+    return '<span class="event-icon '+tone+'">'+svgIcon('wave')+'</span>';
+  }
   function renderFeed(list,container,emptyText){
     if(!container)return;
     if(state.feed==='loading'){container.innerHTML='<div class="empty-state">Загружаем данные USGS…</div>';return}
-    if(state.feed==='error'){container.innerHTML='<div class="empty-state">Нет связи с USGS. Проверьте интернет или обновите страницу. Нет данных — не значит, что нет опасности.</div>';return}
-    if(!list.length){container.innerHTML='<div class="empty-state">'+esc(emptyText||'За выбранный период события не найдены.')+'</div>';return}
+    if(state.feed==='error'){container.innerHTML='<div class="empty-state">Нет связи с USGS. Последние события сейчас недоступны, это не оценка безопасности.</div>';return}
+    if(!list.length){container.innerHTML='<div class="empty-state">'+esc(emptyText||'По выбранным параметрам событий нет.')+'</div>';return}
     container.innerHTML=list.map(q=>{
-      const n=state.quakes.indexOf(q);
-      return '<button type="button" class="feed-item" data-event-index="'+n+'" aria-label="Подробнее о событии M '+q.mag.toFixed(1)+'">'+badge(q.mag)+'<span class="feed-main"><strong>'+esc(locLabel(q))+'</strong><small>'+esc(ago(q.time))+' · глубина '+q.depth.toFixed(0)+' км</small></span>'+svgIcon('chevron').replace('class="icon"','class="icon feed-chevron"')+'</button>';
+      const idx=state.quakes.indexOf(q);
+      return '<button class="feed-item" type="button" data-event-index="'+idx+'">'
+        +eventIcon(q.mag)
+        +'<span class="feed-main"><strong>M '+q.mag.toFixed(1)+'</strong><span class="feed-place">'+esc(locLabel(q))+'</span><small>'+esc(dateAlmaty(q.time))+' · глубина '+q.depth.toFixed(0)+' км</small></span>'
+        +svgIcon('chevron').replace('class="icon"','class="icon feed-chevron"')+'</button>';
     }).join('');
+  }
+  async function fetchWeather(){
+    const temp=$('weatherTemp'),icon=$('weatherIcon');
+    if(!temp||!icon)return;
+    const url='https://api.open-meteo.com/v1/forecast?latitude=43.238&longitude=76.945&current=temperature_2m,weather_code,is_day&timezone=Asia%2FAlmaty';
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),9500);
+    try{
+      const response=await fetch(url,{signal:controller.signal});
+      if(!response.ok)throw Error('Weather HTTP '+response.status);
+      const data=await response.json();
+      const now=data?.current;
+      if(!now||!Number.isFinite(now.temperature_2m))throw Error('No temperature');
+      const t=Math.round(now.temperature_2m);
+      temp.textContent=(t>0?'+':'')+t+'°';
+      const code=Number(now.weather_code),day=Number(now.is_day)===1;
+      icon.textContent=[0,1].includes(code)?(day?'☀':'☾'):[2,3].includes(code)?'☁':[45,48].includes(code)?'≋':[51,53,55,61,63,65,80,81,82].includes(code)?'☂':[71,73,75,77,85,86].includes(code)?'❄':'☁';
+      temp.title='Погода Open-Meteo, измерения/модельные данные на '+String(now.time||'текущее время');
+    }catch(e){temp.textContent='—°';icon.textContent='☁';temp.title='Погода сейчас недоступна'}
+    finally{clearTimeout(timeout)}
   }
   function renderHome(){
     const status=$('headerFeed'),pill=status.closest('.data-pill');
@@ -166,20 +192,21 @@
   }
   function mobileEventDetail(q){
     const src=safeUSGS(q.url);
+    const fact=(symbol,label,value)=>'<div class="event-detail-fact"><span>'+svgIcon(symbol)+' '+esc(label)+'</span><strong>'+esc(value)+'</strong></div>';
     $('refEventDetail').innerHTML='<article class="ref-detail-primary">'
-      +'<span class="eyebrow">ЗАРЕГИСТРИРОВАННОЕ СОБЫТИЕ · USGS</span>'
-      +'<div class="ref-detail-main">'+badge(q.mag)+'<div><h2>'+esc(locLabel(q))+'</h2><p>'+esc(dateAlmaty(q.time))+' · Алматы</p></div></div>'
+      +'<div class="event-detail-top"><span class="event-icon is-strong">'+svgIcon('wave')+'</span><div><strong>Землетрясение</strong><small>USGS · зарегистрированное событие</small></div></div>'
+      +'<div class="event-magnitude-panel"><strong>M '+q.mag.toFixed(1)+'</strong><span>'+esc(dateAlmaty(q.time))+'</span></div>'
+      +'<h2 class="event-detail-place">'+esc(locLabel(q))+'</h2>'
       +'<div class="ref-detail-metrics">'
-      +'<div><span>Магнитуда</span><strong>M '+q.mag.toFixed(1)+'</strong></div>'
-      +'<div><span>Расстояние от центра Алматы</span><strong>≈ '+Math.round(distance(ALMATY,q))+' км</strong></div>'
-      +'<div><span>Глубина</span><strong>'+q.depth.toFixed(1)+' км</strong></div>'
-      +'<div><span>Координаты эпицентра</span><strong>'+q.lat.toFixed(4)+'°, '+q.lng.toFixed(4)+'°</strong></div>'
-      +'<div><span>Источник</span><strong>USGS</strong></div></div>'
-      +(src?'<a class="button button-primary wide" href="'+esc(src)+'" target="_blank" rel="noopener noreferrer">Источник USGS '+svgIcon('arrow')+'</a>':'')
-      +'</article><div class="ref-detail-map" role="img" aria-label="Декоративная панорама Алматы, не карта эпицентра"></div>'
-      +'<div class="ref-detail-info"><p>Магнитуда не прогнозирует последствия для отдельного здания. Каталог USGS не является системой раннего оповещения.</p></div>';
+      +fact('map','Расстояние от Алматы','≈ '+Math.round(distance(ALMATY,q))+' км')
+      +fact('wave','Глубина',q.depth.toFixed(1)+' км')
+      +fact('location','Координаты',q.lat.toFixed(4)+'°, '+q.lng.toFixed(4)+'°')
+      +fact('events','Источник','USGS')
+      +'</div>'
+      +(src?'<a class="button button-secondary wide" href="'+esc(src)+'" target="_blank" rel="noopener noreferrer">Перейти к записи USGS '+svgIcon('arrow')+'</a>':'')
+      +'</article><div class="ref-detail-info"><p>Запись о прошлом событии не прогнозирует будущие землетрясения и не означает, что конкретное здание безопасно или опасно. При сильных толчках укройтесь и защитите голову.</p></div>';
     const back=state.current==='map'?'map':'events';
-    const button=$('page-event-detail').querySelector('.ref-back');if(button)button.dataset.page=back;
+    const backButton=$('page-event-detail').querySelector('.ref-back');if(backButton)backButton.dataset.page=back;
     nav('event-detail');
   }
   function detail(q){
@@ -227,6 +254,8 @@
     return L.divIcon({className:'seismo-map-icon',html:markerHTML(type,label),iconSize:[40,52],iconAnchor:[20,27]});
   }
   function defaultMapSheet(){
+    $('mapSheet').hidden=true;
+    $('mapSheetDismiss').hidden=true;
     $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML='<div class="sheet-default"><strong>Выберите объект на карте</strong><span>Нажмите на маркер, чтобы увидеть категорию, название и подробности.</span></div>';
   }
@@ -292,6 +321,10 @@
       ?'USGS: '+state.quakes.length+' событий · Больницы: '+HOSPITALS.length+' · МЧС: '+SERVICES.length
       :state.feed==='loading'?'Загрузка USGS; объекты предварительные':'USGS недоступен. Объекты предварительные.';
   }
+  function activateMapSheet(){
+    $('mapSheet').hidden=false;
+    $('mapSheetDismiss').hidden=false;
+  }
   function sheetHeader(type,title,subtitle){
     return '<div class="sheet-handle" aria-hidden="true"></div><div class="sheet-header"><span class="sheet-type-icon sheet-type--'+type+'">'+markerHTML(type)+'</span><div class="sheet-heading"><span class="sheet-category">'+esc(subtitle)+'</span><h3>'+esc(title)+'</h3></div></div>';
   }
@@ -306,12 +339,14 @@
       :'<span>Укажите местоположение для расчёта расстояния</span>';
   }
   function showMapQuake(q,i){
-    $('mapSheet').classList.remove('has-place-photo');
-    $('mapSheet').innerHTML=sheetHeader('quake','M '+q.mag.toFixed(1)+' · '+locLabel(q),'Землетрясение · каталог USGS')
-      +'<div class="sheet-meta"><span>Глубина '+q.depth.toFixed(1)+' км</span><span>'+esc(ago(q.time))+'</span><span>≈ '+Math.round(distance(ALMATY,q))+' км от центра Алматы</span></div>'
-      +'<div class="sheet-actions"><button class="button button-primary" type="button" data-event-index="'+i+'">Подробнее '+svgIcon('arrow')+'</button></div>';
+    activateMapSheet();$('mapSheet').classList.remove('has-place-photo');
+    $('mapSheet').innerHTML='<div class="sheet-handle"></div>'
+      +'<div class="quake-sheet-heading"><span class="quake-sheet-icon">'+svgIcon('wave')+'</span><div><strong>Землетрясение</strong><small>USGS · '+esc(ago(q.time))+'</small></div><b>M '+q.mag.toFixed(1)+'</b></div>'
+      +'<div class="quake-sheet-metrics"><div><span>Эпицентр</span><strong>'+q.lat.toFixed(2)+'°, '+q.lng.toFixed(2)+'°</strong></div><div><span>От Алматы</span><strong>≈ '+Math.round(distance(ALMATY,q))+' км</strong></div><div><span>Глубина</span><strong>'+q.depth.toFixed(0)+' км</strong></div></div>'
+      +'<button class="quake-sheet-action" type="button" data-event-index="'+i+'">Подробнее '+svgIcon('chevron')+'</button>';
   }
   function showMapSimulation(){
+    activateMapSheet();
     $('mapSheet').classList.remove('has-place-photo');
     if(!state.sim)return;
     const v=state.sim;
@@ -321,6 +356,7 @@
       +'<div class="sheet-actions"><button class="button button-primary" data-page="simulation" type="button">Управление симуляцией '+svgIcon('arrow')+'</button></div>';
   }
   function showMapHospital(p){
+    activateMapSheet();
     $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('hospital',p.name,'Больница · координаты предварительные')
       +'<p class="sheet-info">Адрес и точность отметки не подтверждены. Перед поездкой проверьте актуальное местоположение и режим работы.</p>'
@@ -328,6 +364,7 @@
       +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
   function showMapAssembly(p){
+    activateMapSheet();
     $('mapSheet').classList.add('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('assembly',p.name,'Возможное место сбора · не подтверждено')
       +'<figure class="map-place-figure">'+placePhotoFigure(p,'sheet')+'<figcaption>'+photoCredit(p)+'</figcaption></figure>'
@@ -336,6 +373,7 @@
       +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
   function showMapServices(p){
+    activateMapSheet();
     $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('services',p.name,'МЧС · координаты предварительные')
       +'<p class="sheet-info">Местоположение учреждения требует проверки. Экстренный номер РК: 112 (общий, не прямой телефон этого учреждения).</p>'
@@ -343,6 +381,7 @@
       +'<div class="sheet-actions">'+searchMaps(p.name)+'</div>';
   }
   function showMapLocation(label,loc){
+    activateMapSheet();
     $('mapSheet').classList.remove('has-place-photo');
     $('mapSheet').innerHTML=sheetHeader('self',label,'Ваше сохранённое местоположение')
       +'<p class="sheet-info">'+Number(loc.lat).toFixed(5)+', '+Number(loc.lng).toFixed(5)+'</p>';
@@ -414,7 +453,8 @@
   }
   function activateGuide(mode){
     document.querySelectorAll('[data-guide]').forEach(b=>{const yes=b.dataset.guide===mode;b.classList.toggle('is-active',yes);b.setAttribute('aria-selected',String(yes))});
-    $('guideCards').innerHTML=(GUIDES[mode]||GUIDES.during).map((s,i)=>'<article class="guide-card"><strong>0'+(i+1)+'</strong><p>'+esc(s)+'</p></article>').join('');
+    const guideIcons=mode==='before'?['shield','book','home','group']:mode==='during'?['shield','alert','home','map']:['shield','home','alert','events'];
+    $('guideCards').innerHTML=(GUIDES[mode]||GUIDES.during).map((txt,i)=>'<article class="guide-card"><span class="guide-icon">'+svgIcon(guideIcons[i])+'</span><p>'+esc(txt)+'</p></article>').join('');
   }
   function openDrill(){$('trainingOverlay').hidden=false;document.body.style.overflow='hidden';$('endDrill').focus()}
   function closeDrill(){$('trainingOverlay').hidden=true;document.body.style.overflow=''}
@@ -422,11 +462,19 @@
     try{const saved=JSON.parse(localStorage.getItem('seismo_resident_profile_v1')||'null');
       if(saved&&typeof saved==='object'){
         const lat=saved.lat===null?null:Number(saved.lat),lng=saved.lng===null?null:Number(saved.lng);
-        state.profile={address:String(saved.address||'').slice(0,150),lat:lat!==null&&Number.isFinite(lat)&&Math.abs(lat)<=90?lat:null,lng:lng!==null&&Number.isFinite(lng)&&Math.abs(lng)<=180?lng:null};
+        state.profile={name:String(saved.name||'').slice(0,48),address:String(saved.address||'').slice(0,150),lat:lat!==null&&Number.isFinite(lat)&&Math.abs(lat)<=90?lat:null,lng:lng!==null&&Number.isFinite(lng)&&Math.abs(lng)<=180?lng:null};
       }
     }catch(e){state.profile=null}
   }
+  function updateProfileLabel(){
+    const raw=(state.profile?.name||'').trim();
+    const name=raw.replace(/[\r\n<>]/g,' ').slice(0,48);
+    $('refProfileName').textContent=name||'Профиль жителя';
+    $('refGreetingName').textContent=name?'Здравствуйте,\n'+name+'!':'Здравствуйте!';
+  }
   function fillProfile(){
+    $('profileName').value=state.profile?.name||'';
+    updateProfileLabel();
     $('profileAddress').value=state.profile?.address||'';
     $('profileLat').value=Number.isFinite(state.profile?.lat)?String(state.profile.lat):'';
     $('profileLng').value=Number.isFinite(state.profile?.lng)?String(state.profile.lng):'';
@@ -441,8 +489,8 @@
     if((a&&!b)||(!a&&b)){$('profileStatus').textContent='Укажите обе координаты или оставьте оба поля пустыми.';return}
     const lat=a?Number(a):null,lng=b?Number(b):null;
     if(lat!==null&&(lat < -90||lat >90||!Number.isFinite(lat))||lng!==null&&(lng < -180||lng >180||!Number.isFinite(lng))){$('profileStatus').textContent='Проверьте координаты широты и долготы.';return}
-    state.profile={address:$('profileAddress').value.trim(),lat,lng};
-    if(saveProfile()){$('profileStatus').textContent='Сохранено на этом устройстве.';refreshMapMarkers()}
+    state.profile={name:$('profileName').value.trim().slice(0,48),address:$('profileAddress').value.trim(),lat,lng};
+    if(saveProfile()){$('profileStatus').textContent='Сохранено на этом устройстве.';updateProfileLabel();refreshMapMarkers()}
   }
   function geolocate(){
     if(!navigator.geolocation){toast('Геолокация недоступна в этом браузере');return}
@@ -465,13 +513,32 @@
   });
   document.querySelector('.map-preview').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nav('map')}});
   window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if($('page-'+h))nav(h)});
+  const filterPanel=$('mapFilterPanel');
+  const mapFilterToggle=$('toggleMapFilters');
+  const mapLayerToggle=$('toggleMapLayers');
+  function toggleFilterPanel(force){
+    const open=typeof force==='boolean'?force:filterPanel.hidden;
+    filterPanel.hidden=!open;
+    mapFilterToggle.setAttribute('aria-expanded',String(open));
+    mapLayerToggle.setAttribute('aria-expanded',String(open));
+  }
+  mapFilterToggle.addEventListener('click',()=>toggleFilterPanel());
+  mapLayerToggle.addEventListener('click',()=>toggleFilterPanel());
+  $('mapSheetDismiss').addEventListener('click',defaultMapSheet);
+  $('mapUserLocate').addEventListener('click',geolocate);
+
   ['periodFilter','magnitudeFilter'].forEach(id=>$(id).addEventListener('change',renderEvents));
-  document.querySelectorAll('[data-map-filter]').forEach(button=>button.addEventListener('click',()=>setMapFilter(button.dataset.mapFilter)));
+  document.querySelectorAll('[data-map-filter]').forEach(button=>button.addEventListener('click',()=>{setMapFilter(button.dataset.mapFilter);toggleFilterPanel(false)}));
   ['mapRefresh','eventsRefresh'].forEach(id=>$(id).addEventListener('click',fetchQuakes));
   ['locateMe','profileGeolocate'].forEach(id=>$(id).addEventListener('click',geolocate));
   $('openAddressEditor').addEventListener('click',()=>{
     const editor=$('profileForm');
-    if(editor){editor.scrollIntoView({behavior:'smooth',block:'start'});$('profileAddress').focus({preventScroll:true})}
+    if(editor){
+      const wrap=editor.closest('.profile-card');
+      wrap?.classList.add('is-open');
+      editor.scrollIntoView({behavior:'smooth',block:'center'});
+      $('profileAddress').focus({preventScroll:true});
+    }
   });
   $('simOpenMap').addEventListener('click',()=>{
     if(!state.sim)return;
@@ -497,5 +564,7 @@
   nav(['home','map','events','instructions','profile','places','simulation'].includes(location.hash.slice(1))?location.hash.slice(1):'home');
   renderSimulation();
   fetchQuakes();
+  fetchWeather();
   setInterval(fetchQuakes,300000);
+  setInterval(fetchWeather,900000);
 })();
