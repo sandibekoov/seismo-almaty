@@ -79,3 +79,8 @@ Recommended test scenarios:
 8. `/engineering/` legacy page continues to function.
 
 This is a student prototype. It is not an earthquake early warning system, a public alert service or a certified building protection system.
+
+
+## Restored original brand and coherent map pins
+
+The original blue **seismic-wave** brand logo, Monitoring shortcut and favicon are restored. The medical-inspired interlaced eight-spoke pictogram from the user's reference is applied **only to hospital markers**. Earthquake, assembly, emergency service and simulation symbols use the same round pin geometry, visible bold rounded strokes, subtle halo and category colors. The real-user marker remains a distinct blue dot with an accuracy-style ring. The medical graphic is a new approximation of the reference's visual language, not an embedded copy of the third-party artwork. See [DESIGN_REFERENCE.md](DESIGN_REFERENCE.md).

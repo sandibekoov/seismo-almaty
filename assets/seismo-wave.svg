@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Seismo Almaty">
+  <defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#419eff"/><stop offset="1" stop-color="#075dd1"/></linearGradient></defs>
+  <rect width="64" height="64" rx="17" fill="url(#b)"/>
+  <path d="M7 33h8l5-11 8 23L36 11l9 31 4-9h8" stroke="#fff" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

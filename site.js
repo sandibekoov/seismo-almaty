@@ -237,18 +237,25 @@
   }
 
   // Consistent category icons. The source catalogue is not a seismic warning system.
+  // One visual language for all category pins: round tile, rounded bold strokes,
+  // restrained halo, and a unique silhouette for each category.
   function markerHTML(type,label){
     const paths={
-      quake:'<path d="M2 12h4l2-6 4 12 3-8 2 4h5"/>',
-      demo:'<path d="M3 12h4l2-5 4 10 3-7 2 2h3"/><path d="M4 20h16"/>',
-      hospital:'<path d="M12 4v16M4 12h16"/>',
-      assembly:'<circle cx="8" cy="8" r="2.6"/><circle cx="17" cy="9" r="2.2"/><path d="M2 20a6 6 0 0 1 12 0M14 16a4.3 4.3 0 0 1 8 4"/>',
-      services:'<path d="m12 2 9 4v6c0 5-3.5 8.5-9 10-5.5-1.5-9-5-9-10V6z"/><path d="M12 7v6m0 3h.01"/>',
-      self:'<circle cx="12" cy="12" r="4.4"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>'
+      quake:'<path d="M3 32h12l6-13 8 27 9-31 8 17h15"/>',
+      demo:'<path d="M4 32h10l6-9 8 20 8-26 9 17h15"/><path d="M21 52h22"/>',
+      assembly:'<circle cx="23" cy="23" r="7"/><circle cx="42" cy="25" r="6"/><path d="M9 49v-4c0-8 6-13 14-13 8 0 14 5 14 13v4M37 35c8 0 16 5 16 13v1"/>',
+      services:'<path d="m32 7 21 9v15c0 13-9 22-21 26-12-4-21-13-21-26V16z"/><path d="M32 19v19m0 9h.01"/>',
+      self:'<circle cx="32" cy="32" r="11"/><path d="M32 7v9m0 32v9M7 32h9m32 0h9"/>'
     };
-    if(!Object.prototype.hasOwnProperty.call(paths,type))return '';
-    const icon='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+paths[type]+'</svg>';
-    return '<span class="map-pin map-pin--'+type+'"><span class="map-pin__core">'+icon+'</span>'+(type==='quake'&&label?'<span class="map-pin__mag">M'+esc(label)+'</span>':type==='demo'?'<span class="map-pin__mag">ТЕСТ</span>':'')+'</span>';
+    const medicalGlyph='<g fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">'
+      +'<path d="M32 9v46M9 32h46M16 16l32 32M48 16 16 48"/></g>'
+      +'<path class="medical-mark-cut" d="M30 8C27 15 40 20 35 28C31 35 25 35 27 42C30 49 40 50 36 57" fill="none" stroke-width="6" stroke-linecap="round"/>'
+      +'<path class="medical-mark-cut" d="M39 10C39 17 26 22 29 30C33 38 40 37 38 44C37 49 33 52 31 56" fill="none" stroke-width="4" stroke-linecap="round"/>';
+    if(type!=='hospital'&&!Object.prototype.hasOwnProperty.call(paths,type))return '';
+    const icon='<svg class="map-pin-symbol'+(type==='hospital'?' map-pin-symbol--medical':'')+'" viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">'
+      +(type==='hospital'?medicalGlyph:paths[type])+'</svg>';
+    return '<span class="map-pin map-pin--'+type+'"><span class="map-pin__core">'+icon+'</span>'
+      +(type==='demo'?'<span class="map-pin__mag">ТЕСТ</span>':'')+'</span>';
   }
   function leafletIcon(type,label){
     return L.divIcon({className:'seismo-map-icon',html:markerHTML(type,label),iconSize:[40,52],iconAnchor:[20,27]});
