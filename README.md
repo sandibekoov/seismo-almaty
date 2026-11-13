@@ -1,5 +1,10 @@
 # Seismo Almaty
 
+## Approved mobile v3
+
+Strict mobile reference implementation, real raster Almaty mountain photography, Open-Meteo weather, cleaner Leaflet map and improved reference-style screens. [Full implementation and QA notes](APPROVED_UI_V3.md).
+
+
 Mobile-first educational UI for seismic event monitoring and building-safety simulations in Almaty.
 
 ## Interfaces
