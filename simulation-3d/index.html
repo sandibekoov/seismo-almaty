@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Seismo Almaty — 3D Building Lab</title>
+<style>
+:root{--bg:#e9eef2;--fg:#13222e;--card:rgba(255,255,255,.92);--mut:#56697a;--ok:#14854f;--bad:#d4352b;--ac:#e8590c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.92);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}}
+:root[data-theme="dark"]{--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.92);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:"Trebuchet MS",Verdana,sans-serif;overflow:hidden;position:relative;font-size:13px}
+#gl{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+.p{position:absolute;background:var(--card);border-radius:10px;padding:8px 10px}
+#top{left:8px;top:8px;width:min(230px,52vw)}
+#top .r{display:flex;justify-content:space-between;align-items:baseline}
+#acc{font-size:22px}
+#ch{width:100%;height:60px;display:block;margin:4px 0}
+#rt{color:var(--mut);min-height:16px}
+#chips{right:8px;top:8px;display:grid;gap:5px}
+.c{display:flex;justify-content:space-between;gap:12px}
+.c b{color:var(--ok)}.c.off b{color:var(--bad)}
+#cap{left:8px;right:8px;top:150px;text-align:center;font-size:15px;font-weight:700;display:none}
+#set{left:8px;right:8px;bottom:104px;max-height:46vh;overflow:auto;display:none}
+#set label{display:block;margin:6px 0 2px}
+#set input[type=range]{width:100%}
+#log{margin-top:8px;font-size:12px;color:var(--mut);line-height:1.5}
+#bot{position:absolute;left:8px;right:8px;bottom:8px;display:grid;gap:6px}
+#views,#main{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:10px 12px;cursor:pointer;background:var(--ac);color:#fff;white-space:nowrap}
+button.s{background:var(--card);color:var(--fg);border:1px solid var(--mut);padding:7px 10px;font-weight:400}
+button.m{background:var(--fg);color:var(--bg)}
+button:disabled{opacity:.45}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+:root{--ac:#377fe7}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#shell{position:absolute;inset:0 0 auto;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 16px;background:var(--card);z-index:5;border-bottom:1px solid rgba(128,128,128,.2)}
+#shell a{color:var(--fg);text-decoration:none;font-weight:700}#shell strong{font-size:15px}
+#shell select{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--mut);border-radius:7px;padding:6px}
+#lang{margin-left:auto}
+#modebar{position:absolute;left:8px;right:8px;top:52px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;z-index:4}
+#notice{flex:1;min-width:120px;color:var(--mut);font-size:11px}
+#top,#chips{top:102px}#cap{top:244px}
+#top .r{gap:4px}#top .r small{font-size:11px}
+#set{z-index:3}
+button.active{background:var(--ac);border-color:var(--ac);color:#fff}
+#connect[hidden],#disconnect[hidden],#baud[hidden]{display:none}
+#fallback{display:none;position:absolute;inset:24% 12%;z-index:6;padding:20px;background:var(--card);border-radius:12px}
+@media(max-width:560px){#shell{padding:8px;gap:5px}#shell strong{font-size:13px}#modebar{top:46px}#top,#chips{top:130px}#top{width:43vw}#chips{font-size:11px;gap:3px}#cap{top:271px}#set{bottom:105px}button{padding:8px}}
+</style></head><body>
+<canvas id="gl"></canvas>
+<header id="shell"><a href="../#simulation" data-t="Back">← Seismo Almaty</a><strong data-t="3D Building Lab">3D Building Lab</strong><select id="lang" aria-label="Language"><option value="kk">ҚАЗ</option><option value="ru">РУС</option><option value="en">ENG</option></select></header>
+<div id="modebar"><button id="mode-sim" class="s active" data-t="Simulation">Simulation</button><button id="mode-live" class="s" data-t="ESP32 Live">ESP32 Live</button><select id="baud" hidden aria-label="Serial baud rate"><option value="115200">115200</option><option value="9600">9600</option></select><button id="connect" class="s" hidden data-t="Connect USB">Connect USB</button><button id="disconnect" class="s" hidden data-t="Disconnect">Disconnect</button><span id="notice" data-t="Demo notice">Educational simulation. Not a real earthquake alert.</span></div>
+<div id="fallback" data-t="3D unavailable">3D could not load. WebGL and an internet connection are required.</div>
+<div class="p" id="top"><div class="r"><small data-t="Accelerometer">Accelerometer</small><b id="acc">0.01 g</b></div><canvas id="ch" width="220" height="60"></canvas><div id="rt">Monitoring</div></div>
+<div class="p" id="chips">
+<div class="c" id="c-esp"><span>ESP32</span><b>ARMED</b></div>
+<div class="c" id="c-power"><span data-t="Power">Power</span><b>ON</b></div>
+<div class="c" id="c-gas"><span data-t="Gas">Gas</span><b>OPEN</b></div>
+<div class="c" id="c-lift"><span data-t="Elevator">Elevator</span><b>MOVING</b></div>
+<div class="c" id="c-siren"><span data-t="Alarm">Alarm</span><b>OFF</b></div>
+</div>
+<div class="p" id="cap"></div>
+<div class="p" id="set">
+<label><span data-t="Scenario magnitude">Scenario magnitude</span>: <b id="mv">6.5</b><input type="range" id="m" min="3" max="8" step="0.1" value="6.5"></label>
+<label><span data-t="Duration">Duration</span>: <b id="dv">8</b> s<input type="range" id="d" min="2" max="15" step="1" value="8"></label>
+<label><span data-t="Trigger threshold">Trigger threshold</span>: <b id="tv">0.30</b> g<input type="range" id="th" min="0.05" max="0.8" step="0.01" value="0.3"></label>
+<label><span data-t="Confirm time">Confirm time</span>: <b id="fv">0.4</b> s<input type="range" id="cf" min="0.1" max="1.5" step="0.1" value="0.4"></label>
+<label><input type="checkbox" id="fl" checked> <span data-t="False-alarm filter">False-alarm filter (ignore short impacts)</span></label>
+<div id="pk"></div>
+<div id="log"></div>
+</div>
+<div id="bot">
+<div id="views"><button class="s" data-v="overview">Overview</button><button class="s" data-v="esp">ESP32</button><button class="s" data-v="lift">Elevator</button><button class="s" data-v="gas">Gas</button><button class="s" data-v="power">Power</button><button class="s" data-v="siren">Alarm</button></div>
+<div id="main"><button id="go">Earthquake</button><button id="st" class="m">Footsteps</button><button id="au" class="m">Auto demo</button><button id="rs" class="s">Reset</button><button id="se" class="s">Settings</button></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="./bridge.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+if(typeof THREE==='undefined'){$('fallback').style.display='block';Seismo3DLanguage.init();throw new Error('Three.js unavailable')}
+const cv=$('gl');let R;
+try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true})}catch(err){$('fallback').style.display='block';Seismo3DLanguage.init();throw err}
+R.setPixelRatio(Math.min(devicePixelRatio,2));
+const S=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.1,100);
+const V={overview:[.8,.3,14,-.5,2.2,0],esp:[.15,.35,4.2,-.3,.3,1.5],lift:[1,.15,7,1.7,2.2,0],gas:[-.5,.25,6.5,-4,.5,1],power:[1.3,.25,6,3.5,.9,-1.2],siren:[.6,.4,6,0,5,0]};
+let cur=[...V.overview],tg=[...V.overview];
+function place(){const k=cv.clientWidth<650?1.35:1,a=cur[0],e=cur[1],r=cur[2]*k;cam.position.set(cur[3]+Math.sin(a)*Math.cos(e)*r,cur[4]+Math.sin(e)*r,cur[5]+Math.cos(a)*Math.cos(e)*r);cam.lookAt(cur[3],cur[4],cur[5])}
+function size(){const w=cv.clientWidth,h=cv.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();place()}
+addEventListener('resize',size);
+S.add(new THREE.AmbientLight(0xffffff,.65));
+const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(5,10,6);S.add(dl);
+const world=new THREE.Group();S.add(world);
+const mat=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.6,metalness:.1},o||{}));
+const box=(w,h,d,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);world.add(o);return o};
+const ball=(r,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),m);o.position.set(x,y,z);world.add(o);return o};
+const cylX=(len,r,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,12),m);o.rotation.z=Math.PI/2;o.position.set(x,y,z);world.add(o);return o};
+box(18,.2,16,mat(0x34485a),0,-.1,0);
+const slab=mat(0x8aa0b3);
+[.075,1.675,3.275,4.875].forEach(y=>box(5,.15,4,slab,0,y,0));
+[[-2.4,-1.9],[2.4,-1.9],[-2.4,1.9],[2.4,1.9]].forEach(p=>box(.12,4.8,.12,mat(0x5d7488),p[0],2.4,p[1]));
+box(5,4.8,4,mat(0x9fd0ff,{transparent:true,opacity:.1,depthWrite:false}),0,2.4,0);
+box(.95,4.8,.95,mat(0xffffff,{transparent:true,opacity:.14,depthWrite:false}),1.7,2.4,0);
+const cabin=box(.7,.9,.7,mat(0x3d7be0),1.7,2.2,0);
+const rope=box(.03,1,.03,mat(0x222222),1.7,4,0);
+const lampM=[1.1,2.7,4.3].map((y,i)=>{const m=mat(0xfff0b0,{emissive:0xffd54a,emissiveIntensity:1.5});ball(.2,m,-1.2,y,-.8);if(i<3)[-1.5,0,1.1].forEach(x=>box(.6,.5,.04,m,x,y-.1,2.02));return m});
+const pipeM=mat(0xe0a526,{metalness:.4});cylX(5,.09,pipeM,-4,.5,1);
+const valveM=mat(0x1fae6a);ball(.22,valveM,-4,.5,1);
+const handle=box(.06,.45,.06,mat(0x222222),-4,.9,1);
+const gasDots=[];for(let i=0;i<6;i++)gasDots.push(ball(.05,mat(0xffe27a,{emissive:0xffc400}),-6.4+i*.8,.5,1));
+box(1,1,1,mat(0x6b7a88),5.2,.5,-1.2);
+const cableM=mat(0x2aa3ff,{emissive:0x2aa3ff,emissiveIntensity:1});cylX(2,.05,cableM,3.7,.5,-1.2);
+box(.5,.8,.15,mat(0x4a5663),2.6,1,-1.2);
+const lever=box(.06,.3,.06,mat(0xd4352b),2.6,1,-1.1);
+const dome=ball(.3,mat(0xff2d2d,{emissive:0xff0000,emissiveIntensity:0}),0,5.25,0);
+const sl=new THREE.PointLight(0xff2020,0,8);sl.position.set(0,5.3,0);world.add(sl);
+box(.9,.06,.5,mat(0x15171a),-.3,.2,1.5);
+box(.25,.08,.25,mat(0x333a44),-.3,.27,1.5);
+box(.18,.05,.14,mat(0x1f6feb),.05,.26,1.5);
+const ledM=mat(0x00ff88,{emissive:0x00ff88,emissiveIntensity:1});ball(.04,ledM,-.65,.26,1.5);
+const wm=new THREE.LineBasicMaterial({color:0x8fb4d6,transparent:true,opacity:.6});
+[[-1.2,1.1,-.8],[-4,.5,1],[1.7,.8,0],[2.6,1,-1.2],[0,5,0]].forEach(p=>{world.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.3,.3,1.5),new THREE.Vector3(...p)]),wm))});
+let drag=false,lx=0,ly=0;
+cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointerup',()=>drag=false);
+cv.addEventListener('pointermove',e=>{if(!drag)return;tg[0]-=(e.clientX-lx)*.008;tg[1]=Math.max(.05,Math.min(1.3,tg[1]+(e.clientY-ly)*.006));cur[0]=tg[0];cur[1]=tg[1];lx=e.clientX;ly=e.clientY});
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{tg=[...V[b.dataset.v]]});
+const P={m:6.5,d:8,th:.3,cf:.4,fl:true};
+const peak=()=>Math.min(1.2,.015*Math.pow(10,(P.m-3)*.5));
+function sync(){$('mv').textContent=P.m.toFixed(1);$('dv').textContent=P.d;$('tv').textContent=P.th.toFixed(2);$('fv').textContent=P.cf.toFixed(1);const p=peak();$('pk').textContent='Demo peak '+p.toFixed(2)+' g: '+(p*.75>P.th?'likely above threshold':'likely below threshold')}
+['m','d','th','cf'].forEach(k=>$(k).oninput=()=>{P[k]=+$(k).value;sync()});
+$('fl').onchange=()=>{P.fl=$('fl').checked};
+function setP(k,v){P[k]=v;$(k).value=v;sync()}
+sync();
+const logs=[];
+function log(t){const d=new Date();logs.unshift(d.toTimeString().slice(0,8)+'  '+t);if(logs.length>30)logs.pop();$('log').innerHTML=logs.join('<br>')}
+function chip(id,ok,txt){const c=$('c-'+id);c.classList.toggle('off',!ok);c.querySelector('b').textContent=txt}
+function cap(t){const c=$('cap');c.textContent=t;c.style.display=t?'block':'none'}
+$('se').onclick=()=>{const s=$('set');s.style.display=s.style.display==='block'?'none':'block'};
+let st='idle',ev=null,cnt=0,prot=false,acc=.01,liftY=2.2,last=0,T=0,demo=null,trT=0;
+const sw={power:true,gas:true,lift:true,siren:false},floors=[.6,2.2,3.8],buf=new Array(160).fill(0);
+function start(type){if(st!=='idle'||liveMode)return;st='run';cnt=0;ev={type,t0:T,dur:type==='step'?.25:P.d,pk:type==='step'?.55:peak(),hit:false};
+log(type==='step'?'Test: footsteps / short impact':'Earthquake started, M'+P.m.toFixed(1));$('rt').textContent='Vibration detected';$('go').disabled=true;$('st').disabled=true}
+function trigger(e){prot=true;trT=T;Object.assign(sw,{power:false,gas:false,lift:false,siren:true});
+liftY=floors.reduce((a,b)=>Math.abs(b-cabin.position.y)<Math.abs(a-cabin.position.y)?b:a);
+$('rt').textContent='Protection active in '+e.toFixed(1)+' s';
+log('Quake confirmed. Reaction '+e.toFixed(1)+' s');log('Power disconnected');log('Gas valve closed');log('Elevator sent to nearest floor');log('Alarm on, app notified');
+chip('esp',false,'TRIGGERED');chip('power',false,'CUT');chip('gas',false,'CLOSED');chip('lift',false,'STOPPED');chip('siren',false,'ALARM')}
+function reset(){st='idle';ev=null;prot=false;cnt=0;demo=null;cap('');buf.fill(0);Object.assign(sw,{power:true,gas:true,lift:true,siren:false});
+world.position.set(0,0,0);world.rotation.z=0;acc=.01;$('go').disabled=false;$('st').disabled=false;$('au').disabled=false;$('rt').textContent='Monitoring';
+chip('esp',true,'ARMED');chip('power',true,'ON');chip('gas',true,'OPEN');chip('lift',true,'MOVING');chip('siren',true,'OFF');log('System reset')}
+$('go').onclick=()=>start('quake');$('st').onclick=()=>start('step');$('rs').onclick=()=>{reset();tg=[...V.overview]};
+const steps=[[0,()=>{setP('m',6.5);setP('d',8);setP('th',.3);setP('cf',.4);$('fl').checked=true;P.fl=true;tg=[...V.overview];cap('Normal operation: sensor monitors vibration')}],
+[3,()=>{tg=[...V.esp];cap('ESP32 reads the accelerometer and checks the threshold')}],
+[6.5,()=>{tg=[...V.overview];start('step');cap('Footsteps: short spike is filtered, no false alarm')}],
+[10,()=>{start('quake');cap('Magnitude 6.5 earthquake')}],
+[11.5,()=>{tg=[...V.power];cap('Power disconnected')}],
+[14,()=>{tg=[...V.gas];cap('Gas valve closed')}],
+[17,()=>{tg=[...V.lift];cap('Elevator stops at the nearest floor')}],
+[20,()=>{tg=[...V.siren];cap('Alarm active, dashboard and app notified')}],
+[25,()=>{tg=[...V.overview];cap('SEISMO: the system acts, not just warns')}],
+[30,()=>{demo=null;cap('');$('au').disabled=false}]];
+$('au').onclick=()=>{if(liveMode)return;reset();demo={t:0,i:0};$('au').disabled=true};
+let liveMode=false,lastLive=0,liveFrame=null,liveStatus='';
+function updateLiveUI(status){
+  if(liveStatus===status)return;
+  liveStatus=status;
+  $('rt').textContent=status;
+  if(!liveFrame || performance.now()-lastLive>2000){
+    ['esp','power','gas','lift','siren'].forEach(id=>chip(id,false,'UNKNOWN'));
+    $('acc').textContent='—';
+  }
+}
+function applyTelemetry(frame){
+  if(!liveMode)return;
+  liveFrame=frame;lastLive=performance.now();acc=frame.accelerationG;buf.push(acc);buf.shift();draw();
+  prot=frame.state==='EMERGENCY'||frame.state==='FAULT';
+  Object.assign(sw,{power:frame.powerOn,gas:frame.gasOpen,lift:frame.liftMoving,siren:frame.alarmOn});
+  liftY=floors[frame.floor-1];
+  chip('esp',!prot,frame.state);
+  chip('power',sw.power,sw.power?'ON':'CUT');
+  chip('gas',sw.gas,sw.gas?'OPEN':'CLOSED');
+  chip('lift',sw.lift,sw.lift?'MOVING':'STOPPED');
+  chip('siren',!sw.siren,sw.siren?'ALARM':'OFF');
+  updateLiveUI('Live telemetry');
+}
+const link=new SeismoSerial(applyTelemetry, status=>{if(liveMode){if(status==='Disconnected'||status==='Connection failed'){liveFrame=null;$('disconnect').hidden=true}updateLiveUI(status)}});
+$('mode-live').onclick=()=>{if(liveMode)return;reset();liveMode=true;liveFrame=null;lastLive=0;
+  $('mode-live').classList.add('active');$('mode-sim').classList.remove('active');$('connect').hidden=false;$('baud').hidden=false;
+  ['go','st','au','rs','se'].forEach(id=>$(id).disabled=true);$('set').style.display='none';$('notice').dataset.t='Live notice';$('notice').textContent='Live notice';liveStatus='';draw();updateLiveUI('Waiting for ESP32')};
+$('mode-sim').onclick=async()=>{if(!liveMode)return;liveMode=false;await link.disconnect();liveFrame=null;
+  $('mode-live').classList.remove('active');$('mode-sim').classList.add('active');$('connect').hidden=true;$('disconnect').hidden=true;$('baud').hidden=true;
+  $('rs').disabled=false;$('se').disabled=false;$('notice').dataset.t='Demo notice';$('notice').textContent='Demo notice';reset()};
+$('connect').onclick=async()=>{if(!liveMode)return;$('connect').disabled=true;await link.connect(+$('baud').value);$('connect').disabled=false;$('disconnect').hidden=!link.connected()};
+$('disconnect').onclick=async()=>{await link.disconnect();liveFrame=null;updateLiveUI('Disconnected');$('disconnect').hidden=true};
+function draw(){const c=$('ch'),x=c.getContext('2d'),w=c.width,h=c.height;x.clearRect(0,0,w,h);const sc=h/1.2;
+x.strokeStyle='rgba(128,128,128,.35)';x.strokeRect(.5,.5,w-1,h-1);
+if(!liveMode){x.strokeStyle='#ff5a4d';x.setLineDash([4,3]);x.beginPath();x.moveTo(0,h-P.th*sc);x.lineTo(w,h-P.th*sc);x.stroke();x.setLineDash([])}
+x.strokeStyle='#35c27d';x.lineWidth=1.5;x.beginPath();buf.forEach((v,i)=>{const px=i/(buf.length-1)*w,py=h-Math.min(1.2,v)*sc;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.lineWidth=1}
+function loop(ms){requestAnimationFrame(loop);const t=ms/1000,dt=Math.min(.05,t-last);last=t;T=t;
+for(let i=0;i<6;i++)cur[i]+=(tg[i]-cur[i])*.07;place();
+if(demo){demo.t+=dt;while(demo&&demo.i<steps.length&&demo.t>=steps[demo.i][0]){steps[demo.i][1]();if(demo)demo.i++}}
+let amp=0;
+if(liveMode){
+  world.position.set(0,0,0);world.rotation.z=0;
+  if(liveFrame&&performance.now()-lastLive>2000&&link.connected()){updateLiveUI('Telemetry stale')}
+  else if(liveFrame&&performance.now()-lastLive<=2000){const shake=Math.min(1.2,acc);world.position.x=Math.sin(t*46)*.08*shake;world.rotation.z=Math.sin(t*41)*.005*shake}
+}else if(ev){const e=T-ev.t0;amp=ev.type==='step'?(e<.25?1:0):Math.min(1,e/.5)*(e<ev.dur-1?1:Math.max(0,ev.dur-e));
+const sx=.1*ev.pk;world.position.x=Math.sin(e*46)*sx*amp;world.position.z=Math.cos(e*38)*sx*.55*amp;world.rotation.z=Math.sin(e*41)*.007*ev.pk*amp;
+acc=.012*(1+Math.random())+ev.pk*amp*(.75+.25*Math.random());
+if(acc>P.th)ev.hit=true;
+if(!prot){if(acc>P.th)cnt+=dt;else cnt=Math.max(0,cnt-dt);const need=P.fl?P.cf:0;if(acc>P.th&&cnt>=need)trigger(e)}
+if(e>ev.dur){if(!prot){$('rt').textContent=ev.hit?'Short impact filtered: no action':'Below threshold: no action';log(ev.hit?'Impact ignored by filter':'Vibration below threshold');st='idle';$('go').disabled=false;$('st').disabled=false}else st='done';ev=null}}
+else{acc=.012*(1+Math.random());world.position.set(0,0,0);world.rotation.z=0}
+const fresh=!liveMode||(liveFrame&&performance.now()-lastLive<=2000);
+if(fresh){if(!liveMode){buf.push(acc);buf.shift();draw()}$('acc').textContent=acc.toFixed(2)+' g'}
+if(fresh){
+if(liveMode){cabin.position.y+=(liftY-cabin.position.y)*.06}
+else if(sw.lift)cabin.position.y=2.2+1.6*Math.sin(t*.6);else cabin.position.y+=(liftY-cabin.position.y)*.06;
+rope.scale.y=4.8-(cabin.position.y+.45);rope.position.y=cabin.position.y+.45+rope.scale.y/2;
+lampM.forEach(m=>m.emissiveIntensity+=((sw.power?1.5:0)-m.emissiveIntensity)*.15);
+cableM.emissiveIntensity+=((sw.power?1:0)-cableM.emissiveIntensity)*.15;cableM.color.set(sw.power?0x2aa3ff:0x555555);
+lever.rotation.z+=((sw.power?0:1.2)-lever.rotation.z)*.15;
+valveM.color.set(sw.gas?0x1fae6a:0xd4352b);handle.rotation.z+=((sw.gas?0:Math.PI/2)-handle.rotation.z)*.12;pipeM.color.set(sw.gas?0xe0a526:0x7a6a4a);
+gasDots.forEach((d,i)=>{d.visible=sw.gas;d.position.x=-6.4+((i*.8+t*1.2)%4.8)});
+const f=sw.siren?(Math.sin(t*12)>0?1:0):0;dome.material.emissiveIntensity=f*2;sl.intensity=f*2.5;
+ledM.color.set(prot?0xff3b30:0x00ff88);ledM.emissive.set(prot?0xff3b30:0x00ff88);ledM.emissiveIntensity=.6+.4*Math.sin(t*8)}
+R.render(S,cam)}
+size();log('System armed');Seismo3DLanguage.init();requestAnimationFrame(loop);
+</script></body></html>

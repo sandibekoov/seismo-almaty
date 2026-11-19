@@ -178,6 +178,7 @@
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div>
     <div class="setting-line sim-settings-link"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Simulation Mode</span><button class="ref-setting-value" data-page="simulation" type="button">Запустить →</button></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-shield"></use></svg>Engineering Demo</span><a href="./engineering/">Открыть ↗</a></div>
+    <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-map"></use></svg>3D-модель здания</span><a href="./simulation-3d/">Открыть ↗</a></div>
    </div><div class="caution-inline standalone"><svg class="icon"><use href="#i-info"></use></svg><p>Приложение не прогнозирует землетрясения, не заменяет официальные оповещения и не отправляет SOS. Экстренная служба Казахстана: <strong>112</strong>.</p></div></div></div>
     </section>
         <section id="page-simulation" class="page" aria-labelledby="simulationHeading" hidden>
@@ -185,6 +186,7 @@
       <div class="sim-header"><span class="sim-eyebrow"><svg class="icon"><use href="#i-wave"></use></svg> INTERNET OF THINGS · УЧЕБНЫЙ РЕЖИМ</span><h1 id="simulationHeading">Имитировать землетрясение</h1><p>Выбери один из трёх сценариев, чтобы увидеть условный сигнал датчика, состояние системы и поведение интерфейса.</p>
         <div class="sim-disclaimer"><svg class="icon"><use href="#i-info"></use></svg><span><strong>Только демонстрация.</strong> Сценарии вымышлены: это не события USGS, не прогноз и не управление реальным зданием. Значения M не измеряются датчиком.</span></div>
       </div>
+      <article class="surface" style="margin:0 0 16px;padding:18px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between"><div><span class="eyebrow">ESP32 · MPU6050</span><h2 style="margin:6px 0">3D-модель здания</h2><p style="margin:0">Интерактивная демонстрация газового клапана, лифта, освещения и сигнализации.</p></div><a class="button button-primary" href="./simulation-3d/">Открыть 3D-модель <svg class="icon"><use href="#i-arrow"></use></svg></a></article>
       <div class="sim-layout">
         <div class="sim-primary"><h2>Выбери сценарий</h2><div class="sim-presets" role="group" aria-label="Учебные сценарии">
           <button class="sim-preset sim-preset--soft" type="button" data-sim-level="3" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-wave"></use></svg></span><span class="sim-preset-copy"><strong>M 3.0</strong><span>Слабый · наблюдение</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
@@ -229,7 +231,7 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по Internet of Things (IoT) и автоматизации. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Погода: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Фотография гор: <a href="https://unsplash.com/photos/uma-cordilheira-coberta-de-neve-sob-um-ceu-azul-WFiuUnN-3Y8" target="_blank" rel="noopener noreferrer">Sergey Zigle (Unsplash License)</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="./translations.js?v=1" defer></script>
+  <script src="./translations.js?v=2" defer></script>
   <script src="./language.js?v=1" defer></script>
   <script src="./site.js?v=9" defer></script>
 </body>
