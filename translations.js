@@ -1,5 +1,8 @@
 /* UI translations. Russian keys refer to the original UI copy; data and URLs are not changed. */
 window.SEISMO_TRANSLATIONS = {
+  "3D-модель здания": ["Ғимараттың 3D үлгісі","3D building model"],
+  "Интерактивная демонстрация газового клапана, лифта, освещения и сигнализации.": ["Газ клапанының, лифттің, жарықтандырудың және дабылдың интерактивті көрсетілімі.","Interactive demonstration of the gas valve, elevator, lighting and alarm."],
+  "Открыть 3D-модель": ["3D үлгісін ашу","Open 3D model"],
   "Seismo Almaty — сейсмический мониторинг": [
     "Seismo Almaty — сейсмикалық мониторинг",
     "Seismo Almaty — seismic monitoring"
