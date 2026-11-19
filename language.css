@@ -1,0 +1,26 @@
+/* Native accessible language controls styled for both resident and engineering UI. */
+.seismo-language {
+  appearance: auto;
+  box-sizing: border-box;
+  width: auto;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 7px 8px;
+  border: 1px solid #d9e6f6;
+  border-radius: 12px;
+  background: #fff;
+  color: #243a56;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.seismo-language:focus-visible { outline: 2px solid #1769ed; outline-offset: 3px; }
+.header-actions .seismo-language { flex: 0 0 auto; }
+.ref-header-buttons .seismo-language { flex: 0 0 auto; min-height: 44px; padding-inline: 5px; }
+.setting-line .seismo-language { margin-left: auto; max-width: 53%; }
+.engineering-language { background: #1f2830; color: #e6edf3; border-color: #2c3843; }
+@media (max-width: 370px) {
+  #page-home .ref-header-buttons { gap: 6px; }
+  #page-home .ref-header-buttons .seismo-language { font-size: 11px; padding-inline: 4px; }
+}

@@ -96,13 +96,14 @@ th{color:var(--muted);font-weight:600}
 footer{padding:10px 16px 24px;color:var(--muted);font-size:12px}
 </style>
 <link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="../language.css?v=1">
 </head>
 <body data-level="NORMAL">
 <div style="padding:12px 20px;background:#fff2d8;color:#654c16;font:700 12px/1.6 system-ui;position:relative;z-index:3000">ENGINEERING DEMO — Симуляция датчика и защитной логики. Не предназначено для реального оповещения, отправки SOS или управления оборудованием здания. <a style="color:#1769ed" href="../">Вернуться в приложение →</a></div>
 
 <header>
 <div class="brand"><div class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="brand-copy"><div class="brand-eyebrow">SEISMO / ALMATY · МОНИТОРИНГ</div><h1>Seismo <span>Almaty</span></h1><div class="sub">Сейсмические события · контроль здания · точки сбора</div></div></div>
-<div class="head-actions"><nav class="top-nav" aria-label="Разделы"><a href="#mapCard">Карта</a><a href="#signalCard">Датчики</a><a href="#systemCard">Система</a><a href="#profileCard">Адрес</a></nav><div class="status" id="statusBox" role="status" aria-live="polite"><span class="dot"></span><span id="statusText">NORMAL</span></div></div>
+<div class="head-actions"><select class="seismo-language engineering-language" data-language-select aria-label="Язык" title="Язык"><option value="kk">ҚАЗ</option><option value="ru" selected>РУС</option><option value="en">ENG</option></select><nav class="top-nav" aria-label="Разделы"><a href="#mapCard">Карта</a><a href="#signalCard">Датчики</a><a href="#systemCard">Система</a><a href="#profileCard">Адрес</a></nav><div class="status" id="statusBox" role="status" aria-live="polite"><span class="dot"></span><span id="statusText">NORMAL</span></div></div>
 <div class="disclaimer"><strong>DEMO MODE</strong> Учебная модель. Не предсказывает землетрясения, не отправляет SOS в экстренные службы и не подтверждает безопасность эвакуационных маршрутов.</div>
 </header>
 
@@ -498,6 +499,7 @@ function setShutdown(on){
   set('cDoors',on, on?'РАЗБЛОКИРОВАНЫ (сервопривод)':'закрыты');
 }
 
+let lastEvacTitle, lastEvacHtml;
 function renderEvac(){
   const u=userLoc(); const floor = profile?.floor ?? null;
   let title, html;
@@ -528,8 +530,8 @@ function renderEvac(){
     }
     if(S.dispatched) html += '<div class="small" style="margin-top:6px">📨 SOS записан локально (демо).</div>';
   }
-  if($('evacTitle').textContent!==title) $('evacTitle').textContent=title;
-  if($('evacBody').innerHTML!==html){ $('evacBody').innerHTML=html; $('evacBody').classList.toggle('muted',S.level==='NORMAL') }
+  if(lastEvacTitle!==title){ lastEvacTitle=title; $('evacTitle').textContent=title; }
+  if(lastEvacHtml!==html){ lastEvacHtml=html; $('evacBody').innerHTML=html; $('evacBody').classList.toggle('muted',S.level==='NORMAL') }
 }
 
 /* ===================== SOS ===================== */
@@ -616,7 +618,7 @@ function drawUI(){
   const col = {NORMAL:'#3fdc6b',WARNING:'#f2b632',EMERGENCY:'#ff5a5f',FAULT:'#a47cf3'}[S.level]||'#3fdc6b';
   cx.strokeStyle=col; cx.lineWidth=2; cx.beginPath();
   S.buf.forEach((v,i)=>{ const x=i/(S.buf.length-1)*W, y=mid-v*mid*0.8; i?cx.lineTo(x,y):cx.moveTo(x,y) }); cx.stroke();
-  cx.fillStyle='#8b9aa8'; cx.font='11px monospace'; cx.fillText(`${S.src.toUpperCase()}  50 Гц  RMS→${S.intensity}`,6,13);
+  cx.fillStyle='#8b9aa8'; cx.font='11px monospace'; cx.fillText(`${S.src.toUpperCase()}  50 ${window.SeismoLanguage?.language==='en'?'Hz':'Гц'}  RMS→${S.intensity}`,6,13);
   $('intVal').textContent=S.intensity;
   const m=$('meter'); m.style.width=S.intensity+'%';
   m.style.background = S.intensity>=TH.EMERG?'var(--emerg)':S.intensity>=TH.WARN?'var(--warn)':'var(--ok)';
@@ -666,5 +668,8 @@ fillForm(); refreshAll(); renderLog();
 setInterval(loop,SAMPLE_MS);
 fetchQuakes(); setInterval(fetchQuakes,120000);
 </script>
+<script src="../translations.js?v=1" defer></script>
+<script src="../language.js?v=1" defer></script>
 </body>
 </html>
+

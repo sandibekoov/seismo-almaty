@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="../location-photos.css?v=1">
   <link rel="stylesheet" href="../approved-ui-v3.css?v=2">
   <link rel="stylesheet" href="../brand-hero-v4.css?v=2">
+  <link rel="stylesheet" href="../language.css?v=1">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -60,14 +61,14 @@
       <button class="nav-link" data-page="instructions" type="button">Инструкции</button>
       <button class="nav-link" data-page="profile" type="button">Профиль</button>
     </nav>
-    <div class="header-actions"><span class="data-pill"><span class="data-dot"></span><span id="headerFeed">Источник загружается</span></span><button class="icon-button profile-shortcut" type="button" data-page="profile" aria-label="Открыть профиль"><svg class="icon"><use href="#i-user"></use></svg></button></div>
+    <div class="header-actions"><select class="seismo-language" data-language-select aria-label="Язык" title="Язык"><option value="kk">ҚАЗ</option><option value="ru" selected>РУС</option><option value="en">ENG</option></select><span class="data-pill"><span class="data-dot"></span><span id="headerFeed">Источник загружается</span></span><button class="icon-button profile-shortcut" type="button" data-page="profile" aria-label="Открыть профиль"><svg class="icon"><use href="#i-user"></use></svg></button></div>
   </header>
 
   <main id="main">
     <section id="page-home" class="page is-active" aria-labelledby="homeHeading">
       <div class="ref-home-hero"><img class="ref-hero-mountains" src="https://images.unsplash.com/photo-1682703638082-3d975a8eec4e?auto=format&fit=crop&w=1400&q=85" alt="" aria-hidden="true" fetchpriority="high" decoding="async"><span class="hero-photo-credit"><a href="https://unsplash.com/photos/uma-cordilheira-coberta-de-neve-sob-um-ceu-azul-WFiuUnN-3Y8" target="_blank" rel="noopener noreferrer">Фото гор: Sergey Zigle · Unsplash</a></span>
         <div class="ref-home-toolbar"><span class="ref-logo"><svg class="icon" aria-hidden="true"><use href="#i-wave"></use></svg><strong>Seismo<br>Almaty</strong></span>
-          <span class="ref-header-buttons"><button type="button" data-page="events" aria-label="История событий"><svg class="icon"><use href="#i-events"></use></svg></button><button type="button" data-page="profile" aria-label="Профиль"><svg class="icon"><use href="#i-user"></use></svg></button></span></div>
+          <span class="ref-header-buttons"><select class="seismo-language" data-language-select aria-label="Язык" title="Язык"><option value="kk">ҚАЗ</option><option value="ru" selected>РУС</option><option value="en">ENG</option></select><button type="button" data-page="events" aria-label="История событий"><svg class="icon"><use href="#i-events"></use></svg></button><button type="button" data-page="profile" aria-label="Профиль"><svg class="icon"><use href="#i-user"></use></svg></button></span></div>
         <div class="ref-greeting"><h2 id="refGreetingName">Здравствуйте!</h2><span class="ref-city-chip" aria-label="Погода в Алматы"><span id="weatherIcon" aria-hidden="true">☁</span><span class="weather-copy"><strong id="weatherTemp">—°</strong><small id="weatherCity">Алматы</small></span></span></div>
         <button type="button" class="ref-status-card" data-page="events" aria-label="Перейти к данным о сейсмических событиях"><span class="ref-status-check"><svg class="icon"><use href="#i-check"></use></svg></span><div><span>Сейсмическая обстановка</span><strong id="refFeedTitle">Загрузка данных</strong><small id="refFeedSubtitle">Проверяем подключение USGS…</small></div><svg class="icon ref-card-arrow"><use href="#i-chevron"></use></svg></button>
       </div>
@@ -172,7 +173,7 @@
       <div class="profile-aside"><div class="surface setting-card"><h2>Настройки</h2>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-map"></use></svg>Мой адрес</span><button type="button" id="openAddressEditor" class="ref-setting-value">Изменить →</button></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-events"></use></svg>Уведомления</span><strong>Не подключены</strong></div>
-    <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-book"></use></svg>Язык интерфейса</span><strong>Русский</strong></div>
+    <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-book"></use></svg>Язык интерфейса</span><select class="seismo-language" data-language-select aria-label="Язык интерфейса"><option value="kk">Қазақша</option><option value="ru" selected>Русский</option><option value="en">English</option></select></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-info"></use></svg>О приложении</span><strong>IoT · прототип 3.0</strong></div>
     <div class="setting-line"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Источник событий</span><a href="https://earthquake.usgs.gov/earthquakes/map/" target="_blank" rel="noopener noreferrer">USGS ↗</a></div>
     <div class="setting-line sim-settings-link"><span class="ref-setting-name"><svg class="icon"><use href="#i-wave"></use></svg>Simulation Mode</span><button class="ref-setting-value" data-page="simulation" type="button">Запустить →</button></div>
@@ -228,6 +229,8 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по Internet of Things (IoT) и автоматизации. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Погода: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Фотография гор: <a href="https://unsplash.com/photos/uma-cordilheira-coberta-de-neve-sob-um-ceu-azul-WFiuUnN-3Y8" target="_blank" rel="noopener noreferrer">Sergey Zigle (Unsplash License)</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="../site.js?v=8" defer></script>
+  <script src="../translations.js?v=1" defer></script>
+  <script src="../language.js?v=1" defer></script>
+  <script src="../site.js?v=9" defer></script>
 </body>
 </html>
