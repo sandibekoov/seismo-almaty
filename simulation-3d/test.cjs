@@ -17,7 +17,7 @@ function element(id){
   if(!elements.has(id))elements.set(id,{id,style:{},dataset:{},textContent:'',classList:{toggle:no,add:no,remove:no},clientWidth:1100,clientHeight:800,width:220,height:60,querySelector:()=>element(id+'-b'),getContext:()=>brush,addEventListener:no,setPointerCapture:no});
   return elements.get(id)
 }
-class Obj{constructor(geometry,material){this.geometry=geometry;this.material=material;this.position=pos();this.rotation=pos();this.scale=pos()}add(){}lookAt(){}updateProjectionMatrix(){}setFromPoints(){return this}}
+class Obj{constructor(geometry,material){this.geometry=geometry;this.material=material;this.position=pos();this.rotation=pos();this.scale=pos();this.userData={}}add(){}lookAt(){}updateProjectionMatrix(){}setFromPoints(){return this}}
 class Material{constructor(o){Object.assign(this,o);this.color={set:no};this.emissive={set:no}}}
 class Renderer{setPixelRatio(){}setSize(){}render(){}}
 class SerialStub{constructor(frame,status){this.frame=frame;this.status=status;this.open=false}connected(){return this.open}async connect(){this.open=true;this.status('Waiting for ESP32')}async disconnect(){this.open=false}}
