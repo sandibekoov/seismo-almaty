@@ -36,10 +36,10 @@ class ProjectedRenderer {
         const shade=.53+.47*Math.max(0,n.dot(light));
         const glow=Math.min(1,(mat.emissiveIntensity||0)*.28),em=mat.emissive||color;
         const rgb=['r','g','b'].map(k=>Math.round(Math.min(1,color[k]*shade+glow*em[k])*255));
-        faces.push({v:[v0,v1,v2],depth:(v0[2]+v1[2]+v2[2])/3,color:'rgb('+rgb.join(',')+')',alpha});
+        faces.push({v:[v0,v1,v2],depth:(v0[2]+v1[2]+v2[2])/3,color:'rgb('+rgb.join(',')+')',alpha,ground:!!obj.userData.ground});
       }
     });
-    faces.sort((a,b)=>b.depth-a.depth);
+    faces.sort((a,b)=>(Number(!!b.ground)-Number(!!a.ground))||b.depth-a.depth);
     for(const f of faces){
       ctx.globalAlpha=f.alpha;ctx.beginPath();ctx.moveTo(f.v[0][0],f.v[0][1]);
       for(let i=1;i<f.v.length;i++)ctx.lineTo(f.v[i][0],f.v[i][1]);

@@ -75,8 +75,8 @@ button.active{background:var(--ac);border-color:var(--ac);color:#fff}
 <div id="main"><button id="go">Earthquake</button><button id="st" class="m">Footsteps</button><button id="au" class="m">Auto demo</button><button id="rs" class="s">Reset</button><button id="se" class="s">Settings</button></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="./bridge.js"></script>
-<script src="./projected-renderer.js"></script>
+<script src="./bridge.js?v=3"></script>
+<script src="./projected-renderer.js?v=2"></script>
 <script>
 const $=id=>document.getElementById(id);
 if(typeof THREE==='undefined'){$('fallback').style.display='block';Seismo3DLanguage.init();throw new Error('Three.js unavailable')}
@@ -99,7 +99,7 @@ const mat=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness
 const box=(w,h,d,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);world.add(o);return o};
 const ball=(r,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),m);o.position.set(x,y,z);world.add(o);return o};
 const cylX=(len,r,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,12),m);o.rotation.z=Math.PI/2;o.position.set(x,y,z);world.add(o);return o};
-box(18,.2,16,mat(0x34485a),0,-.1,0);
+box(18,.2,16,mat(0x34485a),0,-.1,0).userData.ground=true;
 const slab=mat(0x8aa0b3);
 [.075,1.675,3.275,4.875].forEach(y=>box(5,.15,4,slab,0,y,0));
 [[-2.4,-1.9],[2.4,-1.9],[-2.4,1.9],[2.4,1.9]].forEach(p=>box(.12,4.8,.12,mat(0x5d7488),p[0],2.4,p[1]));
@@ -222,7 +222,7 @@ if(fresh){
 if(liveMode){cabin.position.y+=(liftY-cabin.position.y)*.06}
 else if(sw.lift)cabin.position.y=2.2+1.6*Math.sin(t*.6);else cabin.position.y+=(liftY-cabin.position.y)*.06;
 rope.scale.y=4.8-(cabin.position.y+.45);rope.position.y=cabin.position.y+.45+rope.scale.y/2;
-lampM.forEach(m=>m.emissiveIntensity+=((sw.power?1.5:0)-m.emissiveIntensity)*.15);
+lampM.forEach(m=>{m.emissiveIntensity+=((sw.power?1.5:0)-m.emissiveIntensity)*.15;m.color.set(sw.power?0xfff0b0:0x35434f)});
 cableM.emissiveIntensity+=((sw.power?1:0)-cableM.emissiveIntensity)*.15;cableM.color.set(sw.power?0x2aa3ff:0x555555);
 lever.rotation.z+=((sw.power?0:1.2)-lever.rotation.z)*.15;
 valveM.color.set(sw.gas?0x1fae6a:0xd4352b);handle.rotation.z+=((sw.gas?0:Math.PI/2)-handle.rotation.z)*.12;pipeM.color.set(sw.gas?0xe0a526:0x7a6a4a);
