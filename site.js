@@ -82,7 +82,8 @@
   const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false,mapFilter:'all',eventScope:'all',detailBack:'events',sim:null};
   let toastTimer;
   function toast(msg){const el=$('toast');el.textContent=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.textContent=''},4800)}
-  function dateAlmaty(t){return new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(t))}
+  // Numeric dates remain valid when the interface language changes in place.
+  function dateAlmaty(t){return new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(t))}
   function ago(t){const min=Math.max(0,Math.floor((Date.now()-t)/60000));return min<1?'Только что':min<60?min+' мин назад':min<1440?Math.floor(min/60)+' ч назад':Math.floor(min/1440)+' дн назад'}
   function distance(a,b){const r=Math.PI/180;const dLat=(a.lat-b.lat)*r,dLng=(a.lng-b.lng)*r;const v=Math.sin(dLat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLng/2)**2;return 6371*2*Math.asin(Math.min(1,Math.sqrt(v)))}
   function safeUSGS(url){try{const u=new URL(url);return u.protocol==='https:'&&u.hostname==='earthquake.usgs.gov'?u.href:null}catch(e){return null}}
@@ -476,6 +477,7 @@
   function updateProfileLabel(){
     const raw=(state.profile?.name||'').trim();
     const name=raw.replace(/[\r\n<>]/g,' ').slice(0,48);
+    $('refProfileName').setAttribute('translate',name?'no':'yes');
     $('refProfileName').textContent=name||'Профиль жителя';
     $('refGreetingName').textContent=name?'Здравствуйте,\n'+name+'!':'Здравствуйте!';
   }
@@ -575,3 +577,4 @@
   setInterval(fetchQuakes,300000);
   setInterval(fetchWeather,900000);
 })();
+
