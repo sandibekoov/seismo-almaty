@@ -57,6 +57,7 @@ const Seismo3DLanguage=(()=>{
     'Demo notice':['Учебный сценарий. Не реальная тревога.','Оқу сценарийі. Нақты дабыл емес.','Educational simulation. Not a real earthquake alert.'],
     'Live notice':['Данные команд ESP32, не подтверждение положения механизмов. Только чтение.','ESP32 командалары, механизмдердің нақты қалпы расталмайды. Тек оқу.','ESP32 command telemetry, not confirmed actuator position. Read-only.'],
     '3D unavailable':['3D не загрузилась. Нужны WebGL и интернет.','3D жүктелмеді. WebGL және интернет қажет.','3D could not load. WebGL and an internet connection are required.'],
+    'Compatibility renderer':['Совместимый режим отрисовки','Үйлесімді бейнелеу режимі','Compatibility renderer'],
     'Accelerometer':['Акселерометр','Акселерометр','Accelerometer'],
     'Power':['Освещение','Жарықтандыру','Lighting'],
     'Gas':['Газ','Газ','Gas'],

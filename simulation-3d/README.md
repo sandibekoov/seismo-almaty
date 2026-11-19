@@ -3,6 +3,8 @@
 The team's Three.js model is an educational visualisation of an ESP32 + MPU6050
 building prototype. Simulation is independent of real earthquake feeds. No
 commands are issued to the device, no real alarm is sent.
+On devices without WebGL, the same scene and camera are projected onto a
+Canvas 2D surface with simplified lighting.
 
 ## ESP32 telemetry
 
