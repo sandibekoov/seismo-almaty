@@ -11,6 +11,11 @@ of the M 3.0/4.5/6.0 presets. These are training labels; the synthetic signal
 M 6 and above first produce WARNING for two seconds, then EMERGENCY; the
 protection latch remains until Reset. Stop shaking preserves the latch.
 Auto Demo progresses through three levels and ends shaking after 18 seconds.
+Manual emergency shaking ends automatically after 10 seconds. Evacuation of
+14 schematic occupants then follows the same deterministic exit route and
+clock in both views; completion is shown by the shared 14/14 counter. Stop
+shaking starts this phase immediately if protection is latched. The route
+represents a ground-floor illustration, not an approved KBTU evacuation plan.
 The demo does not configure the actual ESP32. Live telemetry is separate.
 Kazakh, Russian and English use the main site's stored language preference.
 On devices without WebGL, the same scene and camera are projected onto a

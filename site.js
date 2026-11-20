@@ -100,7 +100,7 @@
     });
     if(page==='map')requestAnimationFrame(()=>{ensureMap();if(state.map)state.map.invalidateSize()});
     if(page==='events')renderEvents();if(page==='places')renderPlaces();
-    if(page==='simulation'){const frame=$('simCampus');if(frame&&!frame.getAttribute('src'))frame.src='./simulation-3d/?embed=1';renderSimulation()}
+    if(page==='simulation'){const frame=$('simCampus');if(frame&&!frame.getAttribute('src'))frame.src='./simulation-3d/?embed=1&v=evac';renderSimulation()}
     if(page==='profile')fillProfile();
     window.scrollTo({top:0,behavior:'instant'});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
@@ -430,7 +430,9 @@
     $('simMagnitudeValue').textContent='M '+(v?v.mag:0).toFixed(1);
     $('simPause').disabled=!v?.shaking;
     $('simAuto').disabled=!!(v?.auto||v?.latched);
-    $('simPhase').textContent=v?.shaking?'Толчки продолжаются':v?.latched?'Толчки завершены · защита активна':v?'Толчки завершены':'Ожидание сценария';
+    const evac=v?.evacuate?SeismoTraining.evacuation(v):null;
+    $('simPhase').textContent=v?.shaking?'Толчки продолжаются':evac?(evac.arrived===evac.total?'Эвакуация завершена':'Эвакуация'):v?'Толчки завершены':'Ожидание сценария';
+    $('simEvacCount').hidden=!evac;$('simEvacCount').textContent=evac?evac.arrived+' / '+evac.total:'';
     $('simAmplitude').textContent=v?v.amp+' / 100':'0 / 100';
     $('simWavePath').setAttribute('d',syntheticSignal(v));
     $('simWavePath').setAttribute('stroke',v?.level==='EMERGENCY'?'#dd4b56':v?.level==='WARNING'?'#d39b38':'#347bea');
@@ -459,7 +461,7 @@
   let trainingKey='';
   function syncTraining(){
     const s=SeismoTraining.snapshot();
-    const key=[s.active,s.mag,s.level,s.shaking,s.auto,s.time].join('|');
+    const key=[s.active,s.mag,s.level,s.shaking,s.auto,s.time,s.evacuate?SeismoTraining.evacuation(s).arrived:0].join('|');
     if(key===trainingKey)return;
     trainingKey=key;
     const captions={NORMAL:SIM_PRESETS['3'].caption,WARNING:SIM_PRESETS['4.5'].caption,EMERGENCY:'Учебная авария: защита активна до ручного сброса.'};

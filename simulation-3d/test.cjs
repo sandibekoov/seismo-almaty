@@ -39,6 +39,13 @@ function advance(sec){for(let i=0;i<Math.ceil(sec*60);i++){time+=1000/60;run('lo
 main('select(3)');advance(1);assert.equal(run('prot'),false);assert.equal(element('c-esp-b').textContent,'NORMAL');
 main('select(4.5)');advance(1);assert.equal(element('c-esp-b').textContent,'WARNING');assert.equal(run('sw.gas'),true);
 main('select(8)');advance(1);assert.equal(element('c-esp-b').textContent,'WARNING');advance(1.2);assert.equal(run('prot'),true);assert.equal(run('sw.gas'),false);assert.equal(run('sw.power'),false);
+assert.equal(main('snapshot().evacuate'),false);assert.equal(run('people.every(p=>p.g.position.z<2.4)'),true);
+advance(7.9);assert.equal(main('snapshot().shaking'),false);assert.equal(main('snapshot().evacuate'),true);assert.equal(element('evac-status').hidden,false);
+assert.equal(main('evacuation(SeismoTraining.snapshot()).arrived'),0);
+advance(4);assert.equal(run('people.some(p=>p.g.position.z>4.3)'),true);assert.equal(run('people.some(p=>p.g.position.z<2.4)'),true);
+advance(12);assert.equal(main('evacuation(SeismoTraining.snapshot()).arrived'),14);assert.equal(element('evac-count').textContent,'14 / 14');assert.equal(run('people.every(p=>p.g.position.z>=11.35)'),true);
+// Reopening a view uses the same clock and does not restart evacuation.
+assert.equal(run('SeismoTraining.evacuation(SeismoTraining.snapshot()).arrived'),14);
 main('select(3)');advance(.1);assert.equal(run('prot'),true);element('stop').onclick();advance(.1);assert.equal(main('snapshot().evacuate'),true);
 element('rs').onclick();advance(.1);assert.equal(run('prot'),false);assert.equal(run('sw.gas'),true);assert.equal(main('snapshot().active'),false);
 element('au').onclick();advance(4);assert.equal(main('snapshot().level'),'WARNING');advance(5);assert.equal(main('snapshot().level'),'EMERGENCY');advance(10);assert.equal(main('snapshot().shaking'),false);assert.equal(main('snapshot().evacuate'),true);element('rs').onclick();advance(.1);
