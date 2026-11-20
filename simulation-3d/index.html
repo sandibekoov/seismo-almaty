@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SEISMO at KBTU 3D</title>
 <style>
-:root{--bg:#dfe9f2;--fg:#13222e;--card:rgba(255,255,255,.93);--mut:#56697a;--ok:#14854f;--bad:#d4352b;--ac:#e8590c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#e7effa;--fg:#172b49;--card:rgba(255,255,255,.96);--mut:#60738d;--ok:#14854f;--bad:#d4352b;--ac:#2469df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.93);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}}
 :root[data-theme="dark"]{--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.93);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}
 html,body{height:100%;margin:0}
@@ -56,41 +56,55 @@ button.s.active{background:var(--ac);border-color:var(--ac);color:#fff}
 body.live #render-mode{bottom:94px}
 #live-overlay{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;text-align:center;max-width:75vw;padding:12px 18px;background:var(--card);border-radius:10px;pointer-events:none}
 @media(max-width:650px){#shell{padding:8px;gap:5px}#shell strong{font-size:12px}#modebar{top:50px}#top,#chips{top:150px}#top{width:43vw}#chips{font-size:10px;gap:3px}#cap{top:282px;font-size:12px}#render-mode{bottom:205px}}
+:root[data-theme="light"]{color-scheme:light}
+#views,#main{flex-wrap:wrap;overflow:visible}#main button{flex:1;white-space:normal;padding:8px 9px}
+#embed-status{display:none;position:absolute;top:8px;left:8px;z-index:2;background:var(--card);padding:8px 12px;border-radius:10px;font-weight:700}
+#embed-status[data-level="WARNING"],#rt[data-level="WARNING"]{color:#b78024}
+.c.warn b{color:#b78024}
+#embed-status[data-level="EMERGENCY"],#rt[data-level="EMERGENCY"]{color:var(--bad)}
+body.embedded #shell,body.embedded #modebar,body.embedded #top,body.embedded #chips,body.embedded #amplitude-panel,body.embedded #main,body.embedded #set{display:none!important}
+body.embedded #embed-status{display:block}
+body.embedded #bot{bottom:5px}body.embedded #views{gap:4px;justify-content:center}
+body.embedded #views button{font-size:10px;padding:5px 7px;flex:0 1 auto}
+body.embedded #render-mode{bottom:54px;font-size:9px}
+body.embedded .lb span{display:none}
+body.embedded .lb i{width:22px;height:22px}
+@media(max-width:650px){#amp-help{display:none}#top,#chips{top:98px}body.live #top,body.live #chips{top:155px}#views{gap:4px}#views button{font-size:10px;padding:5px 7px}#main button{font-size:11px}#render-mode{bottom:190px}#bot{gap:4px}#amplitude-panel{padding:8px}#top{width:38vw}}
 </style></head><body>
 <canvas id="gl"></canvas>
 <div id="lbs"></div>
+<div id="embed-status">NORMAL · M 0.0</div>
 <span id="render-mode" data-t="Compatibility renderer">Compatibility renderer</span>
 <header id="shell"><a href="../#simulation" data-t="Back">← Seismo Almaty</a><strong data-t="KBTU Campus Lab">KBTU Campus Lab</strong><select id="lang" aria-label="Language"><option value="kk">ҚАЗ</option><option value="ru">РУС</option><option value="en">ENG</option></select></header>
 <div id="modebar"><button id="mode-sim" class="b s active" data-t="Simulation">Simulation</button><button id="mode-live" class="b s" data-t="ESP32 Live">ESP32 Live</button><select id="baud" hidden aria-label="Serial baud rate"><option value="115200">115200</option><option value="9600">9600</option></select><button id="connect" class="b s" hidden data-t="Connect USB">Connect USB</button><button id="disconnect" class="b s" hidden data-t="Disconnect">Disconnect</button><span id="notice" data-t="Demo notice">Educational simulation. Not a real earthquake alert.</span></div>
 <div id="fallback" data-t="3D unavailable">3D could not load.</div><div id="live-overlay" data-t="Live unavailable">No fresh telemetry — model paused.</div>
-<div class="p" id="top"><div class="r"><small data-t="Accelerometer">Accelerometer</small><b id="acc">0.01 g</b></div><canvas id="ch" width="220" height="56"></canvas><div id="rt">Monitoring</div></div>
+<div class="p" id="top"><div class="r"><small id="sensor-label" data-t="Synthetic signal">Synthetic signal</small><b id="acc">0 / 100</b></div><canvas id="ch" width="220" height="56"></canvas><div id="rt">NORMAL</div></div>
 <div class="p" id="chips">
-<div class="c" id="c-esp"><span>ESP32</span><b>ARMED</b></div><div class="c" id="c-power"><span>Power</span><b>ON</b></div><div class="c" id="c-gas"><span>Gas</span><b>OPEN</b></div><div class="c" id="c-lift"><span>Elevator</span><b>MOVING</b></div><div class="c" id="c-siren"><span>Alarm</span><b>OFF</b></div>
+<div class="c" id="c-esp"><span>ESP32</span><b>NORMAL</b></div><div class="c" id="c-power"><span>Power</span><b>ON</b></div><div class="c" id="c-gas"><span>Gas</span><b>OPEN</b></div><div class="c" id="c-lift"><span>Elevator</span><b>MOVING</b></div><div class="c" id="c-siren"><span>Alarm</span><b>OFF</b></div>
 </div>
 <div class="p" id="cap"></div>
 <div class="p" id="set">
-<label><span data-t="Duration">Duration</span>: <b id="dv">8</b> s<input type="range" id="d" min="2" max="15" step="1" value="8"></label>
-<label><span data-t="Trigger threshold">Trigger threshold</span>: <b id="tv">0.30</b> g<input type="range" id="th" min="0.05" max="0.8" step="0.01" value="0.3"></label>
-<label><span data-t="Confirm time">Confirm time</span>: <b id="fv">0.4</b> s<input type="range" id="cf" min="0.1" max="1.5" step="0.1" value="0.4"></label>
-<label><input type="checkbox" id="fl" checked> <span data-t="False-alarm filter">False-alarm filter</span></label>
-<label><input type="checkbox" id="snd" checked> <span data-t="Alarm sound">Alarm sound</span></label>
+<label><input type="checkbox" id="snd"> <span data-t="Alarm sound">Alarm sound</span></label>
 <div id="pk"></div><div id="log"></div>
 </div>
 <div id="bot">
 <section id="amplitude-panel" aria-label="Simulated earthquake amplitude">
-<header><label for="a"><strong>Peak vibration amplitude</strong></label><b id="av">0.84 g</b></header>
-<div id="amp-control"><span id="amp-marker"></span><input id="a" type="range" min="0" max="1.2" step="0.01" value="0.84" aria-describedby="amp-help"></div>
-<div id="amp-labels"><span>0 g</span><span id="amp-threshold">Threshold 0.30 g</span><span>1.20 g</span></div>
-<p id="amp-help">Demo signal only. Change amplitude before or during Earthquake. Reset clears latched protection.</p>
+<header><label for="a"><strong>Scenario magnitude</strong></label><b id="av">M 0.0</b></header>
+<div id="amp-control"><input id="a" type="range" min="0" max="8" step="0.1" value="0" aria-describedby="amp-help"></div>
+<div id="amp-labels"><span>0</span><span>3.0</span><span>4.5</span><span>6.0</span><span>8.0</span></div>
+<div id="main-presets" style="display:flex;gap:6px"><button class="b s" data-m="3">M 3.0</button><button class="b s" data-m="4.5">M 4.5</button><button class="b s" data-m="6">M 6.0</button></div>
+<p id="amp-help">Demo magnitude only. Release the slider to start shaking.</p>
 </section>
-<div id="views"><button class="b s" data-v="campus">Campus</button><button class="b s" data-v="sensor">1 Sensor</button><button class="b s" data-v="gas">2 Gas</button><button class="b s" data-v="power">3 Power</button><button class="b s" data-v="lift">4 Elevator</button><button class="b s" data-v="roof">5 Alarm</button></div>
-<div id="main"><button class="b" id="go">Earthquake</button><button class="b m" id="stp">Footsteps</button><button class="b m" id="au">Auto demo</button><button class="b s" id="cu">Cutaway</button><button class="b s" id="rs">Reset</button><button class="b s" id="se">Settings</button></div>
+<div id="views"><button class="b s" data-v="campus">Campus</button><button class="b s" data-v="sensor">1 Sensor</button><button class="b s" data-v="gas">2 Gas</button><button class="b s" data-v="power">3 Power</button><button class="b s" data-v="lift">4 Elevator</button><button class="b s" data-v="roof">5 Alarm</button><button class="b s" id="cu">Cutaway</button></div>
+<div id="main"><button class="b" id="au">Auto demo</button><button class="b s" id="stop">Stop shaking</button><button class="b s" id="rs">Reset</button><button class="b s" id="se">Settings</button></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="./bridge.js?v=4"></script>
+<script src="../simulation-state.js?v=1"></script>
+<script src="./bridge.js?v=5"></script>
 <script src="./projected-renderer.js?v=3"></script>
 <script>
 const $=id=>document.getElementById(id);
+const embedded=new URLSearchParams(location.search).has('embed');document.documentElement.dataset.theme='light';document.body.classList.toggle('embedded',embedded);
 if(typeof THREE==='undefined'){$('fallback').style.display='block';Seismo3DLanguage.init();throw new Error('Three.js unavailable')}
 let cv=$('gl'),R;
 try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true})}catch(err){
@@ -100,7 +114,7 @@ R.setPixelRatio(Math.min(devicePixelRatio,2));
 const S=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.1,200);
 const V={campus:[.55,.28,27,0,3,2],sensor:[.25,.25,6,-4.8,.8,2.6],gas:[-.5,.2,8,-11.5,.8,1],power:[1.1,.25,9,11.5,1.2,1],lift:[.3,.3,10,0,3.2,-1],roof:[.6,.35,9,0,6.4,0]};
 let cur=[...V.campus],tg=[...V.campus];
-function place(){const k=cv.clientWidth<650?1.35:1,a=cur[0],e=cur[1],r=cur[2]*k;cam.position.set(cur[3]+Math.sin(a)*Math.cos(e)*r,cur[4]+Math.sin(e)*r,cur[5]+Math.cos(a)*Math.cos(e)*r);cam.lookAt(cur[3],cur[4],cur[5])}
+function place(){const k=Math.max(1,1.35/Math.max(.45,cam.aspect||1)),a=cur[0],e=cur[1],r=cur[2]*k;cam.position.set(cur[3]+Math.sin(a)*Math.cos(e)*r,cur[4]+Math.sin(e)*r,cur[5]+Math.cos(a)*Math.cos(e)*r);cam.lookAt(cur[3],cur[4],cur[5]);cam.updateMatrixWorld(true)}
 function size(){const w=cv.clientWidth,h=cv.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();place()}
 addEventListener('resize',size);
 S.add(new THREE.AmbientLight(0xffffff,.7));
@@ -154,82 +168,99 @@ cv.addEventListener('pointermove',e=>{if(!drag)return;tg[0]-=(e.clientX-lx)*.008
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{tg=[...V[b.dataset.v]]});
 let cut=false;function setCut(v){cut=v;wallM.opacity=v?.13:1;wallM.depthWrite=!v;$('cu').classList.toggle('on',v)}
 $('cu').onclick=()=>setCut(!cut);
-const P={a:.84,d:8,th:.3,cf:.4,fl:true};
-const peak=()=>P.a;
-function sync(){$('av').textContent=P.a.toFixed(2)+' g';$('amp-threshold').textContent='Threshold '+P.th.toFixed(2)+' g';$('amp-marker').style.left=(P.th/1.2*100)+'%';$('dv').textContent=P.d;$('tv').textContent=P.th.toFixed(2);$('fv').textContent=P.cf.toFixed(1);const p=peak();$('pk').textContent='Set peak target '+p.toFixed(2)+' g · '+(p*.75>P.th?'likely above threshold':p<P.th?'likely below threshold':'near threshold')+' (simulation)'}
-['a','d','th','cf'].forEach(k=>$(k).oninput=()=>{P[k]=+$(k).value;sync()});$('fl').onchange=()=>{P.fl=$('fl').checked};
-function setP(k,v){P[k]=v;$(k).value=v;sync()}sync();
-const logs=[];function log(t){logs.unshift(new Date().toTimeString().slice(0,8)+'  '+t);if(logs.length>30)logs.pop();$('log').innerHTML=logs.join('<br>')}
-function chip(id,ok,txt){const c=$('c-'+id);c.classList.toggle('off',!ok);c.querySelector('b').textContent=txt}
-function cap(t){const c=$('cap');c.textContent=t;c.style.display=t?'block':'none'}
-$('se').onclick=()=>{const s=$('set');s.style.display=s.style.display==='block'?'none':'block'};
-let st='idle',ev=null,cnt=0,prot=false,acc=.01,liftY=2.9,last=0,T=0,trT=0,demo=null,ac=null,osc=null;
+const logs=[];function log(t){logs.unshift(new Date().toTimeString().slice(0,8)+'  '+t);if(logs.length>20)logs.pop();$('log').innerHTML=logs.join('<br>')}
 const sw={power:true,gas:true,lift:true,siren:false},buf=new Array(150).fill(0);
-function beep(on){try{if(on){if(!$('snd').checked)return;ac=ac||new (window.AudioContext||window.webkitAudioContext)();osc=ac.createOscillator();const g=ac.createGain();g.gain.value=.05;osc.type='square';osc.connect(g);g.connect(ac.destination);osc.start()}else if(osc){osc.stop();osc=null}}catch(e){}}
-function start(type){if(st!=='idle'||liveMode)return;st='run';cnt=0;ev={type,t0:T,dur:type==='step'?.25:P.d,pk:type==='step'?.55:peak(),hit:false};log(type==='step'?'Test: footsteps / short impact':'Demo earthquake, '+P.a.toFixed(2)+' g target');$('rt').textContent='Vibration detected';$('go').disabled=$('stp').disabled=true;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
-function trigger(e){prot=true;trT=T;Object.assign(sw,{power:false,gas:false,lift:false,siren:true});liftY=lv.reduce((a,b)=>Math.abs(b-cabin.position.y)<Math.abs(a-cabin.position.y)?b:a);beep(true);
-$('rt').textContent='Protection active in '+e.toFixed(1)+' s';['Quake confirmed, reaction '+e.toFixed(1)+' s','Power disconnected','Gas valve closed','Elevator sent to nearest floor','Demo alarm active','Evacuation started'].forEach(log);
-chip('esp',false,'TRIGGERED');chip('power',false,'CUT');chip('gas',false,'CLOSED');chip('lift',false,'STOPPED');chip('siren',false,'ALARM')}
-function reset(){st='idle';ev=null;prot=false;cnt=0;demo=null;cap('');beep(false);Object.assign(sw,{power:true,gas:true,lift:true,siren:false});rig.position.set(0,0,0);bld.rotation.z=0;acc=.01;buf.fill(0);$('go').disabled=$('stp').disabled=$('au').disabled=false;$('rt').textContent='Monitoring';resetPeople();
-chip('esp',true,'ARMED');chip('power',true,'ON');chip('gas',true,'OPEN');chip('lift',true,'MOVING');chip('siren',true,'OFF');log('System reset')}
-$('go').onclick=()=>{if(!demo)start('quake')};$('stp').onclick=()=>{if(!demo)start('step')};$('rs').onclick=()=>{reset();setCut(false);tg=[...V.campus]};
-const steps=[[0,()=>{setCut(false);setP('d',8);setP('th',.3);setP('cf',.4);$('fl').checked=P.fl=true;tg=[...V.campus];cap('SEISMO installed on a campus building (schematic model)')}],
-[3,()=>{tg=[...V.sensor];cap('1: ESP32 with accelerometer monitors vibration')}],
-[6.5,()=>{start('step');cap('Footsteps: short spike is filtered, no false alarm')}],
-[10,()=>{tg=[...V.campus];start('quake');cap('Simulated earthquake — adjustable peak vibration')}],
-[11.5,()=>{tg=[...V.power];cap(prot?'3: Power disconnected':'3: Power')}],
-[14,()=>{tg=[...V.gas];cap(prot?'2: Gas valve closed':'2: Gas valve')}],
-[16.5,()=>{setCut(true);tg=[...V.lift];cap(prot?'4: Elevator stops at the nearest floor':'4: Elevator')}],
-[19,()=>{setCut(false);tg=[...V.roof];cap(prot?'5: Demo alarm active':'5: Alarm')}],
-[21.5,()=>{tg=[...V.campus];cap(prot?'People evacuate to the assembly point':'Below threshold: no action')}],
-[29,()=>{cap('SEISMO: the system acts, not just warns')}],[33,()=>{demo=null;cap('');$('au').disabled=false;$('go').disabled=$('stp').disabled=st!=='idle'}]];
-$('au').onclick=()=>{if(liveMode)return;reset();demo={t:0,i:0};$('au').disabled=$('go').disabled=$('stp').disabled=true};
-let liveMode=false,lastLive=0,liveFrame=null,liveStatus='';
+let prot=false,warning=false,liftY=2.9,last=0,ac=null,osc=null,liveMode=false,lastLive=0,liveFrame=null,liveStatus='',previous='',previousTrip=false,previousEvac=false;
+function chip(id,ok,txt){const c=$('c-'+id);c.classList.toggle('off',!ok);c.querySelector('b').textContent=txt}
+function beep(on){try{if(on&&!osc){if(embedded||!$('snd').checked)return;ac=ac||new (window.AudioContext||window.webkitAudioContext)();osc=ac.createOscillator();const g=ac.createGain();g.gain.value=.03;osc.type='square';osc.connect(g);g.connect(ac.destination);osc.start()}else if(!on&&osc){osc.stop();osc=null}}catch(e){}}
+$('snd').onchange=()=>{if($('snd').checked&&prot&&!liveMode)beep(true);else beep(false)};
+$('se').onclick=()=>{const s=$('set');s.style.display=s.style.display==='block'?'none':'block'};
+function setSceneState(s){
+  prot=s.latched;warning=s.level==='WARNING';
+  if(prot&&!previousTrip)liftY=lv.reduce((a,b)=>Math.abs(b-cabin.position.y)<Math.abs(a-cabin.position.y)?b:a);
+  if(!prot&&previousTrip){resetPeople();setCut(false)}
+  previousTrip=prot;Object.assign(sw,{power:!prot,gas:!prot,lift:!prot,siren:prot});
+  const key=[s.mag,s.level,s.shaking,s.auto,s.time].join('|');
+  if(key!==previous){
+    previous=key;$('av').textContent='M '+s.mag.toFixed(1);
+    if(document.activeElement!==$('a'))$('a').value=s.mag;
+    $('rt').textContent=s.level;$('rt').dataset.level=s.level;
+    $('embed-status').textContent=s.level+' · M '+s.mag.toFixed(1);$('embed-status').dataset.level=s.level;
+    $('au').disabled=s.auto||s.latched;$('stop').disabled=!s.shaking;$('rs').disabled=!s.active;
+    chip('esp',s.level==='NORMAL',s.level);chip('power',sw.power,sw.power?'ON':'CUT');chip('gas',sw.gas,sw.gas?'OPEN':'CLOSED');chip('lift',sw.lift,sw.lift?'MOVING':'STOPPED');chip('siren',!prot&&!warning,prot?'ALARM':warning?'WARNING':'OFF');
+    $('c-esp').classList.toggle('warn',warning);$('c-siren').classList.toggle('warn',warning);
+    document.querySelectorAll('[data-m]').forEach(b=>b.classList.toggle('active',Number(b.dataset.m)===s.mag));
+    log(s.level+' · M '+s.mag.toFixed(1));beep(prot);
+  }
+  if(!s.evacuate&&previousEvac)resetPeople();previousEvac=s.evacuate;
+}
+$('a').oninput=()=>{$('av').textContent='M '+Number($('a').value).toFixed(1)};
+$('a').onchange=()=>{if(!liveMode){SeismoTraining.select($('a').value);$('a').blur()}};
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{if(!liveMode)SeismoTraining.select(b.dataset.m)});
+$('au').onclick=()=>{if(!liveMode)SeismoTraining.auto()};
+$('stop').onclick=()=>{if(!liveMode)SeismoTraining.stop()};
+$('rs').onclick=()=>{if(!liveMode){SeismoTraining.reset();tg=[...V.campus];setCut(false);buf.fill(0);resetPeople()}};
+function draw(){
+ const c=$('ch'),x=c.getContext('2d'),w=c.width,h=c.height;
+ x.clearRect(0,0,w,h);x.strokeStyle='rgba(128,128,128,.25)';x.strokeRect(.5,.5,w-1,h-1);
+ if(liveMode&&(!liveFrame||performance.now()-lastLive>2000))return;
+ x.strokeStyle=prot?'#d4352b':warning?'#d39b38':'#2469df';x.lineWidth=1.5;x.beginPath();
+ buf.forEach((v,i)=>{const px=i/(buf.length-1)*w,py=liveMode?h-Math.min(1.2,v)*h/1.2:h/2-v*h/200;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.lineWidth=1
+}
 function updateLiveUI(status){
- liveStatus=status;$('rt').textContent=status;
+ if(liveStatus!==status){liveStatus=status;$('rt').textContent=status;$('rt').dataset.level=''}
  const fresh=liveFrame&&performance.now()-lastLive<=2000;
  $('live-overlay').style.display=fresh?'none':'block';
  if(!fresh){['esp','power','gas','lift','siren'].forEach(id=>chip(id,false,'UNKNOWN'));$('acc').textContent='—';buf.fill(0);draw()}
 }
 function applyTelemetry(frame){
  if(!liveMode)return;
- liveFrame=frame;lastLive=performance.now();acc=frame.accelerationG;buf.push(acc);buf.shift();draw();
- prot=frame.state==='EMERGENCY'||frame.state==='FAULT';
+ liveFrame=frame;lastLive=performance.now();buf.push(frame.accelerationG);buf.shift();draw();
+ prot=frame.state==='EMERGENCY'||frame.state==='FAULT';warning=frame.state==='WARNING';
+ $('c-esp').classList.toggle('warn',warning);$('c-siren').classList.toggle('warn',false);
  Object.assign(sw,{power:frame.powerOn,gas:frame.gasOpen,lift:frame.liftMoving,siren:frame.alarmOn});liftY=lv[frame.floor-1];
- chip('esp',!prot&&frame.state!=='WARNING',frame.state);chip('power',sw.power,sw.power?'ON':'CUT');chip('gas',sw.gas,sw.gas?'OPEN':'CLOSED');chip('lift',sw.lift,sw.lift?'MOVING':'STOPPED');chip('siren',!sw.siren,sw.siren?'ALARM':'OFF');
- updateLiveUI('Live telemetry');
+ chip('esp',!prot&&!warning,frame.state);chip('power',sw.power,sw.power?'ON':'CUT');chip('gas',sw.gas,sw.gas?'OPEN':'CLOSED');chip('lift',sw.lift,sw.lift?'MOVING':'STOPPED');chip('siren',!sw.siren,sw.siren?'ALARM':'OFF');
+ $('acc').textContent=frame.accelerationG.toFixed(2)+' g';updateLiveUI('Live telemetry');
 }
 const link=new SeismoSerial(applyTelemetry,status=>{if(liveMode){if(status==='Disconnected'||status==='Connection failed'){liveFrame=null;$('disconnect').hidden=true}updateLiveUI(status)}});
-function setModeUI(live){$('mode-sim').classList.toggle('active',!live);$('mode-live').classList.toggle('active',live);document.body.classList.toggle('live',live);$('connect').hidden=$('baud').hidden=!live;$('disconnect').hidden=true;['go','stp','au','rs','se','a'].forEach(id=>$(id).disabled=live);$('amplitude-panel').hidden=live;$('set').style.display='none';$('notice').dataset.t=live?'Live notice':'Demo notice';$('notice').textContent=$('notice').dataset.t}
-$('mode-live').onclick=()=>{if(liveMode)return;reset();liveMode=true;liveFrame=null;lastLive=0;setModeUI(true);people.forEach(p=>p.g.visible=false);updateLiveUI('Waiting for ESP32')};
-$('mode-sim').onclick=async()=>{if(!liveMode)return;liveMode=false;await link.disconnect();liveFrame=null;setModeUI(false);$('live-overlay').style.display='none';reset()};
+function setModeUI(live){
+ $('mode-sim').classList.toggle('active',!live);$('mode-live').classList.toggle('active',live);document.body.classList.toggle('live',live);
+ $('connect').hidden=$('baud').hidden=!live;$('disconnect').hidden=true;
+ ['au','stop','rs','se','a'].forEach(id=>$(id).disabled=live);$('amplitude-panel').hidden=live;$('set').style.display='none';
+ $('notice').dataset.t=live?'Live notice':'Demo notice';$('notice').textContent=$('notice').dataset.t;
+ $('sensor-label').dataset.t=live?'Accelerometer':'Synthetic signal';$('sensor-label').textContent=$('sensor-label').dataset.t;
+}
+$('mode-live').onclick=()=>{if(liveMode||embedded)return;beep(false);liveMode=true;liveFrame=null;lastLive=0;liveStatus='';buf.fill(0);setModeUI(true);people.forEach(p=>p.g.visible=false);updateLiveUI('Waiting for ESP32')};
+$('mode-sim').onclick=async()=>{if(!liveMode)return;liveMode=false;await link.disconnect();liveFrame=null;setModeUI(false);$('live-overlay').style.display='none';previous='';previousTrip=false;previousEvac=false;buf.fill(0);resetPeople();setSceneState(SeismoTraining.snapshot())};
 $('connect').onclick=async()=>{if(!liveMode)return;$('connect').disabled=true;await link.connect(+$('baud').value);$('connect').disabled=false;$('disconnect').hidden=!link.connected()};
 $('disconnect').onclick=async()=>{await link.disconnect();liveFrame=null;updateLiveUI('Disconnected');$('disconnect').hidden=true};
-function draw(){const c=$('ch'),x=c.getContext('2d'),w=c.width,h=c.height,sc=h/1.2;x.clearRect(0,0,w,h);x.strokeStyle='rgba(128,128,128,.35)';x.strokeRect(.5,.5,w-1,h-1);
-if(!liveMode){x.strokeStyle='#ff5a4d';x.setLineDash([4,3]);x.beginPath();x.moveTo(0,h-P.th*sc);x.lineTo(w,h-P.th*sc);x.stroke();x.setLineDash([])}
-if(liveMode&&(!liveFrame||performance.now()-lastLive>2000))return;
-x.strokeStyle='#35c27d';x.lineWidth=1.5;x.beginPath();buf.forEach((v,i)=>{const px=i/(buf.length-1)*w,py=h-Math.min(1.2,v)*sc;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.lineWidth=1}
-function loop(ms){requestAnimationFrame(loop);const t=ms/1000,dt=Math.min(.05,Math.max(0,t-last));last=t;T+=dt;
-for(let i=0;i<6;i++)cur[i]+=(tg[i]-cur[i])*.07;place();
-if(demo){demo.t+=dt;while(demo&&demo.i<steps.length&&demo.t>=steps[demo.i][0]){steps[demo.i][1]();if(demo)demo.i++}}
-if(liveMode){rig.position.set(0,0,0);bld.rotation.z=0;if(liveFrame&&performance.now()-lastLive>2000&&liveStatus!=='Telemetry stale')updateLiveUI('Telemetry stale')}
-else if(ev){if(ev.type==='quake')ev.pk=peak();const e=T-ev.t0,amp=ev.type==='step'?(e<.25?1:0):Math.min(1,e/.5)*(e<ev.dur-1?1:Math.max(0,ev.dur-e)),sx=.1*ev.pk;
-rig.position.x=Math.sin(e*46)*sx*amp;rig.position.z=Math.cos(e*38)*sx*.55*amp;bld.rotation.z=Math.sin(e*5)*.01*ev.pk*amp;
-acc=.012*(1+Math.random())+ev.pk*amp*(.75+.25*Math.random());if(acc>P.th)ev.hit=true;
-if(!prot){if(acc>P.th)cnt+=dt;else cnt=Math.max(0,cnt-dt);if(acc>P.th&&cnt>=(P.fl?P.cf:0))trigger(e)}
-if(e>ev.dur){if(!prot){$('rt').textContent=ev.hit?'Short impact filtered: no action':'Below threshold: no action';log(ev.hit?'Impact ignored by filter':'Vibration below threshold');st='idle';$('go').disabled=$('stp').disabled=!!demo}else st='done';ev=null}}
-else{acc=.012*(1+Math.random());rig.position.set(0,0,0);bld.rotation.z=0}
-const fresh=!liveMode||(liveFrame&&performance.now()-lastLive<=2000);
-if(!liveMode){buf.push(acc);buf.shift();draw()}if(fresh){$('acc').textContent=acc.toFixed(2)+' g';
-if(!liveMode&&prot)people.forEach(p=>{const d=T-trT-1.5-p.i*.25;if(d<0)return;const tx=p.st===0?p.dx:p.tx,tz=p.st===0?2.9:p.tz,vx=tx-p.g.position.x,vz=tz-p.g.position.z,l=Math.hypot(vx,vz);if(l<.1){if(p.st===0)p.st=1}else{const s=Math.min(l,2.4*dt);p.g.position.x+=vx/l*s;p.g.position.z+=vz/l*s}});
-if(liveMode)cabin.position.y+=(liftY-cabin.position.y)*.06;else if(sw.lift)cabin.position.y=2.9+2.4*Math.sin(t*.6);else cabin.position.y+=(liftY-cabin.position.y)*.06;
-lampM.emissiveIntensity+=((sw.power?1.6:0)-lampM.emissiveIntensity)*.15;winM.emissiveIntensity+=((sw.power?.5:0)-winM.emissiveIntensity)*.15;
-lampM.color.set(sw.power?0xfff0b0:0x35434f);winM.color.set(sw.power?0x9fd0ff:0x35434f);
-cabM.emissiveIntensity+=((sw.power?1:0)-cabM.emissiveIntensity)*.15;cabM.color.set(sw.power?0x2aa3ff:0x555555);lever.rotation.z+=((sw.power?0:1.2)-lever.rotation.z)*.15;
-valveM.color.set(sw.gas?0x1fae6a:0xd4352b);handle.rotation.z+=((sw.gas?0:Math.PI/2)-handle.rotation.z)*.12;pipeM.color.set(sw.gas?0xe0a526:0x7a6a4a);
-dots.forEach((d,i)=>{d.visible=sw.gas;d.position.x=-14.2+((i*.75+t*1.3)%4.4)});
-const f=sw.siren?(Math.sin(t*12)>0?1:0):0;dome.material.emissiveIntensity=f*2;sl.intensity=f*3;if(osc)osc.frequency.value=Math.sin(t*6)>0?880:640;
-ledM.color.set(prot?0xff3b30:0x00ff88);ledM.emissive.set(prot?0xff3b30:0x00ff88);ringM.color.set(prot?0xff3b30:0x00ff88);ringM.emissive.set(prot?0xff3b30:0x00ff88);ring.scale.setScalar(1+.25*Math.sin(t*3));ringM.opacity=.55-.25*Math.sin(t*3);}
-R.render(S,cam);labels()}
-size();log('System armed');Seismo3DLanguage.init();requestAnimationFrame(loop);
+function loop(ms){
+ requestAnimationFrame(loop);const t=ms/1000,dt=Math.min(.2,Math.max(0,t-last));last=t;
+ for(let i=0;i<6;i++)cur[i]+=(tg[i]-cur[i])*Math.min(1,dt*6);place();
+ let fresh=true;
+ if(liveMode){rig.position.set(0,0,0);bld.rotation.z=0;fresh=!!liveFrame&&performance.now()-lastLive<=2000;if(liveFrame&&!fresh&&liveStatus!=='Telemetry stale')updateLiveUI('Telemetry stale')}
+ else{
+  const s=SeismoTraining.snapshot();setSceneState(s);
+  const shake=s.amp/100,wave=SeismoTraining.wave(s)/100;
+  // Visible exaggerated motion, not a structural response calculation.
+  rig.position.x=wave*.78;rig.position.z=Math.sin(t*18)*shake*.30;
+  bld.rotation.z=Math.sin(t*13)*shake*.045;
+  $('acc').textContent=s.amp+' / 100';buf.push(wave*100);buf.shift();draw();
+  if(s.evacuate)people.forEach(p=>{const tx=p.st===0?p.dx:p.tx,tz=p.st===0?2.9:p.tz,vx=tx-p.g.position.x,vz=tz-p.g.position.z,l=Math.hypot(vx,vz);if(l<.1){if(p.st===0)p.st=1}else{const d=Math.min(l,2.4*dt);p.g.position.x+=vx/l*d;p.g.position.z+=vz/l*d}});
+ }
+ if(fresh){
+ if(liveMode)cabin.position.y+=(liftY-cabin.position.y)*Math.min(1,dt*4);else if(sw.lift)cabin.position.y=2.9+2.4*Math.sin(t*.6);else cabin.position.y+=(liftY-cabin.position.y)*Math.min(1,dt*4);
+ lampM.emissiveIntensity+=((sw.power?1.6:0)-lampM.emissiveIntensity)*.15;winM.emissiveIntensity+=((sw.power?.5:0)-winM.emissiveIntensity)*.15;
+ lampM.color.set(sw.power?0xfff0b0:0x35434f);winM.color.set(sw.power?0x9fd0ff:0x35434f);
+ cabM.emissiveIntensity+=((sw.power?1:0)-cabM.emissiveIntensity)*.15;cabM.color.set(sw.power?0x2aa3ff:0x555555);lever.rotation.z+=((sw.power?0:1.2)-lever.rotation.z)*.15;
+ valveM.color.set(sw.gas?0x1fae6a:0xd4352b);handle.rotation.z+=((sw.gas?0:Math.PI/2)-handle.rotation.z)*.12;pipeM.color.set(sw.gas?0xe0a526:0x7a6a4a);
+ dots.forEach((d,i)=>{d.visible=sw.gas;d.position.x=-14.2+((i*.75+t*1.3)%4.4)});
+ const f=(sw.siren||warning)?(Math.sin(t*(sw.siren?12:4))>0?1:0):0;
+ dome.material.color.set(warning?0xe6aa26:0xff2d2d);dome.material.emissive.set(warning?0xe6aa26:0xff0000);dome.material.emissiveIntensity=f*2;sl.intensity=f*3;
+ if(osc)osc.frequency.value=Math.sin(t*6)>0?880:640;
+ const color=prot?0xff3b30:warning?0xe6aa26:0x00ff88;ledM.color.set(color);ledM.emissive.set(color);ringM.color.set(color);ringM.emissive.set(color);ring.scale.setScalar(1+.25*Math.sin(t*3));ringM.opacity=.55-.25*Math.sin(t*3);
+ }
+ R.render(S,cam);labels();
+}
+size();Seismo3DLanguage.init();setSceneState(SeismoTraining.snapshot());if(new URLSearchParams(location.search).has('live')&&!embedded)$('mode-live').onclick();requestAnimationFrame(loop);
 </script></body></html>
