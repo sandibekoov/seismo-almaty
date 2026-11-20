@@ -80,7 +80,7 @@
     ]
   };
   const state={quakes:[],feed:'loading',updated:null,current:'home',map:null,layers:null,profile:null,pickOnMap:false,mapFilter:'all',eventScope:'all',detailBack:'events',sim:null};
-  let toastTimer;
+  let toastTimer,homePreview=null,homePreviewLayers=null;
   function toast(msg){const el=$('toast');el.textContent=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.textContent=''},4800)}
   // Numeric dates remain valid when the interface language changes in place.
   function dateAlmaty(t){return new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(t))}
@@ -95,12 +95,13 @@
     state.current=page;
     document.querySelectorAll('.page').forEach(p=>{const selected=p===target;p.hidden=!selected;p.classList.toggle('is-active',selected)});
     document.querySelectorAll('[data-page]').forEach(b=>{
-      const active=b.dataset.page===page || (page==='places'&&b.dataset.page==='map') || (page==='event-detail'&&b.dataset.page==='events') || (page==='simulation'&&b.dataset.page==='profile');
+      const active=b.dataset.page===page || (page==='places'&&b.dataset.page==='map') || (page==='event-detail'&&b.dataset.page==='events') || (page==='simulation'&&b.dataset.page==='profile'&&b.classList.contains('bottom-link'));
       if(b.classList.contains('nav-link')||b.classList.contains('bottom-link')){b.classList.toggle('is-active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')}
     });
     if(page==='map')requestAnimationFrame(()=>{ensureMap();if(state.map)state.map.invalidateSize()});
     if(page==='events')renderEvents();if(page==='places')renderPlaces();
-    if(page==='simulation'){const frame=$('simCampus');if(frame&&!frame.getAttribute('src'))frame.src='./simulation-3d/?embed=1&v=evac';renderSimulation()}
+    if(page==='home')requestAnimationFrame(ensureHomePreview);
+    if(page==='simulation'){const frame=$('simCampus');if(frame&&!frame.getAttribute('src'))frame.src='./simulation-3d/?embed=1&v=desktop';renderSimulation()}
     if(page==='profile')fillProfile();
     window.scrollTo({top:0,behavior:'instant'});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
@@ -157,7 +158,30 @@
       document.querySelector('.ref-status-card')?.classList.toggle('is-loading',state.feed==='loading');
     }
     renderFeed(state.quakes.slice(0,3),$('homeEvents'),'За 30 дней событий M ≥ 2.5 в каталоге не найдено.');
+    refreshHomePreviewMarkers();
     renderSimHome();
+  }
+  function ensureHomePreview(){
+    if(state.current!=='home'||!matchMedia('(min-width:801px)').matches||!$('homeMapPreview'))return;
+    if(homePreview){homePreview.invalidateSize();return}
+    const fallback=$('homeMapFallback');
+    if(!window.L){fallback.textContent='Карта недоступна';return}
+    homePreview=L.map('homeMapPreview',{zoomControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,attributionControl:true}).setView([ALMATY.lat,ALMATY.lng],11);
+    const tiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'});
+    let loaded=false;
+    tiles.on('tileload',()=>{loaded=true;fallback.hidden=true});
+    tiles.on('tileerror',()=>{if(!loaded)fallback.textContent='Карта недоступна'});
+    tiles.addTo(homePreview);
+    homePreviewLayers=L.layerGroup().addTo(homePreview);
+    refreshHomePreviewMarkers();
+  }
+  function refreshHomePreviewMarkers(){
+    if(!homePreviewLayers)return;
+    homePreviewLayers.clearLayers();
+    ASSEMBLY.forEach(p=>L.circleMarker([p.lat,p.lng],{radius:5,color:'#fff',weight:2,fillColor:'#239b6d',fillOpacity:.9,interactive:false}).addTo(homePreviewLayers));
+    if(state.feed==='ok')state.quakes.forEach(q=>{
+      if(distance(ALMATY,q)<=35)L.circleMarker([q.lat,q.lng],{radius:6,color:'#fff',weight:2,fillColor:'#dc4a55',fillOpacity:.9,interactive:false}).addTo(homePreviewLayers);
+    });
   }
   function filteredEvents(){
     const days=Number($('periodFilter').value)||30,min=Number($('magnitudeFilter').value)||2.5;
@@ -521,6 +545,7 @@
   }
   loadProfile();fillProfile();activateGuide('before');renderPlaces();
   document.addEventListener('click',e=>{
+    if(e.target.closest('#homeMapPreview .leaflet-control-attribution a'))return;
     const pager=e.target.closest('[data-page]');
     if(pager){e.preventDefault();if(pager.dataset.mapLayer==='assembly')setMapFilter('assembly');nav(pager.dataset.page);return}
     const evt=e.target.closest('[data-event-index]');if(evt){detail(state.quakes[Number(evt.dataset.eventIndex)]);return}
@@ -530,7 +555,8 @@
     const scope=e.target.closest('[data-event-scope]');if(scope){setEventScope(scope.dataset.eventScope);return}
     const guide=e.target.closest('[data-guide]');if(guide){activateGuide(guide.dataset.guide);return}
   });
-  document.querySelector('.map-preview').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nav('map')}});
+  document.querySelector('.map-preview').addEventListener('keydown',e=>{if(e.target===e.currentTarget&&(e.key==='Enter'||e.key===' ')){e.preventDefault();nav('map')}});
+  matchMedia('(min-width:801px)').addEventListener('change',()=>requestAnimationFrame(ensureHomePreview));
   window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if($('page-'+h))nav(h)});
   const filterPanel=$('mapFilterPanel');
   const mapFilterToggle=$('toggleMapFilters');
