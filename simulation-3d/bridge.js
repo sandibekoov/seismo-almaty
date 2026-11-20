@@ -5,7 +5,7 @@ function parseSeismoFrame(line) {
   if(!p || p.source!=='esp32' || !['NORMAL','WARNING','EMERGENCY','FAULT'].includes(p.state) ||
     typeof p.accelerationG!=='number' || !Number.isFinite(p.accelerationG) || p.accelerationG<0 ||
     !['powerOn','gasOpen','liftMoving','alarmOn'].every(k=>typeof p[k]==='boolean') ||
-    !Number.isInteger(p.floor) || p.floor<1 || p.floor>3) return null;
+    !Number.isInteger(p.floor) || p.floor<1 || p.floor>5) return null;
   return p;
 }
 class SeismoSerial {
@@ -50,13 +50,15 @@ const Seismo3DLanguage=(()=>{
   const strings={
     'Back':['← Seismo Almaty','← Seismo Almaty','← Seismo Almaty'],
     '3D Building Lab':['3D-модель здания','Ғимараттың 3D үлгісі','3D Building Lab'],
+    'KBTU Campus Lab':['3D-модель КБТУ','ҚБТУ 3D үлгісі','KBTU Campus Lab'],
+    'Live unavailable':['Нет свежих данных — модель на паузе.','Жаңа деректер жоқ — үлгі кідіртілді.','No fresh telemetry — model paused.'],
     'Simulation':['Симуляция','Симуляция','Simulation'],
     'ESP32 Live':['ESP32 · мониторинг','ESP32 · мониторинг','ESP32 Live'],
     'Connect USB':['Подключить USB','USB қосу','Connect USB'],
     'Disconnect':['Отключить','Ажырату','Disconnect'],
     'Demo notice':['Учебный сценарий. Не реальная тревога.','Оқу сценарийі. Нақты дабыл емес.','Educational simulation. Not a real earthquake alert.'],
     'Live notice':['Данные команд ESP32, не подтверждение положения механизмов. Только чтение.','ESP32 командалары, механизмдердің нақты қалпы расталмайды. Тек оқу.','ESP32 command telemetry, not confirmed actuator position. Read-only.'],
-    '3D unavailable':['3D не загрузилась. Нужны WebGL и интернет.','3D жүктелмеді. WebGL және интернет қажет.','3D could not load. WebGL and an internet connection are required.'],
+    '3D unavailable':['Модель не загрузилась. Проверьте интернет.','Үлгі жүктелмеді. Интернетті тексеріңіз.','Model could not load. Check your internet connection.'],
     'Compatibility renderer':['Совместимый режим отрисовки','Үйлесімді бейнелеу режимі','Compatibility renderer'],
     'Accelerometer':['Акселерометр','Акселерометр','Accelerometer'],
     'Power':['Освещение','Жарықтандыру','Lighting'],
@@ -64,6 +66,20 @@ const Seismo3DLanguage=(()=>{
     'Elevator':['Лифт','Лифт','Elevator'],
     'Alarm':['Тревога','Дабыл','Alarm'],
     'Overview':['Обзор','Шолу','Overview'],
+    'Campus':['Кампус','Кампус','Campus'],
+    'Sensor':['Датчик','Датчик','Sensor'],
+    'Gas valve':['Газовый клапан','Газ клапаны','Gas valve'],
+    'Cutaway':['Разрез','Қима','Cutaway'],
+    'Alarm sound':['Звук тревоги','Дабыл дыбысы','Alarm sound'],
+    'Peak vibration amplitude':['Амплитуда вибрации','Діріл амплитудасы','Peak vibration amplitude'],
+    'Demo signal only. Change amplitude before or during Earthquake. Reset clears latched protection.':['Демо-сигнал. Меняйте амплитуду до или во время землетрясения. Сброс снимает защиту.','Демо-сигнал. Амплитуданы жер сілкінісіне дейін немесе кезінде өзгертіңіз. Қорғауды қалпына келтіру арқылы өшіріңіз.','Demo signal only. Change amplitude before or during Earthquake. Reset clears latched protection.'],
+    'SEISMO installed on a campus building (schematic model)':['SEISMO в здании КБТУ (условная модель)','ҚБТУ ғимаратындағы SEISMO (шартты үлгі)','SEISMO installed on a campus building (schematic model)'],
+    'ESP32 with accelerometer monitors vibration':['ESP32 с акселерометром контролирует вибрацию','ESP32 акселерометр арқылы дірілді бақылайды','ESP32 with accelerometer monitors vibration'],
+    'Simulated earthquake — adjustable peak vibration':['Симуляция землетрясения — регулируемая амплитуда','Жер сілкінісін модельдеу — реттелетін амплитуда','Simulated earthquake — adjustable peak vibration'],
+    'Demo alarm active':['Демо-тревога активна','Демо-дабыл белсенді','Demo alarm active'],
+    'Evacuation started':['Началась эвакуация','Эвакуация басталды','Evacuation started'],
+    'People evacuate to the assembly point':['Люди выходят к точке сбора','Адамдар жиналу орнына шығады','People evacuate to the assembly point'],
+    'NORMAL':['НОРМА','ҚАЛЫПТЫ','NORMAL'],'WARNING':['ВНИМАНИЕ','ЕСКЕРТУ','WARNING'],'EMERGENCY':['АВАРИЯ','АПАТ','EMERGENCY'],'FAULT':['НЕИСПРАВНОСТЬ','АҚАУ','FAULT'],
     'Earthquake':['Землетрясение','Жер сілкінісі','Earthquake'],
     'Footsteps':['Шаги','Қадамдар','Footsteps'],
     'Auto demo':['Автодемо','Автодемо','Auto demo'],
@@ -111,10 +127,16 @@ const Seismo3DLanguage=(()=>{
   if(!['ru','kk','en'].includes(lang))lang='ru';
   const originals=new WeakMap();
   const tr=s=>{const i=lang==='kk'?1:lang==='en'?2:0;if(strings[s])return strings[s][i];
+    const numbered=s.match(/^(\d[:]?\s+)(.*)$/);if(numbered)return numbered[1]+tr(numbered[2]);
+    const threshold=s.match(/^Threshold (.+) g$/);if(threshold)return ['Порог ','Шек ','Threshold '][i]+threshold[1]+' g';
+    const demo=s.match(/^Demo earthquake, (.+) g target$/);if(demo)return ['Демо-землетрясение, цель ','Демо жер сілкінісі, мақсат ','Demo earthquake, target '][i]+demo[1]+' g';
+    const target=s.match(/^Set peak target (.+) g · (likely above threshold|likely below threshold|near threshold) \(simulation\)$/);
+    if(target){const states={'likely above threshold':['вероятно выше порога','шектен жоғары болуы мүмкін','likely above threshold'],'likely below threshold':['вероятно ниже порога','шектен төмен болуы мүмкін','likely below threshold'],'near threshold':['около порога','шекке жақын','near threshold']};return ['Целевой пик ','Мақсатты шың ','Set peak target '][i]+target[1]+' g · '+states[target[2]][i]}
     const patterns=[
       [/^Earthquake started, M(.+)$/,['Начата симуляция M','Симуляция басталды M','Earthquake started, M']],
       [/^Protection active in (.+) s$/,['Защита за ','Қорғау уақыты ','Protection active in ']],
       [/^Quake confirmed\. Reaction (.+) s$/,['Сценарий подтверждён за ','Сценарий расталды: ','Quake confirmed. Reaction ']],
+      [/^Quake confirmed, reaction (.+) s$/,['Сценарий подтверждён за ','Сценарий расталды: ','Quake confirmed, reaction ']],
       [/^Demo peak (.+) g: likely (above|below) threshold$/,['Демо-пик ','Демо-шың ','Demo peak ']]
     ];
     for(const [regex,prefix] of patterns){const m=s.match(regex);if(m){if(m[2])return prefix[i]+m[1]+' g · '+(m[2]==='above'?['выше порога','шектен жоғары','above threshold'][i]:['ниже порога','шектен төмен','below threshold'][i]);return prefix[i]+m[1]+(s.startsWith('Earthquake')?'':' s')}}

@@ -1,8 +1,14 @@
-# SEISMO ALMATY — 3D Building Lab
+# SEISMO ALMATY — KBTU Campus Lab
 
 The team's Three.js model is an educational visualisation of an ESP32 + MPU6050
 building prototype. Simulation is independent of real earthquake feeds. No
 commands are issued to the device, no real alarm is sent.
+The campus is a schematic educational model with five virtual floors. The
+0–1.2 g amplitude slider controls the simulated peak vibration only, including
+while an event is running. It does not represent earthquake magnitude.
+The demo threshold and confirmation time do not configure the actual ESP32.
+Auto Demo runs once to completion; Reset clears the simulated protection latch.
+Kazakh, Russian and English use the main site's stored language preference.
 On devices without WebGL, the same scene and camera are projected onto a
 Canvas 2D surface with simplified lighting.
 
@@ -19,7 +25,7 @@ must send UTF-8 JSON, one object per newline, e.g.:
 - `accelerationG`: measured acceleration/vibration metric in g, non-negative;
   firmware must document its method of gravity removal, filtering and calibration.
 - `state`: NORMAL, WARNING, EMERGENCY or FAULT, computed by the device.
-- actuator booleans and floor (1–3): commanded/model state, not physical
+- actuator booleans and floor (1–5, with 1–3 supported as before): commanded/model state, not physical
   position confirmation unless separate feedback is implemented.
 - Missing or invalid frames are ignored; after two seconds without valid data
   the UI reports stale telemetry. Disconnected devices are not simulated.

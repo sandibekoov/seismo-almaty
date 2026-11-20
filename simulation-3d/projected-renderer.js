@@ -29,6 +29,7 @@ class ProjectedRenderer {
         const i0=idx?idx.getX(j):j,i1=idx?idx.getX(j+1):j+1,i2=idx?idx.getX(j+2):j+2;
         const v0=points[i0],v1=points[i1],v2=points[i2];
         if([v0,v1,v2].some(v=>!Number.isFinite(v[0])||v[2]<-1||v[2]>1))continue;
+        if([v0,v1,v2].every(v=>v[0]<0)||[v0,v1,v2].every(v=>v[0]>w)||[v0,v1,v2].every(v=>v[1]<0)||[v0,v1,v2].every(v=>v[1]>h))continue;
         const cross=(v1[0]-v0[0])*(v2[1]-v0[1])-(v1[1]-v0[1])*(v2[0]-v0[0]);
         if(cross>=0)continue;
         a.fromBufferAttribute(attr,i0).applyMatrix4(obj.matrixWorld);b.fromBufferAttribute(attr,i1).applyMatrix4(obj.matrixWorld);c.fromBufferAttribute(attr,i2).applyMatrix4(obj.matrixWorld);
@@ -36,10 +37,10 @@ class ProjectedRenderer {
         const shade=.53+.47*Math.max(0,n.dot(light));
         const glow=Math.min(1,(mat.emissiveIntensity||0)*.28),em=mat.emissive||color;
         const rgb=['r','g','b'].map(k=>Math.round(Math.min(1,color[k]*shade+glow*em[k])*255));
-        faces.push({v:[v0,v1,v2],depth:(v0[2]+v1[2]+v2[2])/3,color:'rgb('+rgb.join(',')+')',alpha,ground:!!obj.userData.ground});
+        faces.push({v:[v0,v1,v2],depth:(v0[2]+v1[2]+v2[2])/3,color:'rgb('+rgb.join(',')+')',alpha,ground:Number(obj.userData.ground)||0});
       }
     });
-    faces.sort((a,b)=>(Number(!!b.ground)-Number(!!a.ground))||b.depth-a.depth);
+    faces.sort((a,b)=>((b.ground||0)-(a.ground||0))||b.depth-a.depth);
     for(const f of faces){
       ctx.globalAlpha=f.alpha;ctx.beginPath();ctx.moveTo(f.v[0][0],f.v[0][1]);
       for(let i=1;i<f.v.length;i++)ctx.lineTo(f.v[i][0],f.v[i][1]);

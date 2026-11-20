@@ -1,234 +1,235 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Seismo Almaty — 3D Building Lab</title>
+<title>SEISMO at KBTU 3D</title>
 <style>
-:root{--bg:#e9eef2;--fg:#13222e;--card:rgba(255,255,255,.92);--mut:#56697a;--ok:#14854f;--bad:#d4352b;--ac:#e8590c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.92);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}}
-:root[data-theme="dark"]{--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.92);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}
+:root{--bg:#dfe9f2;--fg:#13222e;--card:rgba(255,255,255,.93);--mut:#56697a;--ok:#14854f;--bad:#d4352b;--ac:#e8590c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.93);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}}
+:root[data-theme="dark"]{--bg:#0d151c;--fg:#e6eef5;--card:rgba(20,31,41,.93);--mut:#8fa3b5;--ok:#35c27d;--bad:#ff5a4d;--ac:#ff8a3d}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font-family:"Trebuchet MS",Verdana,sans-serif;overflow:hidden;position:relative;font-size:13px}
 #gl{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
 .p{position:absolute;background:var(--card);border-radius:10px;padding:8px 10px}
-#top{left:8px;top:8px;width:min(230px,52vw)}
+#top{left:8px;top:8px;width:min(220px,50vw)}
 #top .r{display:flex;justify-content:space-between;align-items:baseline}
 #acc{font-size:22px}
-#ch{width:100%;height:60px;display:block;margin:4px 0}
+#ch{width:100%;height:56px;display:block;margin:4px 0}
 #rt{color:var(--mut);min-height:16px}
-#chips{right:8px;top:8px;display:grid;gap:5px}
-.c{display:flex;justify-content:space-between;gap:12px}
-.c b{color:var(--ok)}.c.off b{color:var(--bad)}
-#cap{left:8px;right:8px;top:150px;text-align:center;font-size:15px;font-weight:700;display:none}
-#set{left:8px;right:8px;bottom:104px;max-height:46vh;overflow:auto;display:none}
-#set label{display:block;margin:6px 0 2px}
-#set input[type=range]{width:100%}
+#chips{right:8px;top:8px;display:grid;gap:5px;font-size:12px}
+.c{display:flex;justify-content:space-between;gap:10px}.c b{color:var(--ok)}.c.off b{color:var(--bad)}
+#cap{left:8px;right:8px;top:136px;text-align:center;font-size:15px;font-weight:700;display:none}
+#set{left:8px;right:8px;bottom:194px;max-height:40vh;overflow:auto;display:none;z-index:3}
+#set label{display:block;margin:6px 0 2px}#set input[type=range]{width:100%}
 #log{margin-top:8px;font-size:12px;color:var(--mut);line-height:1.5}
+.lb{position:absolute;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;transform:translate(-11px,-11px);cursor:pointer;background:none;border:0;padding:0;color:var(--fg)}
+.lb i{width:22px;height:22px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-style:normal}
+.lb span{background:var(--card);padding:2px 6px;border-radius:6px}
 #bot{position:absolute;left:8px;right:8px;bottom:8px;display:grid;gap:6px}
 #views,#main{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
-button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:10px 12px;cursor:pointer;background:var(--ac);color:#fff;white-space:nowrap}
+#amplitude-panel{position:relative;width:min(100%,540px);box-sizing:border-box;background:var(--card);padding:10px 14px;border-radius:10px;display:grid;gap:6px}
+#amplitude-panel header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#amplitude-panel header b{font-size:18px;font-variant-numeric:tabular-nums;color:var(--ac)}
+#amp-control{position:relative;display:grid;align-items:center}
+#a{width:100%;margin:4px 0;accent-color:var(--ac);cursor:pointer}
+#amp-marker{position:absolute;top:0;left:25%;height:4px;width:2px;background:var(--bad);pointer-events:none}
+#amp-labels{display:flex;justify-content:space-between;color:var(--mut);font-size:11px}
+#amp-help{color:var(--mut);font-size:11px;margin:0}
+@media(max-width:520px){#set{bottom:204px;max-height:35vh}#amplitude-panel{padding:8px 10px}#amp-help{font-size:10px}}
+button.b{font:inherit;font-weight:700;border:0;border-radius:8px;padding:10px 12px;cursor:pointer;background:var(--ac);color:#fff;white-space:nowrap}
 button.s{background:var(--card);color:var(--fg);border:1px solid var(--mut);padding:7px 10px;font-weight:400}
+button.s.on{background:var(--fg);color:var(--bg)}
 button.m{background:var(--fg);color:var(--bg)}
 button:disabled{opacity:.45}
-button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
-:root{--ac:#377fe7}
-body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
 #shell{position:absolute;inset:0 0 auto;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 16px;background:var(--card);z-index:5;border-bottom:1px solid rgba(128,128,128,.2)}
 #shell a{color:var(--fg);text-decoration:none;font-weight:700}#shell strong{font-size:15px}
-#shell select{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--mut);border-radius:7px;padding:6px}
+#shell select,#baud{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--mut);border-radius:7px;padding:6px}
 #lang{margin-left:auto}
 #modebar{position:absolute;left:8px;right:8px;top:52px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;z-index:4}
 #notice{flex:1;min-width:120px;color:var(--mut);font-size:11px}
-#top,#chips{top:102px}#cap{top:244px}
+#top,#chips{top:105px}#cap{top:244px;pointer-events:none}
 #top .r{gap:4px}#top .r small{font-size:11px}
-#set{z-index:3}
-button.active{background:var(--ac);border-color:var(--ac);color:#fff}
-#connect[hidden],#disconnect[hidden],#baud[hidden]{display:none}
+button.s.active{background:var(--ac);border-color:var(--ac);color:#fff}
+#connect[hidden],#disconnect[hidden],#baud[hidden],#amplitude-panel[hidden]{display:none}
 #fallback{display:none;position:absolute;inset:24% 12%;z-index:6;padding:20px;background:var(--card);border-radius:12px}
-#render-mode{position:absolute;right:8px;bottom:106px;color:var(--mut);font-size:11px;z-index:2;background:var(--card);padding:4px 8px;border-radius:6px;display:none}
-@media(max-width:560px){#shell{padding:8px;gap:5px}#shell strong{font-size:13px}#modebar{top:46px}#top,#chips{top:130px}#top{width:43vw}#chips{font-size:11px;gap:3px}#cap{top:271px}#set{bottom:105px}button{padding:8px}}
+#render-mode{position:absolute;right:8px;bottom:196px;color:var(--mut);font-size:11px;z-index:2;background:var(--card);padding:4px 8px;border-radius:6px;display:none;pointer-events:none}
+body.live #render-mode{bottom:94px}
+#live-overlay{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;text-align:center;max-width:75vw;padding:12px 18px;background:var(--card);border-radius:10px;pointer-events:none}
+@media(max-width:650px){#shell{padding:8px;gap:5px}#shell strong{font-size:12px}#modebar{top:50px}#top,#chips{top:150px}#top{width:43vw}#chips{font-size:10px;gap:3px}#cap{top:282px;font-size:12px}#render-mode{bottom:205px}}
 </style></head><body>
 <canvas id="gl"></canvas>
+<div id="lbs"></div>
 <span id="render-mode" data-t="Compatibility renderer">Compatibility renderer</span>
-<header id="shell"><a href="../#simulation" data-t="Back">← Seismo Almaty</a><strong data-t="3D Building Lab">3D Building Lab</strong><select id="lang" aria-label="Language"><option value="kk">ҚАЗ</option><option value="ru">РУС</option><option value="en">ENG</option></select></header>
-<div id="modebar"><button id="mode-sim" class="s active" data-t="Simulation">Simulation</button><button id="mode-live" class="s" data-t="ESP32 Live">ESP32 Live</button><select id="baud" hidden aria-label="Serial baud rate"><option value="115200">115200</option><option value="9600">9600</option></select><button id="connect" class="s" hidden data-t="Connect USB">Connect USB</button><button id="disconnect" class="s" hidden data-t="Disconnect">Disconnect</button><span id="notice" data-t="Demo notice">Educational simulation. Not a real earthquake alert.</span></div>
-<div id="fallback" data-t="3D unavailable">3D could not load. WebGL and an internet connection are required.</div>
-<div class="p" id="top"><div class="r"><small data-t="Accelerometer">Accelerometer</small><b id="acc">0.01 g</b></div><canvas id="ch" width="220" height="60"></canvas><div id="rt">Monitoring</div></div>
+<header id="shell"><a href="../#simulation" data-t="Back">← Seismo Almaty</a><strong data-t="KBTU Campus Lab">KBTU Campus Lab</strong><select id="lang" aria-label="Language"><option value="kk">ҚАЗ</option><option value="ru">РУС</option><option value="en">ENG</option></select></header>
+<div id="modebar"><button id="mode-sim" class="b s active" data-t="Simulation">Simulation</button><button id="mode-live" class="b s" data-t="ESP32 Live">ESP32 Live</button><select id="baud" hidden aria-label="Serial baud rate"><option value="115200">115200</option><option value="9600">9600</option></select><button id="connect" class="b s" hidden data-t="Connect USB">Connect USB</button><button id="disconnect" class="b s" hidden data-t="Disconnect">Disconnect</button><span id="notice" data-t="Demo notice">Educational simulation. Not a real earthquake alert.</span></div>
+<div id="fallback" data-t="3D unavailable">3D could not load.</div><div id="live-overlay" data-t="Live unavailable">No fresh telemetry — model paused.</div>
+<div class="p" id="top"><div class="r"><small data-t="Accelerometer">Accelerometer</small><b id="acc">0.01 g</b></div><canvas id="ch" width="220" height="56"></canvas><div id="rt">Monitoring</div></div>
 <div class="p" id="chips">
-<div class="c" id="c-esp"><span>ESP32</span><b>ARMED</b></div>
-<div class="c" id="c-power"><span data-t="Power">Power</span><b>ON</b></div>
-<div class="c" id="c-gas"><span data-t="Gas">Gas</span><b>OPEN</b></div>
-<div class="c" id="c-lift"><span data-t="Elevator">Elevator</span><b>MOVING</b></div>
-<div class="c" id="c-siren"><span data-t="Alarm">Alarm</span><b>OFF</b></div>
+<div class="c" id="c-esp"><span>ESP32</span><b>ARMED</b></div><div class="c" id="c-power"><span>Power</span><b>ON</b></div><div class="c" id="c-gas"><span>Gas</span><b>OPEN</b></div><div class="c" id="c-lift"><span>Elevator</span><b>MOVING</b></div><div class="c" id="c-siren"><span>Alarm</span><b>OFF</b></div>
 </div>
 <div class="p" id="cap"></div>
 <div class="p" id="set">
-<label><span data-t="Scenario magnitude">Scenario magnitude</span>: <b id="mv">6.5</b><input type="range" id="m" min="3" max="8" step="0.1" value="6.5"></label>
 <label><span data-t="Duration">Duration</span>: <b id="dv">8</b> s<input type="range" id="d" min="2" max="15" step="1" value="8"></label>
 <label><span data-t="Trigger threshold">Trigger threshold</span>: <b id="tv">0.30</b> g<input type="range" id="th" min="0.05" max="0.8" step="0.01" value="0.3"></label>
 <label><span data-t="Confirm time">Confirm time</span>: <b id="fv">0.4</b> s<input type="range" id="cf" min="0.1" max="1.5" step="0.1" value="0.4"></label>
-<label><input type="checkbox" id="fl" checked> <span data-t="False-alarm filter">False-alarm filter (ignore short impacts)</span></label>
-<div id="pk"></div>
-<div id="log"></div>
+<label><input type="checkbox" id="fl" checked> <span data-t="False-alarm filter">False-alarm filter</span></label>
+<label><input type="checkbox" id="snd" checked> <span data-t="Alarm sound">Alarm sound</span></label>
+<div id="pk"></div><div id="log"></div>
 </div>
 <div id="bot">
-<div id="views"><button class="s" data-v="overview">Overview</button><button class="s" data-v="esp">ESP32</button><button class="s" data-v="lift">Elevator</button><button class="s" data-v="gas">Gas</button><button class="s" data-v="power">Power</button><button class="s" data-v="siren">Alarm</button></div>
-<div id="main"><button id="go">Earthquake</button><button id="st" class="m">Footsteps</button><button id="au" class="m">Auto demo</button><button id="rs" class="s">Reset</button><button id="se" class="s">Settings</button></div>
+<section id="amplitude-panel" aria-label="Simulated earthquake amplitude">
+<header><label for="a"><strong>Peak vibration amplitude</strong></label><b id="av">0.84 g</b></header>
+<div id="amp-control"><span id="amp-marker"></span><input id="a" type="range" min="0" max="1.2" step="0.01" value="0.84" aria-describedby="amp-help"></div>
+<div id="amp-labels"><span>0 g</span><span id="amp-threshold">Threshold 0.30 g</span><span>1.20 g</span></div>
+<p id="amp-help">Demo signal only. Change amplitude before or during Earthquake. Reset clears latched protection.</p>
+</section>
+<div id="views"><button class="b s" data-v="campus">Campus</button><button class="b s" data-v="sensor">1 Sensor</button><button class="b s" data-v="gas">2 Gas</button><button class="b s" data-v="power">3 Power</button><button class="b s" data-v="lift">4 Elevator</button><button class="b s" data-v="roof">5 Alarm</button></div>
+<div id="main"><button class="b" id="go">Earthquake</button><button class="b m" id="stp">Footsteps</button><button class="b m" id="au">Auto demo</button><button class="b s" id="cu">Cutaway</button><button class="b s" id="rs">Reset</button><button class="b s" id="se">Settings</button></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="./bridge.js?v=3"></script>
-<script src="./projected-renderer.js?v=2"></script>
+<script src="./bridge.js?v=4"></script>
+<script src="./projected-renderer.js?v=3"></script>
 <script>
 const $=id=>document.getElementById(id);
 if(typeof THREE==='undefined'){$('fallback').style.display='block';Seismo3DLanguage.init();throw new Error('Three.js unavailable')}
 let cv=$('gl'),R;
 try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true})}catch(err){
-  const replacement=document.createElement('canvas');replacement.id='gl';cv.replaceWith(replacement);cv=replacement;
-  R=new ProjectedRenderer(cv);$('render-mode').style.display='block';
+ const replacement=document.createElement('canvas');replacement.id='gl';cv.replaceWith(replacement);cv=replacement;R=new ProjectedRenderer(cv);$('render-mode').style.display='block';
 }
 R.setPixelRatio(Math.min(devicePixelRatio,2));
-const S=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.1,100);
-const V={overview:[.8,.3,14,-.5,2.2,0],esp:[.15,.35,4.2,-.3,.3,1.5],lift:[1,.15,7,1.7,2.2,0],gas:[-.5,.25,6.5,-4,.5,1],power:[1.3,.25,6,3.5,.9,-1.2],siren:[.6,.4,6,0,5,0]};
-let cur=[...V.overview],tg=[...V.overview];
+const S=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.1,200);
+const V={campus:[.55,.28,27,0,3,2],sensor:[.25,.25,6,-4.8,.8,2.6],gas:[-.5,.2,8,-11.5,.8,1],power:[1.1,.25,9,11.5,1.2,1],lift:[.3,.3,10,0,3.2,-1],roof:[.6,.35,9,0,6.4,0]};
+let cur=[...V.campus],tg=[...V.campus];
 function place(){const k=cv.clientWidth<650?1.35:1,a=cur[0],e=cur[1],r=cur[2]*k;cam.position.set(cur[3]+Math.sin(a)*Math.cos(e)*r,cur[4]+Math.sin(e)*r,cur[5]+Math.cos(a)*Math.cos(e)*r);cam.lookAt(cur[3],cur[4],cur[5])}
 function size(){const w=cv.clientWidth,h=cv.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();place()}
 addEventListener('resize',size);
-S.add(new THREE.AmbientLight(0xffffff,.65));
-const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(5,10,6);S.add(dl);
-const world=new THREE.Group();S.add(world);
-const mat=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.6,metalness:.1},o||{}));
-const box=(w,h,d,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);world.add(o);return o};
-const ball=(r,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),m);o.position.set(x,y,z);world.add(o);return o};
-const cylX=(len,r,m,x,y,z)=>{const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,12),m);o.rotation.z=Math.PI/2;o.position.set(x,y,z);world.add(o);return o};
-box(18,.2,16,mat(0x34485a),0,-.1,0).userData.ground=true;
-const slab=mat(0x8aa0b3);
-[.075,1.675,3.275,4.875].forEach(y=>box(5,.15,4,slab,0,y,0));
-[[-2.4,-1.9],[2.4,-1.9],[-2.4,1.9],[2.4,1.9]].forEach(p=>box(.12,4.8,.12,mat(0x5d7488),p[0],2.4,p[1]));
-box(5,4.8,4,mat(0x9fd0ff,{transparent:true,opacity:.1,depthWrite:false}),0,2.4,0);
-box(.95,4.8,.95,mat(0xffffff,{transparent:true,opacity:.14,depthWrite:false}),1.7,2.4,0);
-const cabin=box(.7,.9,.7,mat(0x3d7be0),1.7,2.2,0);
-const rope=box(.03,1,.03,mat(0x222222),1.7,4,0);
-const lampM=[1.1,2.7,4.3].map((y,i)=>{const m=mat(0xfff0b0,{emissive:0xffd54a,emissiveIntensity:1.5});ball(.2,m,-1.2,y,-.8);if(i<3)[-1.5,0,1.1].forEach(x=>box(.6,.5,.04,m,x,y-.1,2.02));return m});
-const pipeM=mat(0xe0a526,{metalness:.4});cylX(5,.09,pipeM,-4,.5,1);
-const valveM=mat(0x1fae6a);ball(.22,valveM,-4,.5,1);
-const handle=box(.06,.45,.06,mat(0x222222),-4,.9,1);
-const gasDots=[];for(let i=0;i<6;i++)gasDots.push(ball(.05,mat(0xffe27a,{emissive:0xffc400}),-6.4+i*.8,.5,1));
-box(1,1,1,mat(0x6b7a88),5.2,.5,-1.2);
-const cableM=mat(0x2aa3ff,{emissive:0x2aa3ff,emissiveIntensity:1});cylX(2,.05,cableM,3.7,.5,-1.2);
-box(.5,.8,.15,mat(0x4a5663),2.6,1,-1.2);
-const lever=box(.06,.3,.06,mat(0xd4352b),2.6,1,-1.1);
-const dome=ball(.3,mat(0xff2d2d,{emissive:0xff0000,emissiveIntensity:0}),0,5.25,0);
-const sl=new THREE.PointLight(0xff2020,0,8);sl.position.set(0,5.3,0);world.add(sl);
-box(.9,.06,.5,mat(0x15171a),-.3,.2,1.5);
-box(.25,.08,.25,mat(0x333a44),-.3,.27,1.5);
-box(.18,.05,.14,mat(0x1f6feb),.05,.26,1.5);
-const ledM=mat(0x00ff88,{emissive:0x00ff88,emissiveIntensity:1});ball(.04,ledM,-.65,.26,1.5);
-const wm=new THREE.LineBasicMaterial({color:0x8fb4d6,transparent:true,opacity:.6});
-[[-1.2,1.1,-.8],[-4,.5,1],[1.7,.8,0],[2.6,1,-1.2],[0,5,0]].forEach(p=>{world.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.3,.3,1.5),new THREE.Vector3(...p)]),wm))});
+S.add(new THREE.AmbientLight(0xffffff,.7));
+const dl=new THREE.DirectionalLight(0xffffff,.85);dl.position.set(10,18,14);S.add(dl);
+const mat=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.7,metalness:.05},o||{}));
+const add=(p,geo,m,x,y,z)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);p.add(o);return o};
+const B=(p,w,h,d,m,x,y,z)=>add(p,new THREE.BoxGeometry(w,h,d),m,x,y,z);
+const Cy=(p,r,h,m,x,y,z)=>add(p,new THREE.CylinderGeometry(r,r,h,16),m,x,y,z);
+const Sp=(p,r,m,x,y,z)=>add(p,new THREE.SphereGeometry(r,14,10),m,x,y,z);
+for(let i=0;i<7;i++){const c=add(S,new THREE.ConeGeometry(14+i%3*4,16+i%4*5,5),mat(0x6f7f94),-60+i*20,6,-55);add(c,new THREE.ConeGeometry(5,6,5),mat(0xf2f6fa),0,c.geometry.parameters.height/2-2.5,0)}
+const rig=new THREE.Group();S.add(rig);
+const groundM=mat(0x5f8050);for(let x=-30;x<=30;x+=10)for(let z=-20;z<=20;z+=10)B(rig,10,.2,10,groundM,x,-.1,z).userData.ground=3;
+B(rig,50,.03,3.2,mat(0x2a2f35),0,.01,8).userData.ground=2;B(rig,16,.03,5,mat(0xbab4a6),0,.02,5).userData.ground=1;
+const asm=B(rig,6,.03,3,mat(0x2fa86a),0,.03,12);asm.userData.ground=1;
+for(let i=0;i<8;i++){const x=-22+i*6.5;if(Math.abs(x)<9)continue;Cy(rig,.2,1.4,mat(0x5b3f2a),x,.7,6);add(rig,new THREE.ConeGeometry(1,2.4,8),mat(0x2e7a3d),x,2.4,6)}
+const bld=new THREE.Group();rig.add(bld);
+const wallM=mat(0xd9d2c3,{transparent:true,opacity:1}),roofM=mat(0x7a7f86);
+B(bld,12,6,5,wallM,0,3,0);[-8,8].forEach(x=>{B(bld,4,4.8,4,wallM,x,2.4,.5);B(bld,4.4,.2,4.4,roofM,x,4.9,.5)});B(bld,12.4,.2,5.4,roofM,0,6.1,0);
+for(let i=0;i<6;i++)Cy(bld,.12,2.4,mat(0xece7dc),-2.5+i,1.2,3);B(bld,6,.2,1.7,roofM,0,2.5,2.9);
+const winM=mat(0x9fd0ff,{emissive:0x9fd0ff,emissiveIntensity:.5});
+for(let f=0;f<5;f++)for(let k=0;k<10;k++){const x=-5.4+k*1.2;if(f<2&&Math.abs(x)<3)continue;B(bld,.7,.55,.05,winM,x,.8+1.2*f,2.52)}
+[-8,8].forEach(x=>{for(let f=0;f<4;f++)[-1.2,1.2].forEach(d=>B(bld,.7,.55,.05,winM,x+d,.8+1.2*f,2.52))});
+const lampM=mat(0xfff0b0,{emissive:0xffd54a,emissiveIntensity:1.6});for(let f=0;f<5;f++)Sp(bld,.14,lampM,-3,.9+1.2*f,-1.5);
+B(bld,.9,6,.9,mat(0xffffff,{transparent:true,opacity:.2,depthWrite:false}),0,3,-1.2);
+const cabin=B(bld,.6,.8,.6,mat(0x3d7be0),0,2.9,-1.2);const lv=[.5,1.7,2.9,4.1,5.3];
+// sensor unit
+const ledM=mat(0x00ff88,{emissive:0x00ff88});B(bld,.5,.4,.2,mat(0x15181c),-4.8,.7,2.6);Sp(bld,.05,ledM,-4.68,.8,2.72);
+const ringM=mat(0x00ff88,{transparent:true,opacity:.5,emissive:0x00ff88});const ring=add(rig,new THREE.TorusGeometry(.7,.04,8,32),ringM,-4.8,.08,3.2);ring.rotation.x=Math.PI/2;
+// gas
+const pipeM=mat(0xe0a526,{metalness:.4});const pipe=Cy(rig,.12,4.5,pipeM,-12.2,.4,1);pipe.rotation.z=Math.PI/2;
+const valveM=mat(0x1fae6a);Sp(rig,.3,valveM,-11.5,.4,1);const handle=B(rig,.08,.6,.08,mat(0x222222),-11.5,.9,1);
+const dots=[];for(let i=0;i<6;i++)dots.push(Sp(rig,.08,mat(0xffe27a,{emissive:0xffc400}),-14,.4,1));
+// power
+B(rig,.25,1,.6,mat(0x4a5663),10.15,1.2,1);const lever=B(rig,.08,.4,.08,mat(0xd4352b),10.3,1.2,1);B(rig,1.4,1.4,1.4,mat(0x6b7a88),13.5,.7,1);
+const cabM=mat(0x2aa3ff,{emissive:0x2aa3ff});const cab=Cy(rig,.06,3,cabM,11.9,.4,1);cab.rotation.z=Math.PI/2;
+// siren
+const dome=Sp(bld,.35,mat(0xff2d2d,{emissive:0xff0000,emissiveIntensity:0}),0,6.5,0);const sl=new THREE.PointLight(0xff2020,0,14);sl.position.set(0,6.8,0);bld.add(sl);
+// people
+const people=[];const pm=mat(0x1f5fd1);
+for(let i=0;i<14;i++){const g=new THREE.Group();Cy(g,.14,.5,pm,0,.3,0);Sp(g,.13,mat(0xf0c9a0),0,.7,0);rig.add(g);people.push({g,i})}
+function resetPeople(){people.forEach(p=>{p.sx=-4+Math.random()*8;p.sz=-1+Math.random()*2.5;p.g.position.set(p.sx,.05,p.sz);p.g.visible=true;p.st=0;p.tx=-2.6+(p.i%7)*.9;p.tz=11.2+Math.floor(p.i/7)*1.2;p.dx=(Math.random()-.5)*.8})}
+resetPeople();
+// labels
+const LB=[['1','Sensor','sensor',[-4.8,1.4,2.6]],['2','Gas valve','gas',[-11.5,1.3,1]],['3','Power','power',[10.2,2,1]],['4','Elevator','lift',[0,6.3,-1.2]],['5','Alarm','roof',[0,7.2,0]]];
+const lbEls=LB.map(l=>{const b=document.createElement('button');b.className='lb';b.innerHTML='<i>'+l[0]+'</i><span>'+l[1]+'</span>';b.onclick=()=>{tg=[...V[l[2]]]};$('lbs').appendChild(b);return{b,p:new THREE.Vector3(...l[3])}});
+function labels(){const w=cv.clientWidth,h=cv.clientHeight;lbEls.forEach(l=>{const v=l.p.clone().project(cam);l.b.style.display=v.z>1||v.z< -1||Math.abs(v.x)>1||Math.abs(v.y)>1?'none':'flex';l.b.style.left=(v.x*.5+.5)*w+'px';l.b.style.top=(-v.y*.5+.5)*h+'px'})}
 let drag=false,lx=0,ly=0;
 cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId)});
 cv.addEventListener('pointerup',()=>drag=false);
 cv.addEventListener('pointermove',e=>{if(!drag)return;tg[0]-=(e.clientX-lx)*.008;tg[1]=Math.max(.05,Math.min(1.3,tg[1]+(e.clientY-ly)*.006));cur[0]=tg[0];cur[1]=tg[1];lx=e.clientX;ly=e.clientY});
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{tg=[...V[b.dataset.v]]});
-const P={m:6.5,d:8,th:.3,cf:.4,fl:true};
-const peak=()=>Math.min(1.2,.015*Math.pow(10,(P.m-3)*.5));
-function sync(){$('mv').textContent=P.m.toFixed(1);$('dv').textContent=P.d;$('tv').textContent=P.th.toFixed(2);$('fv').textContent=P.cf.toFixed(1);const p=peak();$('pk').textContent='Demo peak '+p.toFixed(2)+' g: '+(p*.75>P.th?'likely above threshold':'likely below threshold')}
-['m','d','th','cf'].forEach(k=>$(k).oninput=()=>{P[k]=+$(k).value;sync()});
-$('fl').onchange=()=>{P.fl=$('fl').checked};
-function setP(k,v){P[k]=v;$(k).value=v;sync()}
-sync();
-const logs=[];
-function log(t){const d=new Date();logs.unshift(d.toTimeString().slice(0,8)+'  '+t);if(logs.length>30)logs.pop();$('log').innerHTML=logs.join('<br>')}
+let cut=false;function setCut(v){cut=v;wallM.opacity=v?.13:1;wallM.depthWrite=!v;$('cu').classList.toggle('on',v)}
+$('cu').onclick=()=>setCut(!cut);
+const P={a:.84,d:8,th:.3,cf:.4,fl:true};
+const peak=()=>P.a;
+function sync(){$('av').textContent=P.a.toFixed(2)+' g';$('amp-threshold').textContent='Threshold '+P.th.toFixed(2)+' g';$('amp-marker').style.left=(P.th/1.2*100)+'%';$('dv').textContent=P.d;$('tv').textContent=P.th.toFixed(2);$('fv').textContent=P.cf.toFixed(1);const p=peak();$('pk').textContent='Set peak target '+p.toFixed(2)+' g · '+(p*.75>P.th?'likely above threshold':p<P.th?'likely below threshold':'near threshold')+' (simulation)'}
+['a','d','th','cf'].forEach(k=>$(k).oninput=()=>{P[k]=+$(k).value;sync()});$('fl').onchange=()=>{P.fl=$('fl').checked};
+function setP(k,v){P[k]=v;$(k).value=v;sync()}sync();
+const logs=[];function log(t){logs.unshift(new Date().toTimeString().slice(0,8)+'  '+t);if(logs.length>30)logs.pop();$('log').innerHTML=logs.join('<br>')}
 function chip(id,ok,txt){const c=$('c-'+id);c.classList.toggle('off',!ok);c.querySelector('b').textContent=txt}
 function cap(t){const c=$('cap');c.textContent=t;c.style.display=t?'block':'none'}
 $('se').onclick=()=>{const s=$('set');s.style.display=s.style.display==='block'?'none':'block'};
-let st='idle',ev=null,cnt=0,prot=false,acc=.01,liftY=2.2,last=0,T=0,demo=null,trT=0;
-const sw={power:true,gas:true,lift:true,siren:false},floors=[.6,2.2,3.8],buf=new Array(160).fill(0);
-function start(type){if(st!=='idle'||liveMode)return;st='run';cnt=0;ev={type,t0:T,dur:type==='step'?.25:P.d,pk:type==='step'?.55:peak(),hit:false};
-log(type==='step'?'Test: footsteps / short impact':'Earthquake started, M'+P.m.toFixed(1));$('rt').textContent='Vibration detected';$('go').disabled=true;$('st').disabled=true}
-function trigger(e){prot=true;trT=T;Object.assign(sw,{power:false,gas:false,lift:false,siren:true});
-liftY=floors.reduce((a,b)=>Math.abs(b-cabin.position.y)<Math.abs(a-cabin.position.y)?b:a);
-$('rt').textContent='Protection active in '+e.toFixed(1)+' s';
-log('Quake confirmed. Reaction '+e.toFixed(1)+' s');log('Power disconnected');log('Gas valve closed');log('Elevator sent to nearest floor');log('Alarm on, app notified');
+let st='idle',ev=null,cnt=0,prot=false,acc=.01,liftY=2.9,last=0,T=0,trT=0,demo=null,ac=null,osc=null;
+const sw={power:true,gas:true,lift:true,siren:false},buf=new Array(150).fill(0);
+function beep(on){try{if(on){if(!$('snd').checked)return;ac=ac||new (window.AudioContext||window.webkitAudioContext)();osc=ac.createOscillator();const g=ac.createGain();g.gain.value=.05;osc.type='square';osc.connect(g);g.connect(ac.destination);osc.start()}else if(osc){osc.stop();osc=null}}catch(e){}}
+function start(type){if(st!=='idle'||liveMode)return;st='run';cnt=0;ev={type,t0:T,dur:type==='step'?.25:P.d,pk:type==='step'?.55:peak(),hit:false};log(type==='step'?'Test: footsteps / short impact':'Demo earthquake, '+P.a.toFixed(2)+' g target');$('rt').textContent='Vibration detected';$('go').disabled=$('stp').disabled=true;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+function trigger(e){prot=true;trT=T;Object.assign(sw,{power:false,gas:false,lift:false,siren:true});liftY=lv.reduce((a,b)=>Math.abs(b-cabin.position.y)<Math.abs(a-cabin.position.y)?b:a);beep(true);
+$('rt').textContent='Protection active in '+e.toFixed(1)+' s';['Quake confirmed, reaction '+e.toFixed(1)+' s','Power disconnected','Gas valve closed','Elevator sent to nearest floor','Demo alarm active','Evacuation started'].forEach(log);
 chip('esp',false,'TRIGGERED');chip('power',false,'CUT');chip('gas',false,'CLOSED');chip('lift',false,'STOPPED');chip('siren',false,'ALARM')}
-function reset(){st='idle';ev=null;prot=false;cnt=0;demo=null;cap('');buf.fill(0);Object.assign(sw,{power:true,gas:true,lift:true,siren:false});
-world.position.set(0,0,0);world.rotation.z=0;acc=.01;$('go').disabled=false;$('st').disabled=false;$('au').disabled=false;$('rt').textContent='Monitoring';
+function reset(){st='idle';ev=null;prot=false;cnt=0;demo=null;cap('');beep(false);Object.assign(sw,{power:true,gas:true,lift:true,siren:false});rig.position.set(0,0,0);bld.rotation.z=0;acc=.01;buf.fill(0);$('go').disabled=$('stp').disabled=$('au').disabled=false;$('rt').textContent='Monitoring';resetPeople();
 chip('esp',true,'ARMED');chip('power',true,'ON');chip('gas',true,'OPEN');chip('lift',true,'MOVING');chip('siren',true,'OFF');log('System reset')}
-$('go').onclick=()=>start('quake');$('st').onclick=()=>start('step');$('rs').onclick=()=>{reset();tg=[...V.overview]};
-const steps=[[0,()=>{setP('m',6.5);setP('d',8);setP('th',.3);setP('cf',.4);$('fl').checked=true;P.fl=true;tg=[...V.overview];cap('Normal operation: sensor monitors vibration')}],
-[3,()=>{tg=[...V.esp];cap('ESP32 reads the accelerometer and checks the threshold')}],
-[6.5,()=>{tg=[...V.overview];start('step');cap('Footsteps: short spike is filtered, no false alarm')}],
-[10,()=>{start('quake');cap('Magnitude 6.5 earthquake')}],
-[11.5,()=>{tg=[...V.power];cap('Power disconnected')}],
-[14,()=>{tg=[...V.gas];cap('Gas valve closed')}],
-[17,()=>{tg=[...V.lift];cap('Elevator stops at the nearest floor')}],
-[20,()=>{tg=[...V.siren];cap('Alarm active, dashboard and app notified')}],
-[25,()=>{tg=[...V.overview];cap('SEISMO: the system acts, not just warns')}],
-[30,()=>{demo=null;cap('');$('au').disabled=false}]];
-$('au').onclick=()=>{if(liveMode)return;reset();demo={t:0,i:0};$('au').disabled=true};
+$('go').onclick=()=>{if(!demo)start('quake')};$('stp').onclick=()=>{if(!demo)start('step')};$('rs').onclick=()=>{reset();setCut(false);tg=[...V.campus]};
+const steps=[[0,()=>{setCut(false);setP('d',8);setP('th',.3);setP('cf',.4);$('fl').checked=P.fl=true;tg=[...V.campus];cap('SEISMO installed on a campus building (schematic model)')}],
+[3,()=>{tg=[...V.sensor];cap('1: ESP32 with accelerometer monitors vibration')}],
+[6.5,()=>{start('step');cap('Footsteps: short spike is filtered, no false alarm')}],
+[10,()=>{tg=[...V.campus];start('quake');cap('Simulated earthquake — adjustable peak vibration')}],
+[11.5,()=>{tg=[...V.power];cap(prot?'3: Power disconnected':'3: Power')}],
+[14,()=>{tg=[...V.gas];cap(prot?'2: Gas valve closed':'2: Gas valve')}],
+[16.5,()=>{setCut(true);tg=[...V.lift];cap(prot?'4: Elevator stops at the nearest floor':'4: Elevator')}],
+[19,()=>{setCut(false);tg=[...V.roof];cap(prot?'5: Demo alarm active':'5: Alarm')}],
+[21.5,()=>{tg=[...V.campus];cap(prot?'People evacuate to the assembly point':'Below threshold: no action')}],
+[29,()=>{cap('SEISMO: the system acts, not just warns')}],[33,()=>{demo=null;cap('');$('au').disabled=false;$('go').disabled=$('stp').disabled=st!=='idle'}]];
+$('au').onclick=()=>{if(liveMode)return;reset();demo={t:0,i:0};$('au').disabled=$('go').disabled=$('stp').disabled=true};
 let liveMode=false,lastLive=0,liveFrame=null,liveStatus='';
 function updateLiveUI(status){
-  if(liveStatus===status)return;
-  liveStatus=status;
-  $('rt').textContent=status;
-  if(!liveFrame || performance.now()-lastLive>2000){
-    ['esp','power','gas','lift','siren'].forEach(id=>chip(id,false,'UNKNOWN'));
-    $('acc').textContent='—';
-  }
+ liveStatus=status;$('rt').textContent=status;
+ const fresh=liveFrame&&performance.now()-lastLive<=2000;
+ $('live-overlay').style.display=fresh?'none':'block';
+ if(!fresh){['esp','power','gas','lift','siren'].forEach(id=>chip(id,false,'UNKNOWN'));$('acc').textContent='—';buf.fill(0);draw()}
 }
 function applyTelemetry(frame){
-  if(!liveMode)return;
-  liveFrame=frame;lastLive=performance.now();acc=frame.accelerationG;buf.push(acc);buf.shift();draw();
-  prot=frame.state==='EMERGENCY'||frame.state==='FAULT';
-  Object.assign(sw,{power:frame.powerOn,gas:frame.gasOpen,lift:frame.liftMoving,siren:frame.alarmOn});
-  liftY=floors[frame.floor-1];
-  chip('esp',!prot,frame.state);
-  chip('power',sw.power,sw.power?'ON':'CUT');
-  chip('gas',sw.gas,sw.gas?'OPEN':'CLOSED');
-  chip('lift',sw.lift,sw.lift?'MOVING':'STOPPED');
-  chip('siren',!sw.siren,sw.siren?'ALARM':'OFF');
-  updateLiveUI('Live telemetry');
+ if(!liveMode)return;
+ liveFrame=frame;lastLive=performance.now();acc=frame.accelerationG;buf.push(acc);buf.shift();draw();
+ prot=frame.state==='EMERGENCY'||frame.state==='FAULT';
+ Object.assign(sw,{power:frame.powerOn,gas:frame.gasOpen,lift:frame.liftMoving,siren:frame.alarmOn});liftY=lv[frame.floor-1];
+ chip('esp',!prot&&frame.state!=='WARNING',frame.state);chip('power',sw.power,sw.power?'ON':'CUT');chip('gas',sw.gas,sw.gas?'OPEN':'CLOSED');chip('lift',sw.lift,sw.lift?'MOVING':'STOPPED');chip('siren',!sw.siren,sw.siren?'ALARM':'OFF');
+ updateLiveUI('Live telemetry');
 }
-const link=new SeismoSerial(applyTelemetry, status=>{if(liveMode){if(status==='Disconnected'||status==='Connection failed'){liveFrame=null;$('disconnect').hidden=true}updateLiveUI(status)}});
-$('mode-live').onclick=()=>{if(liveMode)return;reset();liveMode=true;liveFrame=null;lastLive=0;
-  $('mode-live').classList.add('active');$('mode-sim').classList.remove('active');$('connect').hidden=false;$('baud').hidden=false;
-  ['go','st','au','rs','se'].forEach(id=>$(id).disabled=true);$('set').style.display='none';$('notice').dataset.t='Live notice';$('notice').textContent='Live notice';liveStatus='';draw();updateLiveUI('Waiting for ESP32')};
-$('mode-sim').onclick=async()=>{if(!liveMode)return;liveMode=false;await link.disconnect();liveFrame=null;
-  $('mode-live').classList.remove('active');$('mode-sim').classList.add('active');$('connect').hidden=true;$('disconnect').hidden=true;$('baud').hidden=true;
-  $('rs').disabled=false;$('se').disabled=false;$('notice').dataset.t='Demo notice';$('notice').textContent='Demo notice';reset()};
+const link=new SeismoSerial(applyTelemetry,status=>{if(liveMode){if(status==='Disconnected'||status==='Connection failed'){liveFrame=null;$('disconnect').hidden=true}updateLiveUI(status)}});
+function setModeUI(live){$('mode-sim').classList.toggle('active',!live);$('mode-live').classList.toggle('active',live);document.body.classList.toggle('live',live);$('connect').hidden=$('baud').hidden=!live;$('disconnect').hidden=true;['go','stp','au','rs','se','a'].forEach(id=>$(id).disabled=live);$('amplitude-panel').hidden=live;$('set').style.display='none';$('notice').dataset.t=live?'Live notice':'Demo notice';$('notice').textContent=$('notice').dataset.t}
+$('mode-live').onclick=()=>{if(liveMode)return;reset();liveMode=true;liveFrame=null;lastLive=0;setModeUI(true);people.forEach(p=>p.g.visible=false);updateLiveUI('Waiting for ESP32')};
+$('mode-sim').onclick=async()=>{if(!liveMode)return;liveMode=false;await link.disconnect();liveFrame=null;setModeUI(false);$('live-overlay').style.display='none';reset()};
 $('connect').onclick=async()=>{if(!liveMode)return;$('connect').disabled=true;await link.connect(+$('baud').value);$('connect').disabled=false;$('disconnect').hidden=!link.connected()};
 $('disconnect').onclick=async()=>{await link.disconnect();liveFrame=null;updateLiveUI('Disconnected');$('disconnect').hidden=true};
-function draw(){const c=$('ch'),x=c.getContext('2d'),w=c.width,h=c.height;x.clearRect(0,0,w,h);const sc=h/1.2;
-x.strokeStyle='rgba(128,128,128,.35)';x.strokeRect(.5,.5,w-1,h-1);
+function draw(){const c=$('ch'),x=c.getContext('2d'),w=c.width,h=c.height,sc=h/1.2;x.clearRect(0,0,w,h);x.strokeStyle='rgba(128,128,128,.35)';x.strokeRect(.5,.5,w-1,h-1);
 if(!liveMode){x.strokeStyle='#ff5a4d';x.setLineDash([4,3]);x.beginPath();x.moveTo(0,h-P.th*sc);x.lineTo(w,h-P.th*sc);x.stroke();x.setLineDash([])}
+if(liveMode&&(!liveFrame||performance.now()-lastLive>2000))return;
 x.strokeStyle='#35c27d';x.lineWidth=1.5;x.beginPath();buf.forEach((v,i)=>{const px=i/(buf.length-1)*w,py=h-Math.min(1.2,v)*sc;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke();x.lineWidth=1}
-function loop(ms){requestAnimationFrame(loop);const t=ms/1000,dt=Math.min(.05,t-last);last=t;T=t;
+function loop(ms){requestAnimationFrame(loop);const t=ms/1000,dt=Math.min(.05,Math.max(0,t-last));last=t;T+=dt;
 for(let i=0;i<6;i++)cur[i]+=(tg[i]-cur[i])*.07;place();
 if(demo){demo.t+=dt;while(demo&&demo.i<steps.length&&demo.t>=steps[demo.i][0]){steps[demo.i][1]();if(demo)demo.i++}}
-let amp=0;
-if(liveMode){
-  world.position.set(0,0,0);world.rotation.z=0;
-  if(liveFrame&&performance.now()-lastLive>2000&&link.connected()){updateLiveUI('Telemetry stale')}
-  else if(liveFrame&&performance.now()-lastLive<=2000){const shake=Math.min(1.2,acc);world.position.x=Math.sin(t*46)*.08*shake;world.rotation.z=Math.sin(t*41)*.005*shake}
-}else if(ev){const e=T-ev.t0;amp=ev.type==='step'?(e<.25?1:0):Math.min(1,e/.5)*(e<ev.dur-1?1:Math.max(0,ev.dur-e));
-const sx=.1*ev.pk;world.position.x=Math.sin(e*46)*sx*amp;world.position.z=Math.cos(e*38)*sx*.55*amp;world.rotation.z=Math.sin(e*41)*.007*ev.pk*amp;
-acc=.012*(1+Math.random())+ev.pk*amp*(.75+.25*Math.random());
-if(acc>P.th)ev.hit=true;
-if(!prot){if(acc>P.th)cnt+=dt;else cnt=Math.max(0,cnt-dt);const need=P.fl?P.cf:0;if(acc>P.th&&cnt>=need)trigger(e)}
-if(e>ev.dur){if(!prot){$('rt').textContent=ev.hit?'Short impact filtered: no action':'Below threshold: no action';log(ev.hit?'Impact ignored by filter':'Vibration below threshold');st='idle';$('go').disabled=false;$('st').disabled=false}else st='done';ev=null}}
-else{acc=.012*(1+Math.random());world.position.set(0,0,0);world.rotation.z=0}
+if(liveMode){rig.position.set(0,0,0);bld.rotation.z=0;if(liveFrame&&performance.now()-lastLive>2000&&liveStatus!=='Telemetry stale')updateLiveUI('Telemetry stale')}
+else if(ev){if(ev.type==='quake')ev.pk=peak();const e=T-ev.t0,amp=ev.type==='step'?(e<.25?1:0):Math.min(1,e/.5)*(e<ev.dur-1?1:Math.max(0,ev.dur-e)),sx=.1*ev.pk;
+rig.position.x=Math.sin(e*46)*sx*amp;rig.position.z=Math.cos(e*38)*sx*.55*amp;bld.rotation.z=Math.sin(e*5)*.01*ev.pk*amp;
+acc=.012*(1+Math.random())+ev.pk*amp*(.75+.25*Math.random());if(acc>P.th)ev.hit=true;
+if(!prot){if(acc>P.th)cnt+=dt;else cnt=Math.max(0,cnt-dt);if(acc>P.th&&cnt>=(P.fl?P.cf:0))trigger(e)}
+if(e>ev.dur){if(!prot){$('rt').textContent=ev.hit?'Short impact filtered: no action':'Below threshold: no action';log(ev.hit?'Impact ignored by filter':'Vibration below threshold');st='idle';$('go').disabled=$('stp').disabled=!!demo}else st='done';ev=null}}
+else{acc=.012*(1+Math.random());rig.position.set(0,0,0);bld.rotation.z=0}
 const fresh=!liveMode||(liveFrame&&performance.now()-lastLive<=2000);
-if(fresh){if(!liveMode){buf.push(acc);buf.shift();draw()}$('acc').textContent=acc.toFixed(2)+' g'}
-if(fresh){
-if(liveMode){cabin.position.y+=(liftY-cabin.position.y)*.06}
-else if(sw.lift)cabin.position.y=2.2+1.6*Math.sin(t*.6);else cabin.position.y+=(liftY-cabin.position.y)*.06;
-rope.scale.y=4.8-(cabin.position.y+.45);rope.position.y=cabin.position.y+.45+rope.scale.y/2;
-lampM.forEach(m=>{m.emissiveIntensity+=((sw.power?1.5:0)-m.emissiveIntensity)*.15;m.color.set(sw.power?0xfff0b0:0x35434f)});
-cableM.emissiveIntensity+=((sw.power?1:0)-cableM.emissiveIntensity)*.15;cableM.color.set(sw.power?0x2aa3ff:0x555555);
-lever.rotation.z+=((sw.power?0:1.2)-lever.rotation.z)*.15;
+if(!liveMode){buf.push(acc);buf.shift();draw()}if(fresh){$('acc').textContent=acc.toFixed(2)+' g';
+if(!liveMode&&prot)people.forEach(p=>{const d=T-trT-1.5-p.i*.25;if(d<0)return;const tx=p.st===0?p.dx:p.tx,tz=p.st===0?2.9:p.tz,vx=tx-p.g.position.x,vz=tz-p.g.position.z,l=Math.hypot(vx,vz);if(l<.1){if(p.st===0)p.st=1}else{const s=Math.min(l,2.4*dt);p.g.position.x+=vx/l*s;p.g.position.z+=vz/l*s}});
+if(liveMode)cabin.position.y+=(liftY-cabin.position.y)*.06;else if(sw.lift)cabin.position.y=2.9+2.4*Math.sin(t*.6);else cabin.position.y+=(liftY-cabin.position.y)*.06;
+lampM.emissiveIntensity+=((sw.power?1.6:0)-lampM.emissiveIntensity)*.15;winM.emissiveIntensity+=((sw.power?.5:0)-winM.emissiveIntensity)*.15;
+lampM.color.set(sw.power?0xfff0b0:0x35434f);winM.color.set(sw.power?0x9fd0ff:0x35434f);
+cabM.emissiveIntensity+=((sw.power?1:0)-cabM.emissiveIntensity)*.15;cabM.color.set(sw.power?0x2aa3ff:0x555555);lever.rotation.z+=((sw.power?0:1.2)-lever.rotation.z)*.15;
 valveM.color.set(sw.gas?0x1fae6a:0xd4352b);handle.rotation.z+=((sw.gas?0:Math.PI/2)-handle.rotation.z)*.12;pipeM.color.set(sw.gas?0xe0a526:0x7a6a4a);
-gasDots.forEach((d,i)=>{d.visible=sw.gas;d.position.x=-6.4+((i*.8+t*1.2)%4.8)});
-const f=sw.siren?(Math.sin(t*12)>0?1:0):0;dome.material.emissiveIntensity=f*2;sl.intensity=f*2.5;
-ledM.color.set(prot?0xff3b30:0x00ff88);ledM.emissive.set(prot?0xff3b30:0x00ff88);ledM.emissiveIntensity=.6+.4*Math.sin(t*8)}
-R.render(S,cam)}
+dots.forEach((d,i)=>{d.visible=sw.gas;d.position.x=-14.2+((i*.75+t*1.3)%4.4)});
+const f=sw.siren?(Math.sin(t*12)>0?1:0):0;dome.material.emissiveIntensity=f*2;sl.intensity=f*3;if(osc)osc.frequency.value=Math.sin(t*6)>0?880:640;
+ledM.color.set(prot?0xff3b30:0x00ff88);ledM.emissive.set(prot?0xff3b30:0x00ff88);ringM.color.set(prot?0xff3b30:0x00ff88);ringM.emissive.set(prot?0xff3b30:0x00ff88);ring.scale.setScalar(1+.25*Math.sin(t*3));ringM.opacity=.55-.25*Math.sin(t*3);}
+R.render(S,cam);labels()}
 size();log('System armed');Seismo3DLanguage.init();requestAnimationFrame(loop);
 </script></body></html>
