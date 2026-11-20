@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="./approved-ui-v3.css?v=2">
   <link rel="stylesheet" href="./brand-hero-v4.css?v=2">
   <link rel="stylesheet" href="./language.css?v=1">
+  <link rel="stylesheet" href="./desktop-v1.css?v=1">
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -59,6 +60,7 @@
       <button class="nav-link" data-page="map" type="button">Карта</button>
       <button class="nav-link" data-page="events" type="button">События</button>
       <button class="nav-link" data-page="instructions" type="button">Инструкции</button>
+      <button class="nav-link desktop-sim-link" data-page="simulation" type="button">3D-симуляция</button>
       <button class="nav-link" data-page="profile" type="button">Профиль</button>
     </nav>
     <div class="header-actions"><select class="seismo-language" data-language-select aria-label="Язык" title="Язык"><option value="kk">ҚАЗ</option><option value="ru" selected>РУС</option><option value="en">ENG</option></select><span class="data-pill"><span class="data-dot"></span><span id="headerFeed">Источник загружается</span></span><button class="icon-button profile-shortcut" type="button" data-page="profile" aria-label="Открыть профиль"><svg class="icon"><use href="#i-user"></use></svg></button></div>
@@ -77,7 +79,7 @@
           <div class="eyebrow">SEISMO / ALMATY <span>●</span> УЧЕБНЫЙ ПРОЕКТ</div>
           <h1 id="homeHeading">Сейсмическая безопасность <em>Алматы</em></h1>
           <p>Отслеживайте зарегистрированные землетрясения, находите ориентиры на карте и изучайте действия при толчках.</p>
-          <div class="hero-actions"><button class="button button-primary" type="button" data-page="map"><svg class="icon"><use href="#i-map"></use></svg> Открыть карту <svg class="icon arrow"><use href="#i-arrow"></use></svg></button><button class="button button-white" type="button" data-page="instructions">Как действовать</button></div>
+          <div class="hero-actions"><button class="button button-primary" type="button" data-page="map"><svg class="icon"><use href="#i-map"></use></svg> Открыть карту</button><button class="button button-white" type="button" data-page="simulation"><svg class="icon"><use href="#i-wave"></use></svg> 3D-симуляция</button><button class="button button-white" type="button" data-page="instructions">Как действовать</button></div>
         </div>
         <div class="mountain-visual" aria-hidden="true"><div class="sky-disc"></div><svg viewBox="0 0 680 335" preserveAspectRatio="xMidYMax slice"><path fill="#aacbf5" d="M0 268 103 182 145 210 267 57 349 199 442 71 534 204 590 113 680 236v99H0z"/><path fill="#f8fcff" d="m212 119 55-62 49 86-45-19-24 22-18-12ZM407 121l35-50 43 72-39-17-20 15ZM566 148l24-35 33 59-30-18-12 12Z"/><path fill="#83b3e7" d="M0 289 95 227 151 246 230 195 298 253 371 196 464 255 542 212 612 247 680 203v132H0z"/><path fill="#d8eaff" d="M0 299 92 265 170 277 267 248 355 288 434 253 517 287 602 265 680 289v46H0z"/><path fill="#9cbdd8" opacity=".65" d="M0 335v-19h30v-11h15v-12h30v10h17v-22h23v15h20v-27h21v29h20v-12h23v26h18v-34h16v31h25v-17h32v30h20v-27h24v28h40v-19h23v31h18v-34h23v25h26v-32h20v31h50v-21h21v24h32v-17h24v28z"/><path d="M565 95v210m-14 0h28M558 131h14M559 166h12" stroke="#6388aa" stroke-width="4"/><path d="M565 95 574 306h-18z" fill="#6388aa"/><path d="M565 94v-35" stroke="#6388aa" stroke-width="2"/></svg></div>
         <div class="hero-status surface">
@@ -97,6 +99,7 @@
         <article class="surface map-preview" role="button" tabindex="0" data-page="map" aria-label="Перейти к интерактивной карте Алматы">
           <div class="section-top"><div><span class="eyebrow">НА КАРТЕ</span><h2>Алматы и окрестности</h2></div><span class="round-arrow"><svg class="icon"><use href="#i-arrow"></use></svg></span></div>
           <div class="map-preview-art" aria-hidden="true"><div class="preview-grid"></div><span class="preview-city">АЛМАТЫ</span><span class="preview-pin p1"></span><span class="preview-pin p2"></span><span class="preview-pin p3"></span><span class="preview-pin user"></span></div>
+          <div class="desktop-map-preview"><div id="homeMapPreview"></div><div id="homeMapFallback" class="preview-fallback">Загрузка карты…</div></div>
           <p class="muted">События USGS и возможные ориентиры для сбора. Доступна интерактивная карта.</p>
         </article>
         <article class="surface latest-card">
@@ -187,13 +190,13 @@
         <div class="sim-disclaimer"><svg class="icon"><use href="#i-info"></use></svg><span><strong>Только демонстрация.</strong> Сценарии вымышлены: это не события USGS, не прогноз и не управление реальным зданием. Значения M не измеряются датчиком.</span></div>
       </div>
       <div class="sim-layout">
-        <div class="sim-primary"><h2>Выбери сценарий</h2><div class="sim-presets" role="group" aria-label="Учебные сценарии">
+        <div class="sim-primary"><div class="sim-setup"><h2>Выбери сценарий</h2><div class="sim-presets" role="group" aria-label="Учебные сценарии">
           <button class="sim-preset sim-preset--soft" type="button" data-sim-level="3" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-wave"></use></svg></span><span class="sim-preset-copy"><strong>M 3.0</strong><span>Слабый · наблюдение</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
           <button class="sim-preset sim-preset--warning" type="button" data-sim-level="4.5" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-alert"></use></svg></span><span class="sim-preset-copy"><strong>M 4.5</strong><span>Умеренный · WARNING</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
           <button class="sim-preset sim-preset--critical" type="button" data-sim-level="6" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-shield"></use></svg></span><span class="sim-preset-copy"><strong>M 6.0</strong><span>Сильный · EMERGENCY</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
         </div>
         <article class="surface sim-control"><div class="sim-control-head"><label for="simMagnitude">Магнитуда сценария</label><strong id="simMagnitudeValue">M 0.0</strong></div><input type="range" id="simMagnitude" min="0" max="8" step="0.1" value="0"><div class="sim-scale"><span>0</span><span>3.0</span><span>4.5</span><span>6.0</span><span>8.0</span></div><p>Условный уровень землетрясения. Отпустите ползунок для запуска.</p><div class="sim-control-buttons"><button id="simAuto" class="button button-secondary" type="button">Автодемо</button><button id="simPause" class="button button-secondary" type="button" disabled>Остановить толчки</button><button id="simStop" type="button" class="button sim-stop" disabled>Сбросить</button></div></article>
-        <article class="surface sim-campus-card"><div class="sim-campus-head"><div><span class="eyebrow">DIGITAL TWIN · KBTU</span><h2>3D-модель здания</h2><small id="simPhase">Ожидание сценария</small> <strong id="simEvacCount" hidden style="font-size:12px;color:#168a59"></strong></div><a class="button button-secondary" href="./simulation-3d/?v=evac">На весь экран ↗</a></div><iframe id="simCampus" title="3D-модель здания" loading="lazy" allow="fullscreen"></iframe></article>
+        </div><article class="surface sim-campus-card"><div class="sim-campus-head"><div><span class="eyebrow">DIGITAL TWIN · KBTU</span><h2>3D-модель здания</h2><small id="simPhase">Ожидание сценария</small> <strong id="simEvacCount" hidden style="font-size:12px;color:#168a59"></strong></div><a class="button button-secondary" href="./simulation-3d/?v=desktop">На весь экран ↗</a></div><iframe id="simCampus" title="3D-модель здания" loading="lazy" allow="fullscreen"></iframe></article>
         <div class="sim-active-status" id="simActivePanel" aria-live="polite">
           <div class="sim-active-heading"><span class="sim-live-dot"></span><strong id="simState">Нет активной симуляции</strong><span id="simModeLabel">OFF</span></div>
           <p id="simDescription">Выберите сценарий выше. Отдельная учебная карточка появится в событиях, а тестовая точка — на карте.</p>
@@ -232,9 +235,9 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по Internet of Things (IoT) и автоматизации. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Погода: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Фотография гор: <a href="https://unsplash.com/photos/uma-cordilheira-coberta-de-neve-sob-um-ceu-azul-WFiuUnN-3Y8" target="_blank" rel="noopener noreferrer">Sergey Zigle (Unsplash License)</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="./translations.js?v=4" defer></script>
+  <script src="./translations.js?v=5" defer></script>
   <script src="./language.js?v=1" defer></script>
   <script src="./simulation-state.js?v=2" defer></script>
-  <script src="./site.js?v=11" defer></script>
+  <script src="./site.js?v=12" defer></script>
 </body>
 </html>
