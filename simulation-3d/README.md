@@ -4,10 +4,14 @@ The team's Three.js model is an educational visualisation of an ESP32 + MPU6050
 building prototype. Simulation is independent of real earthquake feeds. No
 commands are issued to the device, no real alarm is sent.
 The campus is a schematic educational model with five virtual floors. The
-0–1.2 g amplitude slider controls the simulated peak vibration only, including
-while an event is running. It does not represent earthquake magnitude.
-The demo threshold and confirmation time do not configure the actual ESP32.
-Auto Demo runs once to completion; Reset clears the simulated protection latch.
+embedded and full-screen model, resident page, map and events share one scenario
+through simulation-state.js and same-origin localStorage. Select M 0–8 or one
+of the M 3.0/4.5/6.0 presets. These are training labels; the synthetic signal
+0–100 is not calculated physical acceleration or a measured magnitude.
+M 6 and above first produce WARNING for two seconds, then EMERGENCY; the
+protection latch remains until Reset. Stop shaking preserves the latch.
+Auto Demo progresses through three levels and ends shaking after 18 seconds.
+The demo does not configure the actual ESP32. Live telemetry is separate.
 Kazakh, Russian and English use the main site's stored language preference.
 On devices without WebGL, the same scene and camera are projected onto a
 Canvas 2D surface with simplified lighting.

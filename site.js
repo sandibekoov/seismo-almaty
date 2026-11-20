@@ -100,7 +100,7 @@
     });
     if(page==='map')requestAnimationFrame(()=>{ensureMap();if(state.map)state.map.invalidateSize()});
     if(page==='events')renderEvents();if(page==='places')renderPlaces();
-    if(page==='simulation')renderSimulation();
+    if(page==='simulation'){const frame=$('simCampus');if(frame&&!frame.getAttribute('src'))frame.src='./simulation-3d/?embed=1';renderSimulation()}
     if(page==='profile')fillProfile();
     window.scrollTo({top:0,behavior:'instant'});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
@@ -394,14 +394,13 @@
     $('mapSheet').innerHTML=sheetHeader('self',label,'Ваше сохранённое местоположение')
       +'<p class="sheet-info">'+Number(loc.lat).toFixed(5)+', '+Number(loc.lng).toFixed(5)+'</p>';
   }
-  function syntheticSignal(amp){
-    if(!amp)return 'M0 38 H340';
+  function syntheticSignal(s){
+    if(!s?.shaking)return 'M0 38 H340';
     const pts=[];
-    // Deterministic synthetic waveform (not data acquired from sensors).
+    const t=Date.now();
     for(let x=0;x<=340;x+=3){
-      const phase=x/340*Math.PI*9;
-      const n=(Math.sin(phase)*.65+Math.sin(phase*2.33+.7)*.22+Math.sin(phase*4.9+1.4)*.13);
-      pts.push((x===0?'M':'L')+x+' '+(38-n*amp*.34).toFixed(2));
+      const n=SeismoTraining.wave(s,t-(340-x)*6);
+      pts.push((x===0?'M':'L')+x+' '+(38-n*.34).toFixed(2));
     }
     return pts.join(' ');
   }
@@ -427,8 +426,13 @@
     $('simState').textContent=v?'СИМУЛЯЦИЯ · M '+v.mag.toFixed(1):'Нет активной симуляции';
     $('simModeLabel').textContent=v?v.level:'OFF';
     $('simDescription').textContent=v?v.caption:'Выберите сценарий выше. Отдельная учебная карточка появится в событиях, а тестовая точка — на карте.';
+    if(document.activeElement!==$('simMagnitude'))$('simMagnitude').value=v?v.mag:0;
+    $('simMagnitudeValue').textContent='M '+(v?v.mag:0).toFixed(1);
+    $('simPause').disabled=!v?.shaking;
+    $('simAuto').disabled=!!(v?.auto||v?.latched);
+    $('simPhase').textContent=v?.shaking?'Толчки продолжаются':v?.latched?'Толчки завершены · защита активна':v?'Толчки завершены':'Ожидание сценария';
     $('simAmplitude').textContent=v?v.amp+' / 100':'0 / 100';
-    $('simWavePath').setAttribute('d',syntheticSignal(v?v.amp:0));
+    $('simWavePath').setAttribute('d',syntheticSignal(v));
     $('simWavePath').setAttribute('stroke',v?.level==='EMERGENCY'?'#dd4b56':v?.level==='WARNING'?'#d39b38':'#347bea');
     document.querySelectorAll('[data-sim-level]').forEach(btn=>{
       const selected=active&&Number(btn.dataset.simLevel)===v.mag;
@@ -436,28 +440,32 @@
     });
     for(const id of ['simOpenMap','simOpenEvents','simStop'])$(id).disabled=!active;
     const modes={
-      'OFF':['Обычный режим','Обычный режим','Обычный режим','Обычный режим'],
-      NORMAL:['Норма (демо)','Норма (демо)','Норма (демо)','Норма (демо)'],
-      WARNING:['Мониторинг (демо)','Мониторинг (демо)','Проверка (демо)','Проверка (демо)'],
-      EMERGENCY:['Запрос закрытия (демо)','Запрос безопасного отключения (демо)','Запрос остановки (демо)','Запрос разблокировки (демо)']
+      'OFF':['Открыт','Включено','Работает','Выключена'],
+      NORMAL:['Открыт','Включено','Работает','Выключена'],
+      WARNING:['Открыт','Включено','Работает','Предупреждение'],
+      EMERGENCY:['Закрыт','Отключено','Остановка на этаже','Аварийная тревога']
     };
     const states=modes[v?v.level:'OFF'];
     ['simGas','simPower','simLift','simDoors'].forEach((id,i)=>$(id).textContent=states[i]);
     renderSimHome();renderSimEvent();refreshMapMarkers();
   }
   function runSimulation(key){
-    if(!Object.prototype.hasOwnProperty.call(SIM_PRESETS,key))return;
-    const p=SIM_PRESETS[key];
-    state.sim={...p,time:Date.now()};
-    renderSimulation();
-    if(p.level==='EMERGENCY')openDrill();
-    else toast('Запущена учебная симуляция M '+p.mag.toFixed(1)+' · '+p.level);
+    SeismoTraining.select(Number(key));syncTraining();
   }
   function stopSimulation(){
-    if(!state.sim)return;
-    state.sim=null;
-    renderSimulation();defaultMapSheet();
+    SeismoTraining.reset();syncTraining();defaultMapSheet();
     toast('Учебный сценарий завершён. Реальные данные USGS не менялись.');
+  }
+  let trainingKey='';
+  function syncTraining(){
+    const s=SeismoTraining.snapshot();
+    const key=[s.active,s.mag,s.level,s.shaking,s.auto,s.time].join('|');
+    if(key===trainingKey)return;
+    trainingKey=key;
+    const captions={NORMAL:SIM_PRESETS['3'].caption,WARNING:SIM_PRESETS['4.5'].caption,EMERGENCY:'Учебная авария: защита активна до ручного сброса.'};
+    state.sim=s.active?{...s,caption:captions[s.level]}:null;
+    renderSimulation();
+    if(state.current==='map'&&$('mapSheet').querySelector('.sheet-type--demo')){if(state.sim)showMapSimulation();else defaultMapSheet()}
   }
   function activateGuide(mode){
     document.querySelectorAll('[data-guide]').forEach(b=>{const yes=b.dataset.guide===mode;b.classList.toggle('is-active',yes);b.setAttribute('aria-selected',String(yes))});
@@ -559,6 +567,10 @@
   });
   $('simOpenEvents').addEventListener('click',()=>{if(state.sim)nav('events')});
   $('simStop').addEventListener('click',stopSimulation);
+  $('simMagnitude').addEventListener('input',e=>{$('simMagnitudeValue').textContent='M '+Number(e.target.value).toFixed(1)});
+  $('simMagnitude').addEventListener('change',e=>{runSimulation(e.target.value);e.target.blur()});
+  $('simPause').addEventListener('click',()=>{SeismoTraining.stop();syncTraining()});
+  $('simAuto').addEventListener('click',()=>{SeismoTraining.auto();syncTraining()});
   $('profileForm').addEventListener('submit',saveForm);
   $('closeDetail').addEventListener('click',closeDetail);
   $('detailDialog').addEventListener('click',e=>{if(e.target===$('detailDialog'))closeDetail()});
@@ -571,7 +583,7 @@
   },true);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('detailDialog').hidden)closeDetail();if(!$('trainingOverlay').hidden)closeDrill()}});
   nav(['home','map','events','instructions','profile','places','simulation'].includes(location.hash.slice(1))?location.hash.slice(1):'home');
-  renderSimulation();
+  syncTraining();setInterval(()=>{syncTraining();if(state.current==='simulation'&&state.sim?.shaking)$('simWavePath').setAttribute('d',syntheticSignal(state.sim))},150);
   fetchQuakes();
   fetchWeather();
   setInterval(fetchQuakes,300000);

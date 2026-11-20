@@ -2,6 +2,20 @@
    Strictly inherits approved pale-blue mobile reference.
    This is a deterministic training model, not connected to physical hardware. */
 :root{--sim-purple:#7759bb;--sim-purple-soft:#f1ecff}
+#page-simulation .sim-control,#page-simulation .sim-campus-card{margin:14px 0;padding:15px;min-width:0}
+.sim-control-head,.sim-campus-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sim-control-head label{font-weight:750}.sim-control-head strong{color:#2169d2;font-size:22px}
+#simMagnitude{display:block;width:100%;accent-color:#2469df;margin:14px 0 8px;min-height:28px}
+.sim-scale{display:flex;justify-content:space-between;font-size:11px;color:#71839d}
+.sim-control p{font-size:12px;margin:9px 0;color:#61738c}
+.sim-control-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sim-control-buttons .sim-stop{background:#fff0f1;color:#b9444c;border:1px solid #edc4c7}
+.sim-control-buttons button{white-space:normal;font-size:12px}
+.sim-campus-head{margin-bottom:12px}.sim-campus-head h2{margin:5px 0!important;font-size:19px!important}
+.sim-campus-head small{color:#61718c;font-size:12px}
+.sim-campus-head .button{font-size:11px;white-space:nowrap;padding:8px;min-height:38px}
+#simCampus{display:block;border:0;width:100%;height:clamp(350px,43vw,540px);border-radius:15px;background:#e4edf8}
+@media(max-width:560px){#page-simulation .sim-campus-card{padding:10px}#simCampus{height:390px}.sim-campus-head .button{font-size:10px}.sim-control-buttons button{font-size:11px}}
 .sim-home-banner,.sim-event-row{background:#f5f0ff;border:1px solid #ded0ff;color:#48317a;border-radius:19px;box-shadow:0 7px 22px rgba(68,53,133,.07)}
 .sim-home-banner{display:flex;align-items:center;gap:11px;padding:12px 15px;margin:13px 0 0}
 .sim-home-banner>.icon{color:var(--sim-purple);width:27px;height:27px}
@@ -106,6 +120,12 @@
   #page-events .sim-event-row{margin-top:8px}
 }
 @media(max-width:560px){
+  #page-simulation .sim-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  #page-simulation .sim-preset{min-height:94px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:9px}
+  #page-simulation .sim-preset>.icon{display:none}
+  #page-simulation .sim-preset-icon{width:29px;height:29px;border-radius:9px}
+  #page-simulation .sim-preset-icon .icon{width:19px;height:19px}
+  #page-simulation .sim-preset-copy>span{font-size:9px}
   .sim-home-banner strong{font-size:11px}
   .sim-home-banner button{font-size:10px}
   .sim-event-row{padding:12px;grid-template-columns:1fr auto}

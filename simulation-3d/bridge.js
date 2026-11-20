@@ -72,6 +72,9 @@ const Seismo3DLanguage=(()=>{
     'Cutaway':['Разрез','Қима','Cutaway'],
     'Alarm sound':['Звук тревоги','Дабыл дыбысы','Alarm sound'],
     'Peak vibration amplitude':['Амплитуда вибрации','Діріл амплитудасы','Peak vibration amplitude'],
+    'Synthetic signal':['Условный сигнал','Шартты сигнал','Synthetic signal'],
+    'Stop shaking':['Остановить толчки','Дірілді тоқтату','Stop shaking'],
+    'Demo magnitude only. Release the slider to start shaking.':['Учебная магнитуда. Отпустите ползунок для запуска.','Оқу магнитудасы. Іске қосу үшін жүгірткіні босатыңыз.','Demo magnitude only. Release the slider to start shaking.'],
     'Demo signal only. Change amplitude before or during Earthquake. Reset clears latched protection.':['Демо-сигнал. Меняйте амплитуду до или во время землетрясения. Сброс снимает защиту.','Демо-сигнал. Амплитуданы жер сілкінісіне дейін немесе кезінде өзгертіңіз. Қорғауды қалпына келтіру арқылы өшіріңіз.','Demo signal only. Change amplitude before or during Earthquake. Reset clears latched protection.'],
     'SEISMO installed on a campus building (schematic model)':['SEISMO в здании КБТУ (условная модель)','ҚБТУ ғимаратындағы SEISMO (шартты үлгі)','SEISMO installed on a campus building (schematic model)'],
     'ESP32 with accelerometer monitors vibration':['ESP32 с акселерометром контролирует вибрацию','ESP32 акселерометр арқылы дірілді бақылайды','ESP32 with accelerometer monitors vibration'],
@@ -85,7 +88,7 @@ const Seismo3DLanguage=(()=>{
     'Auto demo':['Автодемо','Автодемо','Auto demo'],
     'Reset':['Сброс','Қалпына келтіру','Reset'],
     'Settings':['Настройки','Баптаулар','Settings'],
-    'Scenario magnitude':['Условная магнитуда','Шартты магнитуда','Scenario magnitude'],
+    'Scenario magnitude':['Магнитуда сценария','Сценарий магнитудасы','Scenario magnitude'],
     'Duration':['Длительность','Ұзақтығы','Duration'],
     'Trigger threshold':['Демо-порог','Демо-шек','Demo threshold'],
     'Confirm time':['Время подтверждения','Растау уақыты','Confirm time'],
@@ -148,6 +151,7 @@ const Seismo3DLanguage=(()=>{
   function init(){
     const selector=document.getElementById('lang');selector.value=lang;
     selector.onchange=()=>{lang=selector.value;try{localStorage.setItem('seismo_language_v1',lang)}catch(_){}translateAll()};
+    window.addEventListener('storage',e=>{if(e.key==='seismo_language_v1'&&['ru','kk','en'].includes(e.newValue)){lang=e.newValue;selector.value=lang;translateAll()}});
     translateAll();
     new MutationObserver(records=>{for(const r of records){if(r.type==='characterData')translateNode(r.target);else for(const n of r.addedNodes)walk(n);if(r.type==='childList'&&r.target.dataset&&r.target.dataset.t){const v=tr(r.target.dataset.t);if(r.target.textContent!==v)r.target.textContent=v}}}).observe(document.body,{childList:true,characterData:true,subtree:true});
   }

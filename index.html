@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="./site.css?v=3">
   <link rel="stylesheet" href="./reference-ui.css?v=2">
-  <link rel="stylesheet" href="./simulation.css?v=1">
+  <link rel="stylesheet" href="./simulation.css?v=3">
   <link rel="stylesheet" href="./location-photos.css?v=1">
   <link rel="stylesheet" href="./approved-ui-v3.css?v=2">
   <link rel="stylesheet" href="./brand-hero-v4.css?v=2">
@@ -186,21 +186,22 @@
       <div class="sim-header"><span class="sim-eyebrow"><svg class="icon"><use href="#i-wave"></use></svg> INTERNET OF THINGS · УЧЕБНЫЙ РЕЖИМ</span><h1 id="simulationHeading">Имитировать землетрясение</h1><p>Выбери один из трёх сценариев, чтобы увидеть условный сигнал датчика, состояние системы и поведение интерфейса.</p>
         <div class="sim-disclaimer"><svg class="icon"><use href="#i-info"></use></svg><span><strong>Только демонстрация.</strong> Сценарии вымышлены: это не события USGS, не прогноз и не управление реальным зданием. Значения M не измеряются датчиком.</span></div>
       </div>
-      <article class="surface" style="margin:0 0 16px;padding:18px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between"><div><span class="eyebrow">ESP32 · MPU6050</span><h2 style="margin:6px 0">3D-модель здания</h2><p style="margin:0">Интерактивная демонстрация газового клапана, лифта, освещения и сигнализации.</p></div><a class="button button-primary" href="./simulation-3d/">Открыть 3D-модель <svg class="icon"><use href="#i-arrow"></use></svg></a></article>
       <div class="sim-layout">
         <div class="sim-primary"><h2>Выбери сценарий</h2><div class="sim-presets" role="group" aria-label="Учебные сценарии">
           <button class="sim-preset sim-preset--soft" type="button" data-sim-level="3" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-wave"></use></svg></span><span class="sim-preset-copy"><strong>M 3.0</strong><span>Слабый · наблюдение</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
           <button class="sim-preset sim-preset--warning" type="button" data-sim-level="4.5" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-alert"></use></svg></span><span class="sim-preset-copy"><strong>M 4.5</strong><span>Умеренный · WARNING</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
           <button class="sim-preset sim-preset--critical" type="button" data-sim-level="6" aria-pressed="false"><span class="sim-preset-icon"><svg class="icon"><use href="#i-shield"></use></svg></span><span class="sim-preset-copy"><strong>M 6.0</strong><span>Сильный · EMERGENCY</span></span><svg class="icon"><use href="#i-chevron"></use></svg></button>
         </div>
+        <article class="surface sim-control"><div class="sim-control-head"><label for="simMagnitude">Магнитуда сценария</label><strong id="simMagnitudeValue">M 0.0</strong></div><input type="range" id="simMagnitude" min="0" max="8" step="0.1" value="0"><div class="sim-scale"><span>0</span><span>3.0</span><span>4.5</span><span>6.0</span><span>8.0</span></div><p>Условный уровень землетрясения. Отпустите ползунок для запуска.</p><div class="sim-control-buttons"><button id="simAuto" class="button button-secondary" type="button">Автодемо</button><button id="simPause" class="button button-secondary" type="button" disabled>Остановить толчки</button><button id="simStop" type="button" class="button sim-stop" disabled>Сбросить</button></div></article>
+        <article class="surface sim-campus-card"><div class="sim-campus-head"><div><span class="eyebrow">DIGITAL TWIN · KBTU</span><h2>3D-модель здания</h2><small id="simPhase">Ожидание сценария</small></div><a class="button button-secondary" href="./simulation-3d/">На весь экран ↗</a></div><iframe id="simCampus" title="3D-модель здания" loading="lazy" allow="fullscreen"></iframe></article>
         <div class="sim-active-status" id="simActivePanel" aria-live="polite">
           <div class="sim-active-heading"><span class="sim-live-dot"></span><strong id="simState">Нет активной симуляции</strong><span id="simModeLabel">OFF</span></div>
           <p id="simDescription">Выберите сценарий выше. Отдельная учебная карточка появится в событиях, а тестовая точка — на карте.</p>
           <div class="sim-wave-wrapper"><div class="sim-wave-top"><span>Синтетический сигнал датчика</span><span id="simAmplitude">0 / 100</span></div><svg id="simWave" class="sim-wave" viewBox="0 0 340 76" preserveAspectRatio="none" aria-label="График условного сигнала"><path id="simWavePath" d="M0 38 H340" fill="none" stroke="#377fe7" stroke-width="2.5"/></svg><small>Не реальные измерения. Амплитуда не рассчитывается из магнитуды.</small></div>
-          <div class="sim-actions"><button id="simOpenMap" type="button" class="button button-secondary" disabled><svg class="icon"><use href="#i-map"></use></svg> На карте</button><button id="simOpenEvents" type="button" class="button button-secondary" disabled><svg class="icon"><use href="#i-events"></use></svg> В событиях</button><button id="simStop" type="button" class="button sim-stop" disabled>Сбросить</button></div>
+          <div class="sim-actions"><button id="simOpenMap" type="button" class="button button-secondary" disabled><svg class="icon"><use href="#i-map"></use></svg> На карте</button><button id="simOpenEvents" type="button" class="button button-secondary" disabled><svg class="icon"><use href="#i-events"></use></svg> В событиях</button></div>
         </div></div>
-        <aside class="sim-secondary"><article class="surface sim-iot-flow"><span class="eyebrow">INTERNET OF THINGS</span><h2>Как работает модель</h2><div class="sim-flow"><span>Датчик</span><svg class="icon"><use href="#i-arrow"></use></svg><span>Обработка</span><svg class="icon"><use href="#i-arrow"></use></svg><span>IoT-интерфейс</span></div><p>На этой странице программная имитация. Работа реального Arduino / Flex Sensor демонстрируется отдельно в Engineering Demo.</p><a href="./engineering/" class="text-link">Инженерный симулятор <svg class="icon"><use href="#i-arrow"></use></svg></a></article>
-        <article class="surface sim-building"><span class="eyebrow">УЧЕБНАЯ ЗАЩИТА ЗДАНИЯ</span><h2>Состояния элементов</h2><div class="sim-device-row"><span>Газоснабжение</span><strong id="simGas">Обычный режим</strong></div><div class="sim-device-row"><span>Электропитание</span><strong id="simPower">Обычный режим</strong></div><div class="sim-device-row"><span>Лифты</span><strong id="simLift">Обычный режим</strong></div><div class="sim-device-row"><span>Аварийные двери</span><strong id="simDoors">Обычный режим</strong></div><p>Эти статусы не подключены к оборудованию здания. Реальные решения зависят от инженерного проекта и его проверки.</p></article></aside>
+        <aside class="sim-secondary"><article class="surface sim-building"><span class="eyebrow">УЧЕБНАЯ ЗАЩИТА ЗДАНИЯ</span><h2>Состояния элементов</h2><div class="sim-device-row"><span>Газовый клапан</span><strong id="simGas">Открыт</strong></div><div class="sim-device-row"><span>Освещение</span><strong id="simPower">Включено</strong></div><div class="sim-device-row"><span>Лифты</span><strong id="simLift">Работает</strong></div><div class="sim-device-row"><span>Сигнализация</span><strong id="simDoors">Выключена</strong></div><p>Эти статусы не подключены к оборудованию здания. Реальные решения зависят от инженерного проекта и его проверки.</p></article>
+        <article class="surface sim-iot-flow"><span class="eyebrow">INTERNET OF THINGS</span><h2>Как работает модель</h2><div class="sim-flow"><span>Датчик</span><svg class="icon"><use href="#i-arrow"></use></svg><span>Обработка</span><svg class="icon"><use href="#i-arrow"></use></svg><span>IoT-интерфейс</span></div><p>Акселерометр, ESP32, газовый клапан, шаговый двигатель, реле, светодиоды, зуммер и LCD. Здесь работает учебная имитация; реальные измерения доступны отдельно через ESP32 Live.</p><a href="./simulation-3d/?live=1" class="text-link">ESP32 Live <svg class="icon"><use href="#i-arrow"></use></svg></a></article></aside>
       </div>
     </section>
     <section id="page-event-detail" class="page" aria-labelledby="refDetailHeading" hidden>
@@ -231,8 +232,9 @@
   <footer class="site-footer">Seismo Almaty · Учебный проект по Internet of Things (IoT) и автоматизации. Неофициальная система мониторинга. События: <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener noreferrer">USGS</a>. Погода: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>. Фотография гор: <a href="https://unsplash.com/photos/uma-cordilheira-coberta-de-neve-sob-um-ceu-azul-WFiuUnN-3Y8" target="_blank" rel="noopener noreferrer">Sergey Zigle (Unsplash License)</a>. Экстренный номер: 112.</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="./translations.js?v=2" defer></script>
+  <script src="./translations.js?v=3" defer></script>
   <script src="./language.js?v=1" defer></script>
-  <script src="./site.js?v=9" defer></script>
+  <script src="./simulation-state.js?v=1" defer></script>
+  <script src="./site.js?v=10" defer></script>
 </body>
 </html>
