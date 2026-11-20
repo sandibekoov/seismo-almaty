@@ -1879,6 +1879,8 @@ window.SEISMO_TRANSLATIONS = {
   "Ожидание сценария": ["Сценарий күтілуде","Waiting for scenario"],
   "Толчки продолжаются": ["Діріл жалғасуда","Shaking in progress"],
   "Толчки завершены": ["Діріл аяқталды","Shaking ended"],
+  "Эвакуация": ["Эвакуация","Evacuation"],
+  "Эвакуация завершена": ["Эвакуация аяқталды","Evacuation complete"],
   "Толчки завершены · защита активна": ["Діріл аяқталды · қорғау белсенді","Shaking ended · protection active"],
   "Учебная авария: защита активна до ручного сброса.": ["Оқу апаты: қорғау қолмен қалпына келтірілгенше белсенді.","Training emergency: protection remains active until reset."],
   "Акселерометр, ESP32, газовый клапан, шаговый двигатель, реле, светодиоды, зуммер и LCD. Здесь работает учебная имитация; реальные измерения доступны отдельно через ESP32 Live.": ["Акселерометр, ESP32, газ клапаны, қадамдық қозғалтқыш, реле, жарықдиодтар, зуммер және LCD. Бұл — оқу симуляциясы; нақты өлшемдер ESP32 Live режимінде.","Accelerometer, ESP32, gas valve, stepper motor, relay, LEDs, buzzer and LCD. This is a training simulation; real measurements are available in ESP32 Live."],
