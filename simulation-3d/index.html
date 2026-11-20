@@ -78,6 +78,25 @@ body.embedded .lb span{display:none}
 body.embedded .lb.assembly span{display:block;font-size:9px;white-space:nowrap}
 body.embedded .lb i{width:22px;height:22px}
 @media(max-width:650px){#amp-help{display:none}#top,#chips{top:98px}body.live #top,body.live #chips{top:155px}#views{gap:4px}#views button{font-size:10px;padding:5px 7px}#main button{font-size:11px}#render-mode{bottom:190px}#bot{gap:4px}#amplitude-panel{padding:8px}#top{width:38vw}}
+/* Desktop lab: separate controls and telemetry from the 3D viewport. */
+@media(min-width:1101px) and (min-height:550px){
+ body:not(.embedded){--left-panel:clamp(210px,19vw,270px);--right-panel:clamp(210px,18vw,255px);--viewport-top:104px;--gutter:12px}
+ body:not(.embedded) #gl,body:not(.embedded) #lbs{position:absolute;left:calc(var(--left-panel) + 2*var(--gutter));top:var(--viewport-top);right:auto;bottom:auto;width:calc(100% - var(--left-panel) - var(--right-panel) - 4*var(--gutter));height:calc(100% - var(--viewport-top) - var(--gutter));border-radius:15px;overflow:hidden}
+ body:not(.embedded) #gl{background:#dce8f5;box-shadow:0 0 0 1px #c7d8ea}
+ body:not(.embedded) #lbs{pointer-events:none}body:not(.embedded) .lb{pointer-events:auto}
+ body:not(.embedded) #bot{top:var(--viewport-top);left:var(--gutter);right:auto;bottom:auto;width:var(--left-panel);gap:10px;max-height:calc(100% - var(--viewport-top) - var(--gutter));overflow:auto;padding:1px}
+ body:not(.embedded) #amplitude-panel{width:100%;padding:14px 11px;border-radius:13px;gap:9px}
+ body:not(.embedded) #main-presets{flex-wrap:wrap}body:not(.embedded) #main-presets button{flex:1;padding:7px 5px}
+ body:not(.embedded) #views,body:not(.embedded) #main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;overflow:visible;padding:8px;background:var(--card);border-radius:12px}
+ body:not(.embedded) #views button,body:not(.embedded) #main button{min-width:0;white-space:normal;overflow-wrap:break-word;font-size:12px;padding:9px 5px}
+ body:not(.embedded) #top,body:not(.embedded) #chips{left:auto;right:var(--gutter);width:var(--right-panel);box-sizing:border-box;padding:13px;border-radius:13px}
+ body:not(.embedded) #top{top:var(--viewport-top)}body:not(.embedded) #chips{top:calc(var(--viewport-top) + 140px);gap:11px}
+ body:not(.embedded) #ch{height:64px}
+ body:not(.embedded) #evac-status{top:calc(var(--viewport-top) + 315px);left:auto;right:var(--gutter);width:var(--right-panel);box-sizing:border-box;transform:none;justify-content:space-between;white-space:normal}
+ body:not(.embedded) #set{left:var(--gutter);right:auto;bottom:var(--gutter);width:var(--left-panel);box-sizing:border-box;max-height:38vh}
+ body:not(.embedded) #render-mode{right:calc(var(--right-panel) + 3*var(--gutter));bottom:calc(var(--gutter) + 8px)}
+ body:not(.embedded) #live-overlay{left:calc(var(--left-panel) + (100% - var(--left-panel) - var(--right-panel))/2);max-width:40vw}
+}
 </style></head><body>
 <canvas id="gl"></canvas>
 <div id="lbs"></div>
