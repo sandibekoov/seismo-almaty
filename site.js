@@ -101,7 +101,7 @@
     if(page==='map')requestAnimationFrame(()=>{ensureMap();if(state.map)state.map.invalidateSize()});
     if(page==='events')renderEvents();if(page==='places')renderPlaces();
     if(page==='home')requestAnimationFrame(ensureHomePreview);
-    if(page==='simulation'){const frame=$('simCampus');if(frame&&!frame.getAttribute('src'))frame.src='./simulation-3d/?embed=1&v=desktop';renderSimulation()}
+    if(page==='simulation'){const frame=$('simCampus');if(frame&&!frame.getAttribute('src'))frame.src='./simulation-3d/?embed=1&v=campus2';renderSimulation()}
     if(page==='profile')fillProfile();
     window.scrollTo({top:0,behavior:'instant'});
     if(location.hash!=='#'+page)history.replaceState(null,'','#'+page);
@@ -491,6 +491,7 @@
     const captions={NORMAL:SIM_PRESETS['3'].caption,WARNING:SIM_PRESETS['4.5'].caption,EMERGENCY:'Учебная авария: защита активна до ручного сброса.'};
     state.sim=s.active?{...s,caption:captions[s.level]}:null;
     renderSimulation();
+    syncEmergencyOverlay(s);
     if(state.current==='map'&&$('mapSheet').querySelector('.sheet-type--demo')){if(state.sim)showMapSimulation();else defaultMapSheet()}
   }
   function activateGuide(mode){
@@ -498,8 +499,15 @@
     const guideIcons=mode==='before'?['shield','book','home','group']:mode==='during'?['shield','alert','home','map']:['shield','home','alert','events'];
     $('guideCards').innerHTML=(GUIDES[mode]||GUIDES.during).map((txt,i)=>'<article class="guide-card"><span class="guide-icon">'+svgIcon(guideIcons[i])+'</span><p>'+esc(txt)+'</p></article>').join('');
   }
-  function openDrill(){$('trainingOverlay').hidden=false;document.body.style.overflow='hidden';$('endDrill').focus()}
-  function closeDrill(){$('trainingOverlay').hidden=true;document.body.style.overflow=''}
+  const alertKey='seismo_emergency_ack_v1';let alertSeen=0,alertTime=0;
+  function openDrill(emergency=false){$('emergencyBanner').hidden=emergency!==true;$('trainingOverlay').hidden=false;document.body.style.overflow='hidden';$('endDrill').focus()}
+  function closeDrill(){if(!$('emergencyBanner').hidden){alertSeen=alertTime;try{sessionStorage.setItem(alertKey,String(alertTime))}catch(_){}}$('trainingOverlay').hidden=true;$('emergencyBanner').hidden=true;document.body.style.overflow=''}
+  function syncEmergencyOverlay(s){
+    if(s.level!=='EMERGENCY'){if(!$('emergencyBanner').hidden)closeDrill();return}
+    let seen=alertSeen;try{seen=Number(sessionStorage.getItem(alertKey))||seen}catch(_){}
+    if(seen===s.time||(!$('trainingOverlay').hidden&&!$('emergencyBanner').hidden))return;
+    alertTime=s.time;openDrill(true);
+  }
   function loadProfile(){
     try{const saved=JSON.parse(localStorage.getItem('seismo_resident_profile_v1')||'null');
       if(saved&&typeof saved==='object'){
