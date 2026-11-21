@@ -120,3 +120,16 @@
   .desktop-nav .nav-link{flex:1;min-width:0;padding-inline:5px;min-height:34px}
   .header-actions .seismo-language{font-size:11px;padding:6px}
 }
+
+/* Shared home training status. Never infer building safety from the USGS feed. */
+.training-state{--level:#158354;--level-bg:#e3f6eb;--level-border:#c3e9d4;--level-halo:#d6f5e6}
+.training-state[data-level="WARNING"]{--level:#a66b13;--level-bg:#fff2d8;--level-border:#f2d49a;--level-halo:#ffebc3}
+.training-state[data-level="EMERGENCY"]{--level:#c52836;--level-bg:#ffe6e8;--level-border:#f3bdc2;--level-halo:#fbd3d8}
+#page-home .ref-status-card.training-state,#page-home .hero-status.training-state{background:linear-gradient(110deg,#fff,var(--level-bg));border:1px solid var(--level-border)}
+#page-home .training-state strong,#page-home .training-state .small-label,#page-home .ref-status-card.training-state>div>span{color:var(--level)}
+#page-home .ref-status-card.training-state .ref-status-check{background:var(--level);box-shadow:0 0 0 8px var(--level-halo);color:white}
+#page-home .hero-status.training-state .state-symbol{background:var(--level-halo);color:var(--level)}
+#page-home .hero-status.training-state strong{font-size:16px;letter-spacing:.03em}
+.data-pill.training-state{color:var(--level);background:var(--level-bg);border-color:var(--level-border);font-weight:800}
+.data-pill.training-state .data-dot{background:var(--level)}
+.catalog-source-status{font-size:11px;font-weight:700;color:var(--muted);margin:0 0 10px}
