@@ -143,20 +143,11 @@
     finally{clearTimeout(timeout)}
   }
   function renderHome(){
-    const status=$('headerFeed'),pill=status.closest('.data-pill');
-    pill.classList.toggle('is-live',state.feed==='ok');pill.classList.toggle('is-error',state.feed==='error');
-    status.textContent=state.feed==='ok'?'USGS · данные загружены':state.feed==='error'?'USGS · нет соединения':'USGS · загрузка';
-    $('homeFeedTitle').textContent=state.feed==='ok'?'События USGS загружены':state.feed==='error'?'Источник сейчас недоступен':'Подключаем данные USGS';
-    $('homeFeedSubtitle').textContent=state.feed==='ok'?'Каталог событий · обновление '+new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',hour:'2-digit',minute:'2-digit'}).format(new Date(state.updated)):'Нет данных не означает отсутствие опасности';
+    // USGS catalogue availability is separate from the educational protection level.
+    $('homeCatalogStatus').textContent=state.feed==='ok'?'USGS · обновлено '+new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',hour:'2-digit',minute:'2-digit'}).format(new Date(state.updated)):state.feed==='error'?'USGS · нет соединения':'USGS · загрузка';
     $('statCount').textContent=state.feed==='ok'?String(state.quakes.length):'—';
     $('statMax').textContent=state.feed==='ok'?(state.quakes.length?'M '+Math.max(...state.quakes.map(q=>q.mag)).toFixed(1):'—'):'—';
     $('statRecent').textContent=state.feed==='ok'?(state.quakes.length?ago(state.quakes[0].time):'—'):'—';
-    if($('refFeedTitle')) {
-      $('refFeedTitle').textContent=state.feed==='ok'?'Данные получены':state.feed==='error'?'Нет соединения':'Загрузка данных';
-      $('refFeedSubtitle').textContent=state.feed==='ok'?'USGS · обновлено '+new Intl.DateTimeFormat('ru-RU',{timeZone:'Asia/Almaty',hour:'2-digit',minute:'2-digit'}).format(new Date(state.updated)):state.feed==='error'?'Статус безопасности неизвестен':'Проверяем подключение USGS…';
-      document.querySelector('.ref-status-card')?.classList.toggle('is-error',state.feed==='error');
-      document.querySelector('.ref-status-card')?.classList.toggle('is-loading',state.feed==='loading');
-    }
     renderFeed(state.quakes.slice(0,3),$('homeEvents'),'За 30 дней событий M ≥ 2.5 в каталоге не найдено.');
     refreshHomePreviewMarkers();
     renderSimHome();
@@ -429,6 +420,14 @@
     return pts.join(' ');
   }
   function renderSimHome(){
+    const level=state.sim?.level||'NORMAL';
+    for(const id of ['homeFeedTitle','refFeedTitle','headerFeed']){
+      const node=$(id),value=id==='headerFeed'?level+' · DEMO':level;
+      if(node.textContent!==value)node.textContent=value;
+      const card=node.closest('.training-state');card.dataset.level=level;
+      const icon=card.querySelector('.state-symbol use,.ref-status-check use');
+      if(icon)icon.setAttribute('href',level==='NORMAL'?'#i-check':level==='WARNING'?'#i-alert':'#i-shield');
+    }
     const banner=$('simulationHomeBanner');
     if(!banner)return;
     banner.hidden=!state.sim;
