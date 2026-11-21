@@ -19,7 +19,7 @@ class ProjectedRenderer {
         return [w*(p.x+1)/2,h*(1-p.y)/2,p.z]
       };
       const points=Array.from({length:attr.count},(_,i)=>project(i));
-      const color=mat.color,alpha=mat.opacity===undefined?1:mat.opacity;
+      const color=mat.color,vertexColors=mat.vertexColors&&obj.geometry.getAttribute('color'),alpha=mat.opacity===undefined?1:mat.opacity;
       if(obj.isLine){
         for(let j=1;j<points.length;j++)faces.push({line:true,v:[points[j-1],points[j]],depth:(points[j-1][2]+points[j][2])/2,color:color.getStyle(),alpha});
         return
@@ -36,7 +36,7 @@ class ProjectedRenderer {
         n.subVectors(b,a).cross(edge.subVectors(c,a)).normalize();
         const shade=.53+.47*Math.max(0,n.dot(light));
         const glow=Math.min(1,(mat.emissiveIntensity||0)*.28),em=mat.emissive||color;
-        const rgb=['r','g','b'].map(k=>Math.round(Math.min(1,color[k]*shade+glow*em[k])*255));
+        const rgb=['r','g','b'].map((k,j)=>{const channel=vertexColors?([i0,i1,i2].reduce((sum,i)=>sum+vertexColors.array[i*3+j],0)/3):color[k];return Math.round(Math.min(1,channel*shade+glow*em[k])*255)});
         faces.push({v:[v0,v1,v2],depth:(v0[2]+v1[2]+v2[2])/3,color:'rgb('+rgb.join(',')+')',alpha,ground:Number(obj.userData.ground)||0});
       }
     });
