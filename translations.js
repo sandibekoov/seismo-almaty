@@ -1,5 +1,7 @@
 /* UI translations. Russian keys refer to the original UI copy; data and URLs are not changed. */
 window.SEISMO_TRANSLATIONS = {
+  "Состояние макета, не реальная тревога": ["Макет күйі, нақты дабыл емес","Model status, not a real alert"],
+  "Учебный режим": ["Оқу режимі","Training mode"],
   "3D-симуляция": ["3D симуляция","3D simulation"],
   "Загрузка карты…": ["Карта жүктелуде…","Loading map…"],
   "Карта недоступна": ["Карта қолжетімсіз","Map unavailable"],
