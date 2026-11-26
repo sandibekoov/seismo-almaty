@@ -1,0 +1,7 @@
+# Local-only server secrets and Python environment
+.env
+server/.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
